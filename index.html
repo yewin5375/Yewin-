@@ -8,65 +8,71 @@
     <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #e67e22; --secondary: #d35400; --bg: #f8fafc; --sidebar: #2c3e50; }
-        body { font-family: 'Pyidaungsu', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        body { font-family: 'Pyidaungsu', sans-serif; background: var(--bg); margin: 0; padding: 0; }
+
+        /* Top Bar with 3-lines menu */
+        .top-bar { background: var(--secondary); color: white; padding: 15px; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .menu-icon { font-size: 24px; cursor: pointer; margin-right: 15px; }
         
-        /* Sidebar Design */
-        .sidebar { width: 80px; background: var(--sidebar); color: white; display: flex; flex-direction: column; align-items: center; padding: 20px 0; transition: 0.3s; }
-        .sidebar:hover { width: 200px; }
-        .nav-item { width: 100%; padding: 15px 0; text-align: center; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; }
+        /* Sidebar Navigation */
+        .sidebar { position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: var(--sidebar); color: white; transition: 0.3s; z-index: 200; padding-top: 60px; box-shadow: 5px 0 15px rgba(0,0,0,0.3); }
+        .sidebar.active { left: 0; }
+        .nav-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #3e4f5f; }
         .nav-item:hover { background: var(--primary); }
-        .nav-text { display: none; font-size: 14px; }
-        .sidebar:hover .nav-text { display: inline; }
-        .admin-btn { margin-top: auto; border-top: 1px solid #555; width: 100%; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 25px; cursor: pointer; }
 
         /* Main Content */
-        .main-content { flex-grow: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; }
-        .header { background: linear-gradient(135deg, #fbbf24, #d35400); color: white; padding: 30px; border-radius: 20px; text-align: center; margin-bottom: 20px; }
+        .container { padding: 15px; padding-bottom: 100px; }
+        .header { background: linear-gradient(135deg, #fbbf24, #d35400); color: white; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
         
-        /* Category Tabs */
-        .tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; }
-        .tab-btn { padding: 10px 20px; border: none; border-radius: 25px; background: white; cursor: pointer; white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .tab-btn.active { background: var(--primary); color: white; }
-
         /* Menu Grid */
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        .menu-card { background: white; border-radius: 15px; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
-        .menu-card img { width: 100%; height: 120px; border-radius: 10px; object-fit: cover; }
-        .item-name { font-weight: 700; font-size: 15px; margin-top: 8px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+        .menu-card { background: white; border-radius: 12px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .menu-card img { width: 100%; height: 110px; border-radius: 8px; object-fit: cover; }
+        .item-name { font-weight: bold; font-size: 14px; margin-top: 8px; height: 40px; overflow: hidden; }
         .item-price { color: var(--secondary); font-weight: bold; margin: 5px 0; }
         
-        /* Qty Control */
-        .qty-box { display: flex; align-items: center; justify-content: space-between; background: #f1f5f9; border-radius: 8px; padding: 5px; margin-top: 10px; }
-        .btn-qty { width: 25px; height: 25px; border: none; background: white; border-radius: 5px; cursor: pointer; color: var(--secondary); font-weight: bold; }
+        .qty-box { display: flex; align-items: center; justify-content: space-between; background: #f1f5f9; border-radius: 8px; padding: 5px; }
+        .btn-qty { width: 30px; height: 30px; border: none; background: white; border-radius: 5px; cursor: pointer; color: var(--secondary); font-weight: bold; }
 
-        /* Floating Checkout */
-        .footer-bar { position: sticky; bottom: 20px; background: white; padding: 15px 25px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-        .btn-checkout { background: var(--secondary); color: white; border: none; padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; }
+        /* Order Panel */
+        .footer-bar { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
+        .btn-checkout { background: var(--secondary); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        /* Overlay */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150; }
+        .overlay.active { display: block; }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <div class="nav-item" onclick="renderMenu('အားလုံး')">🏠 <span class="nav-text">အားလုံး</span></div>
-    <div class="nav-item" onclick="renderMenu('တစ်ခုချင်း')">🍗 <span class="nav-text">တစ်ခုချင်း</span></div>
-    <div class="nav-item" onclick="renderMenu('၁၀၀၀၀ တန်ဆပ်')">🍱 <span class="nav-text">၁၀၀၀၀ တန်</span></div>
-    <div class="nav-item" onclick="renderMenu('၂၀၀၀၀ တန်ဆပ်')">🍱 <span class="nav-text">၂၀၀၀၀ တန်</span></div>
-    
-    <div class="nav-item admin-btn" onclick="gotoAdmin()">⚙️ <span class="nav-text">Admin</span></div>
+<div class="top-bar">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <div style="font-weight: bold; font-size: 18px;">🍗 မြင်သာကြက်ကင်</div>
 </div>
 
-<div class="main-content">
+<div class="overlay" onclick="toggleSidebar()"></div>
+
+<div class="sidebar" id="mySidebar">
+    <div class="close-btn" onclick="toggleSidebar()">×</div>
+    <div class="nav-item" onclick="changeCat('အားလုံး')">🏠 အားလုံး</div>
+    <div class="nav-item" onclick="changeCat('တစ်ခုချင်း')">🍗 တစ်ခုချင်း</div>
+    <div class="nav-item" onclick="changeCat('၁၀၀၀၀ တန်ဆပ်')">🍱 ၁၀၀၀၀ တန်ဆပ်</div>
+    <div class="nav-item" onclick="changeCat('၂၀၀၀၀ တန်ဆပ်')">🍱 ၂၀၀၀၀ တန်ဆပ်</div>
+    <div class="nav-item" onclick="gotoAdmin()" style="margin-top: 50px; color: #f1c40f;">⚙️ Admin Panel</div>
+</div>
+
+<div class="container">
     <div class="header">
-        <h2>🍗 မြင်သာကြက်ကင်</h2>
-        <p>ရသာစုံလင် အကင်စုံ POS စနစ်</p>
+        <h3>🍗 မြင်သာကြက်ကင်</h3>
+        <p>ရသာစုံလင် အကင်စုံ POS</p>
     </div>
-
     <div id="menu-grid" class="menu-grid">မီနူးများ ဆွဲယူနေသည်...</div>
+</div>
 
-    <div class="footer-bar">
-        <div><small>စုစုပေါင်း ကျသင့်ငွေ</small><br><b style="font-size:20px;"><span id="total-price">0</span> K</b></div>
-        <button class="btn-checkout" onclick="openCheckout()">မှာယူမည် ➔</button>
-    </div>
+<div class="footer-bar">
+    <div><small>စုစုပေါင်း ကျသင့်ငွေ</small><br><b style="font-size:18px;"><span id="total-price">0</span> K</b></div>
+    <button class="btn-checkout" onclick="openOrderModal()">မှာယူမည် ➔</button>
 </div>
 
 <script>
@@ -110,15 +116,47 @@
         let total = 0;
         menuData.forEach(i => total += (cart[i.name] || 0) * i.price);
         document.getElementById('total-price').innerText = total.toLocaleString();
+        return total;
+    }
+
+    function toggleSidebar() {
+        document.getElementById('mySidebar').classList.toggle('active');
+        document.querySelector('.overlay').classList.toggle('active');
+    }
+
+    function changeCat(cat) {
+        renderMenu(cat);
+        toggleSidebar();
     }
 
     function gotoAdmin() {
-        let pass = prompt("Admin Password ရိုက်ထည့်ပါ:");
-        if (pass === "123456") { window.location.href = "admin.html"; }
-        else { alert("စကားဝှက် မှားယွင်းနေပါသည်။"); }
+        let pass = prompt("Admin Password:");
+        if (pass === "123456") window.location.href = "admin.html";
+        else alert("Password မှားယွင်းနေပါသည်။");
+    }
+
+    // Viber/Telegram သို့ ပို့ရန် function
+    function openOrderModal() {
+        const total = calculateTotal();
+        if (total === 0) return alert("ပစ္စည်း အရင်ရွေးပါ");
+        
+        let name = prompt("ဝယ်သူအမည် ရိုက်ထည့်ပါ:");
+        let phone = prompt("ဖုန်းနံပါတ် ရိုက်ထည့်ပါ:");
+        if (!name || !phone) return;
+
+        let itemsArr = [];
+        menuData.forEach(i => {
+            if (cart[i.name] > 0) itemsArr.push(`${i.name} x ${cart[i.name]}`);
+        });
+
+        const msg = `🍗 *မြင်သာကြက်ကင် - အော်ဒါ*\\n👤 *ဝယ်သူ:* ${name}\\n📞 *ဖုန်း:* ${phone}\\n━━━━━━━━━━━━━━\\n${itemsArr.join('\\n')}\\n━━━━━━━━━━━━━━\\n💰 *စုစုပေါင်း:* *${total.toLocaleString()} K*`;
+        
+        // Viber သို့ ပို့ခြင်း
+        window.location.href = `viber://forward?text=${encodeURIComponent(msg)}`;
     }
 
     window.onload = fetchMenu;
 </script>
 </body>
 </html>
+
