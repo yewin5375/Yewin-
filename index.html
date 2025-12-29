@@ -917,34 +917,32 @@
         }
 
         function proceedWithOrder(platform, message) {
-            const guideModal = document.getElementById('app-guide-modal');
-            
-            // Copy message to clipboard
-            copyToClipboard(message).then(() => {
-                showNotification('Order copied to clipboard!', 'success');
-                
-                // Close guide modal
-                guideModal.classList.add('hidden');
-                
-                // Open respective app
-                if (platform === 'viber') {
-                    window.open('viber://chat?number=959767287345', '_blank');
-                } else if (platform === 'telegram') {
-                    window.open('https://t.me/share/url?url=&text=', '_blank');
-                }
-                
-                // Generate and show invoice
-                generateInvoice();
-                
-                // Reset cart after delay
-                setTimeout(() => {
-                    resetCart();
-                    location.reload();
-                }, 2000);
-            }).catch(() => {
-                showNotification('Failed to copy to clipboard', 'error');
-            });
+    const guideModal = document.getElementById('app-guide-modal');
+    
+    copyToClipboard(message).then(() => {
+        showNotification(currentLanguage === 'mm' ? 'အော်ဒါကို Copy ကူးပြီးပါပြီ' : 'Order copied to clipboard!', 'success');
+        
+        if (guideModal) guideModal.classList.add('hidden');
+        
+        if (platform === 'viber') {
+            // Viber အတွက် link
+            window.open(`viber://chat?number=959767287345`, '_blank');
+        } else if (platform === 'telegram') {
+            // Telegram အတွက် link (စာပါတစ်ခါတည်းပါအောင် ပြင်ထားသည်)
+            const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(' ')}&text=${encodeURIComponent(message)}`;
+            window.open(telegramUrl, '_blank');
         }
+        
+        generateInvoice();
+        
+        // မှတ်ချက်- location.reload() ကို ခဏပိတ်ထားပါ (Invoice ကြည့်ချိန်ရအောင်)
+        setTimeout(() => {
+            resetCart();
+            // location.reload(); // လိုအပ်မှ ပြန်ဖွင့်ပါ
+        }, 2000);
+    });
+        }
+    
     function copyToClipboard(text) {
             if (navigator.clipboard && window.isSecureContext) {
                 return navigator.clipboard.writeText(text);
