@@ -1325,6 +1325,42 @@
             });
         });
 
+                // App Guide Modal အတွင်းရှိ ခလုတ်များအတွက် Event Listeners
+            // Viber ဖြင့် ဆက်လုပ်ရန်နှိပ်ချိန်
+            document.getElementById('proceed-viber').addEventListener('click', () => {
+                const message = generateOrderMessage({
+                    customer: {
+                        name: document.getElementById('customer-name').value,
+                        phone: document.getElementById('customer-phone').value
+                    },
+                    items: cart,
+                    pickupDate: document.getElementById('pickup-date').value,
+                    pickupTime: document.getElementById('pickup-time').value,
+                    notes: document.getElementById('order-notes').value,
+                    total: Object.values(cart).reduce((sum, item) => sum + item.total, 0),
+                    timestamp: new Date().toISOString()
+                });
+                proceedWithOrder('viber', message);
+            });
+
+            // Telegram ဖြင့် ဆက်လုပ်ရန်နှိပ်ချိန်
+            document.getElementById('proceed-telegram').addEventListener('click', () => {
+                const message = generateOrderMessage({
+                    customer: {
+                        name: document.getElementById('customer-name').value,
+                        phone: document.getElementById('customer-phone').value
+                    },
+                    items: cart,
+                    pickupDate: document.getElementById('pickup-date').value,
+                    pickupTime: document.getElementById('pickup-time').value,
+                    notes: document.getElementById('order-notes').value,
+                    total: Object.values(cart).reduce((sum, item) => sum + item.total, 0),
+                    timestamp: new Date().toISOString()
+                });
+                proceedWithOrder('telegram', message);
+            });
+    
+
         function updateProfileStats() {
             const history = JSON.parse(localStorage.getItem('orderHistory') || '[]');
             const totalOrders = history.length;
