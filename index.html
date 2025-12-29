@@ -1,79 +1,532 @@
 <!DOCTYPE html>
-<html lang="my">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍗 မြင်သာကြက်ကင် - POS</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+    <title>Myin Thar Roast - Premium Food Ordering</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-orange': '#FF6B35',
+                        'brand-light-orange': '#FF8C61',
+                        'brand-cream': '#FFF8F0',
+                        'brand-pearl': '#FDF8F6',
+                        'brand-dark': '#2C1810'
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-in': 'slideIn 0.3s ease-out',
+                        'bounce-in': 'bounceIn 0.6s ease-out',
+                        'pulse-soft': 'pulseSoft 2s infinite'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(0)' }
+                        },
+                        bounceIn: {
+                            '0%, 20%, 40%, 60%, 80%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.05)' }
+                        },
+                        pulseSoft: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.7' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root { --primary: #e67e22; --secondary: #d35400; --bg: #f8fafc; --sidebar: #2c3e50; }
-        body { font-family: 'Pyidaungsu', sans-serif; background: var(--bg); margin: 0; padding: 0; }
-
-        /* Top Bar with 3-lines menu */
-        .top-bar { background: var(--secondary); color: white; padding: 15px; display: flex; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .menu-icon { font-size: 24px; cursor: pointer; margin-right: 15px; }
-        
-        /* Sidebar Navigation */
-        .sidebar { position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: var(--sidebar); color: white; transition: 0.3s; z-index: 200; padding-top: 60px; box-shadow: 5px 0 15px rgba(0,0,0,0.3); }
-        .sidebar.active { left: 0; }
-        .nav-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #3e4f5f; }
-        .nav-item:hover { background: var(--primary); }
-        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 25px; cursor: pointer; }
-
-        /* Main Content */
-        .container { padding: 15px; padding-bottom: 100px; }
-        .header { background: linear-gradient(135deg, #fbbf24, #d35400); color: white; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
-        
-        /* Menu Grid */
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-        .menu-card { background: white; border-radius: 12px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .menu-card img { width: 100%; height: 110px; border-radius: 8px; object-fit: cover; }
-        .item-name { font-weight: bold; font-size: 14px; margin-top: 8px; height: 40px; overflow: hidden; }
-        .item-price { color: var(--secondary); font-weight: bold; margin: 5px 0; }
-        
-        .qty-box { display: flex; align-items: center; justify-content: space-between; background: #f1f5f9; border-radius: 8px; padding: 5px; }
-        .btn-qty { width: 30px; height: 30px; border: none; background: white; border-radius: 5px; cursor: pointer; color: var(--secondary); font-weight: bold; }
-
-        /* Order Panel */
-        .footer-bar { position: fixed; bottom: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
-        .btn-checkout { background: var(--secondary); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
-        /* Overlay */
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150; }
-        .overlay.active { display: block; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #FFF8F0 0%, #FDF8F6 100%);
+        }
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .gradient-orange {
+            background: linear-gradient(135deg, #FF6B35 0%, #FF8C61 100%);
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(255, 107, 53, 0.25);
+        }
+        .notification-badge {
+            animation: pulse 2s infinite;
+        }
+        .cart-item-enter {
+            animation: cartItemEnter 0.5s ease-out;
+        }
+        @keyframes cartItemEnter {
+            0% { transform: translateX(100%) scale(0.8); opacity: 0; }
+            100% { transform: translateX(0) scale(1); opacity: 1; }
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .menu-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 </head>
-<body>
-
-<div class="top-bar">
-    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
-    <div style="font-weight: bold; font-size: 18px;">🍗 မြင်သာကြက်ကင်</div>
-</div>
-
-<div class="overlay" onclick="toggleSidebar()"></div>
-
-<div class="sidebar" id="mySidebar">
-    <div class="close-btn" onclick="toggleSidebar()">×</div>
-    <div class="nav-item" onclick="changeCat('အားလုံး')">🏠 အားလုံး</div>
-    <div class="nav-item" onclick="changeCat('တစ်ခုချင်း')">🍗 တစ်ခုချင်း</div>
-    <div class="nav-item" onclick="changeCat('၁၀၀၀၀ တန်ဆပ်')">🍱 ၁၀၀၀၀ တန်ဆပ်</div>
-    <div class="nav-item" onclick="changeCat('၂၀၀၀၀ တန်ဆပ်')">🍱 ၂၀၀၀၀ တန်ဆပ်</div>
-    <div class="nav-item" onclick="gotoAdmin()" style="margin-top: 50px; color: #f1c40f;">⚙️ Admin Panel</div>
-</div>
-
-<div class="container">
-    <div class="header">
-        <h3>🍗 မြင်သာကြက်ကင်</h3>
-        <p>ရသာစုံလင် အကင်စုံ POS</p>
+<body class="min-h-screen">
+    <!-- Loading Screen -->
+    <div id="loader" class="fixed inset-0 z-50 flex items-center justify-center bg-brand-pearl">
+        <div class="text-center">
+            <div class="relative">
+                <div class="w-24 h-24 mx-auto rounded-full gradient-orange animate-spin">
+                    <div class="absolute inset-2 rounded-full bg-white flex items-center justify-center">
+                        <span class="text-brand-orange font-bold text-xl">MT</span>
+                    </div>
+                </div>
+            </div>
+            <p class="mt-4 text-brand-dark font-semibold text-lg">Loading Myin Thar Roast...</p>
+        </div>
     </div>
-    <div id="menu-grid" class="menu-grid">မီနူးများ ဆွဲယူနေသည်...</div>
-</div>
 
-<div class="footer-bar">
-    <div><small>စုစုပေါင်း ကျသင့်ငွေ</small><br><b style="font-size:18px;"><span id="total-price">0</span> K</b></div>
-    <button class="btn-checkout" onclick="openOrderModal()">မှာယူမည် ➔</button>
-</div>
+    <!-- Header -->
+    <header class="sticky top-0 z-40 glass-effect shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <button id="menu-toggle" class="lg:hidden p-2 rounded-lg hover:bg-brand-cream transition-colors">
+                        <svg class="w-6 h-6 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-xl gradient-orange flex items-center justify-center">
+                            <span class="text-white font-bold text-xl">MT</span>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-brand-dark">Myin Thar Roast</h1>
+                            <p class="text-sm text-gray-600">Premium Roast & Delivery</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- Language Toggle -->
+                    <div class="flex items-center space-x-2">
+                        <button id="lang-toggle" class="px-3 py-1 rounded-lg bg-brand-cream hover:bg-brand-orange hover:text-white transition-all">
+                            <span id="current-lang">EN</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button id="notification-btn" class="p-2 rounded-lg hover:bg-brand-cream transition-colors relative">
+                            <svg class="w-6 h-6 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM9 17H4l5 5v-5zM12 3v12"></path>
+                            </svg>
+                            <span id="notification-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center notification-badge hidden">0</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Cart Button -->
+                    <button id="cart-toggle" class="p-2 rounded-lg hover:bg-brand-cream transition-colors relative">
+                        <svg class="w-6 h-6 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 4.5M7 13l-1.5 4.5m0 0h13m-13 0l1.5 4.5m7.5-4.5h6m-6 0a1 1 0 11-2 0m6 0a1 1 0 11-2 0"></path>
+                        </svg>
+                        <span id="cart-count" class="absolute -top-1 -right-1 w-6 h-6 bg-brand-orange text-white text-xs rounded-full flex items-center justify-center font-semibold">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden"></div>
+    
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed left-0 top-0 h-full w-80 bg-white shadow-2xl z-40 transform -translate-x-full transition-transform duration-300 lg:translate-x-0 lg:static lg:z-20">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-xl font-bold text-brand-dark">Menu</h2>
+                <button id="close-sidebar" class="lg:hidden p-2 rounded-lg hover:bg-brand-cream">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="mb-6">
+                <div class="relative">
+                    <input type="text" id="search-bar" placeholder="Search menu..." class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent">
+                    <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            
+           <!-- Categories -->
+            <div class="mb-8">
+                <h3 class="font-semibold text-brand-dark mb-4">Categories</h3>
+                <div class="space-y-2">
+                    <button class="category-btn w-full text-left p-3 rounded-lg hover:bg-brand-cream transition-colors" data-category="all">
+                        <span class="lang-all">All Items</span>
+                        <span class="lang-all-mm hidden">ပစ္စည်းအားလုံး</span>
+                    </button>
+                    <button class="category-btn w-full text-left p-3 rounded-lg hover:bg-brand-cream transition-colors" data-category="roast">
+                        <span class="lang-roast">Roast Dishes</span>
+                        <span class="lang-roast-mm hidden">အတိုချုံးချက်ပြုတ်</span>
+                    </button>
+                    <button class="category-btn w-full text-left p-3 rounded-lg hover:bg-brand-cream transition-colors" data-category="soup">
+                        <span class="lang-soup">Soups</span>
+                        <span class="lang-soup-mm hidden">ဟင်းရည်</span>
+                    </button>
+                    <button class="category-btn w-full text-left p-3 rounded-lg hover:bg-brand-cream transition-colors" data-category="drink">
+                        <span class="lang-drink">Beverages</span>
+                        <span class="lang-drink-mm hidden">သောက်စရာ</span>
+                    </button>
+                    <button class="category-btn w-full text-left p-3 rounded-lg hover:bg-brand-cream transition-colors" data-category="dessert">
+                        <span class="lang-dessert">Desserts</span>
+                        <span class="lang-dessert-mm hidden">အသီးအနှံ</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Customer Profile -->
+            <div class="border-t pt-6">
+                <h3 class="font-semibold text-brand-dark mb-4">Customer Profile</h3>
+                <div class="space-y-3">
+                    <button id="profile-btn" class="w-full text-left p-3 rounded-lg hover:bg-brand-cream transition-colors flex items-center space-x-3">
+                        <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        <span class="lang-profile">Profile</span>
+                        <span class="lang-profile-mm hidden">အကြောင်းအရာ</span>
+                    </button>
+                    <button id="history-btn" class="w-full text-left p-3 rounded-lg hover:bg-brand-cream transition-colors flex items-center space-x-3">
+                        <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="lang-history">Order History</span>
+                        <span class="lang-history-mm hidden">မှာယူမှုမှတ်တမ်း</span>
+                    </button>
+                    <button id="tracking-btn" class="w-full text-left p-3 rounded-lg hover:bg-brand-cream transition-colors flex items-center space-x-3">
+                        <svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span class="lang-tracking">Track Order</span>
+                        <span class="lang-tracking-mm hidden">အော်ဒါရှာရန်</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="lg:ml-80 min-h-screen">
+        <div class="container mx-auto px-4 py-6">
+            <!-- Welcome Banner -->
+            <div class="bg-gradient-to-r from-brand-orange to-brand-light-orange rounded-2xl p-6 mb-8 text-white">
+                <h2 class="text-2xl font-bold mb-2 lang-welcome">Welcome to Myin Thar Roast</h2>
+                <h2 class="text-2xl font-bold mb-2 lang-welcome-mm hidden">Myin Thar Roast မှ ကြိုဆိုပါတယ်</h2>
+                <p class="lang-welcome-desc">Premium quality roast dishes delivered to your door</p>
+                <p class="lang-welcome-desc-mm hidden">အကောင်းဆုံးအတိုချုံးချက်ပြုတ်အသီးအနှံများ သင့်အိမ်သို့ ပို့ဆောင်ပေးပါတယ်</p>
+            </div>
+
+            <!-- Menu Display -->
+            <div id="menu-display" class="menu-grid">
+                <!-- Menu items will be populated by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Checkout Bar -->
+    <div id="checkout-bar" class="fixed bottom-0 left-0 right-0 lg:left-80 bg-white border-t border-gray-200 p-4 transform translate-y-full transition-transform duration-300 z-30">
+        <div class="container mx-auto">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 lang-items-count">0 items</p>
+                    <p id="total-price" class="text-xl font-bold text-brand-dark">$0.00</p>
+                </div>
+                <button id="checkout-btn" class="gradient-orange text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all transform hover:scale-105">
+                    <span class="lang-checkout">Checkout</span>
+                    <span class="lang-checkout-mm hidden">စျေးဝယ်ရန်</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Drawer -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="cart-overlay"></div>
+        <div class="absolute right-0 top-0 h-full w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-brand-dark lang-cart">Shopping Cart</h3>
+                    <button id="close-cart" class="p-2 rounded-lg hover:bg-brand-cream">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div id="cart-items" class="space-y-4 mb-6 max-h-96 overflow-y-auto">
+                    <!-- Cart items will be populated here -->
+                </div>
+                
+                <div class="border-t pt-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="font-semibold lang-total">Total:</span>
+                        <span id="drawer-total" class="text-xl font-bold text-brand-orange">$0.00</span>
+                    </div>
+                    <button id="drawer-checkout" class="w-full gradient-orange text-white py-3 rounded-xl font-semibold">
+                        <span class="lang-proceed">Proceed to Checkout</span>
+                        <span class="lang-proceed-mm hidden">စျေးဝယ်ရန်</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="checkout-overlay"></div>
+        <div class="absolute inset-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 h-full overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-brand-dark lang-order-form">Order Form</h3>
+                    <button id="close-checkout" class="p-2 rounded-lg hover:bg-brand-cream">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="order-form" class="space-y-4">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 lang-name">Name</label>
+                            <input type="text" id="customer-name" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 lang-phone">Phone Number</label>
+                            <input type="tel" id="customer-phone" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange">
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 lang-date">Pickup Date</label>
+                            <input type="date" id="pickup-date" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 lang-time">Pickup Time</label>
+                            <input type="time" id="pickup-time" required class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 lang-notes">Special Notes</label>
+                        <textarea id="order-notes" rows="3" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange" placeholder="Any special requests..."></textarea>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="font-semibold lang-order-total">Order Total:</span>
+                            <span id="modal-total" class="text-2xl font-bold text-brand-orange">$0.00</span>
+                        </div>
+                        
+                        <div class="flex space-x-3">
+                            <button type="button" id="viber-btn" class="flex-1 bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors">
+                                <svg class="w-5 h-5 inline mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12.007 0C5.37 0 .007 5.364.007 12.001c0 6.637 5.363 12 12 12.001 6.637.001 12-5.364 12-12.001C24.007 5.364 18.644.001 12.007 0zm5.458 17.917c-.263.736-.596 1.428-.991 2.068-.395-.64-.728-1.332-.991-2.068H6.517c.263.736.596 1.428.991 2.068.395-.64.728-1.332.991-2.068h5.508z"/>
+                                </svg>
+                                <span class="lang-viber">Send via Viber</span>
+                                <span class="lang-viber-mm hidden">Viber ဖြင့်ပို့ရန်</span>
+                            </button>
+                            <button type="button" id="telegram-btn" class="flex-1 bg-blue-500 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 transition-colors">
+                                <svg class="w-5 h-5 inline mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                                </svg>
+                                <span class="lang-telegram">Send via Telegram</span>
+                                <span class="lang-telegram-mm hidden">Telegram ဖြင့်ပို့ရန်</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Guide Modal -->
+    <div id="app-guide-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="guide-overlay"></div>
+        <div class="absolute inset-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 h-full overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-brand-dark lang-guide-title">How to Send Order</h3>
+                    <button id="close-guide" class="p-2 rounded-lg hover:bg-brand-cream">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span class="text-white font-bold">💡</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-yellow-800 lang-guide-step1">Step 1: Order Summary</h4>
+                                <p class="text-yellow-700 text-sm lang-guide-step1-text">Your order details will be automatically copied to clipboard</p>
+                                <p class="text-yellow-700 text-sm lang-guide-step1-text-mm hidden">သင့်အော်ဒါအသေးစိတ်များ clipboard သို့ အလိုအလျောက် ကူးယူပါမည်</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-blue-400 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span class="text-white font-bold">2</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-blue-800 lang-guide-step2">Step 2: Open App</h4>
+                                <p class="text-blue-700 text-sm lang-guide-step2-text">The selected app will open automatically</p>
+                                <p class="text-blue-700 text-sm lang-guide-step2-text-mm hidden">ရွေးချယ်ထားသော app ကို အလိုအလျောက် ဖွင့်ပါမည်</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-green-400 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span class="text-white font-bold">3</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-green-800 lang-guide-step3">Step 3: Paste & Send</h4>
+                                <p class="text-green-700 text-sm lang-guide-step3-text">Long press in the chat and select Paste to send your order</p>
+                                <p class="text-green-700 text-sm lang-guide-step3-text-mm hidden">chat ထဲတွင် အရှည်နှိပ်ပြီး Paste ရွေးချယ်၍ သင့်အော်ဒါကို ပို့ပေးပါ</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-red-400 rounded-full flex items-center justify-center flex-shrink-0">
+                                <span class="text-white font-bold">⚠️</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-red-800 lang-guide-warning">Important Notice</h4>
+                                <p class="text-red-700 text-sm lang-guide-warning-text">After placing your order, please call <strong>09767287345</strong> to confirm</p>
+                                <p class="text-red-700 text-sm lang-guide-warning-text-mm hidden">အော်ဒါတင်ပြီးပါက <strong>09767287345</strong> သို့ ဖုန်းဆက်ပြီး အကြောင်းကြားပေးပါ</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button id="proceed-viber" class="flex-1 bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition-colors">
+                            <svg class="w-5 h-5 inline mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12.007 0C5.37 0 .007 5.364.007 12.001c0 6.637 5.363 12 12 12.001 6.637.001 12-5.364 12-12.001C24.007 5.364 18.644.001 12.007 0zm5.458 17.917c-.263.736-.596 1.428-.991 2.068-.395-.64-.728-1.332-.991-2.068H6.517c.263.736.596 1.428.991 2.068.395-.64.728-1.332.991-2.068h5.508z"/>
+                            </svg>
+                            <span class="lang-proceed-viber">Proceed with Viber</span>
+                            <span class="lang-proceed-viber-mm hidden">Viber ဖြင့်ဆက်လုပ်ရန်</span>
+                        </button>
+                        <button id="proceed-telegram" class="flex-1 bg-blue-500 text-white py-3 rounded-xl font-semibold hover:bg-blue-600 transition-colors">
+                            <svg class="w-5 h-5 inline mr-2" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                            </svg>
+                            <span class="lang-proceed-telegram">Proceed with Telegram</span>
+                            <span class="lang-proceed-telegram-mm hidden">Telegram ဖြင့်ဆက်လုပ်ရန်</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Customer Profile Modal -->
+    <div id="profile-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="profile-overlay"></div>
+        <div class="absolute inset-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 h-full overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-brand-dark lang-customer-profile">Customer Profile</h3>
+                    <button id="close-profile" class="p-2 rounded-lg hover:bg-brand-cream">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-brand-cream rounded-xl p-6">
+                            <h4 class="font-semibold text-brand-dark mb-4 lang-total-orders">Total Orders</h4>
+                            <div class="text-3xl font-bold text-brand-orange" id="total-orders">0</div>
+                        </div>
+                        <div class="bg-brand-cream rounded-xl p-6">
+                            <h4 class="font-semibold text-brand-dark mb-4 lang-total-spent">Total Spent</h4>
+                            <div class="text-3xl font-bold text-brand-orange" id="total-spent">$0.00</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-brand-cream rounded-xl p-6">
+                        <h4 class="font-semibold text-brand-dark mb-4 lang-recent-orders">Recent Orders</h4>
+                        <div id="recent-orders" class="space-y-3">
+                            <p class="text-gray-600 lang-no-orders">No orders yet</p>
+                            <p class="text-gray-600 lang-no-orders-mm hidden">မှာယူခြင့် မရှိသေး</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Modal -->
+    <div id="invoice-modal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="invoice-overlay"></div>
+        <div class="absolute inset-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-6 h-full overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-brand-dark lang-invoice">Invoice</h3>
+                    <button id="close-invoice" class="p-2 rounded-lg hover:bg-brand-cream">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div id="invoice-content" class="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                    <!-- Invoice content will be populated here -->
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button id="download-invoice" class="flex-1 bg-brand-orange text-white py-3 rounded-xl font-semibold hover:bg-brand-light-orange transition-colors">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="lang-download">Download Invoice</span>
+                        <span class="lang-download-mm hidden">ဘေလ်တို ဒေါင်းလုတ်ရန်</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <script>
     const SB_URL = "https://deabtvqzxpkepgcdutzd.supabase.co";
@@ -100,7 +553,7 @@
             },
             {
                 id: 2,
-                name: "Chicken Curry",
+                name: "Chicken Cury",
                 name_mm: "ကြက်သားချိုသားရည်",
                 category: "roast",
                 price: 8.99,
