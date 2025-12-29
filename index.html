@@ -79,84 +79,853 @@
     const SB_URL = "https://deabtvqzxpkepgcdutzd.supabase.co";
     const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlYWJ0dnF6eHBrZXBnY2R1dHpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyNzQzNDMsImV4cCI6MjA4MTg1MDM0M30.BbxmM65uoTDcf_nTP6w5siSF6Y5_eM4peqYJCAxR90I";
     const _supabase = window.supabase.createClient(SB_URL, SB_KEY);
-    
-    let cart = {};
-    let menuData = [];
 
-    async function fetchMenu() {
-        const { data } = await _supabase.from('menu_items').select('*').order('name');
-        if (data) { menuData = data; renderMenu('အားလုံး'); }
-    }
+       // Global Variables
+        let cart = {};
+        let menuItems = [];
+        let currentLanguage = 'en';
+        let currentPlatform = null;
 
-    function renderMenu(filter) {
-        const grid = document.getElementById('menu-grid');
-        let displayData = filter === 'အားလုံး' ? menuData : menuData.filter(i => i.category === filter);
+        // Sample Menu Data (Replace with Supabase fetch)
+        const sampleMenuItems = [
+            {
+                id: 1,
+                name: "Fried Rice",
+                name_mm: "ကြက်သားအတိုချုံး",
+                category: "roast",
+                price: 5.99,
+                image: "https://images.unsplash.com/photo-1563379091339-03246963d7c3?w=400",
+                description: "Delicious fried rice with vegetables",
+                description_mm: "ဟင်းသီးဟင်းရွက်နှင့် စိတ်ကြိုက်အတိုချုံး"
+            },
+            {
+                id: 2,
+                name: "Chicken Curry",
+                name_mm: "ကြက်သားချိုသားရည်",
+                category: "roast",
+                price: 8.99,
+                image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400",
+                description: "Traditional chicken curry",
+                description_mm: "ရိုးရိုးနည်းကြက်သားချိုသားရည်"
+            },
+            {
+                id: 3,
+                name: "Tomato Soup",
+                name_mm: "ခရမ်းချဉ်သီးဟင်းရည်",
+                category: "soup",
+                price: 3.99,
+                image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400",
+                description: "Fresh tomato soup",
+                description_mm: "သန့်ရှင်းသောခရမ်းချဉ်သီးဟင်းရည်"
+            },
+            {
+                id: 4,
+                name: "Fresh Orange Juice",
+                name_mm: "လိမ္မာရွှေတာရှိုင်း",
+                category: "drink",
+                price: 2.99,
+                image: "https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=400",
+                description: "Freshly squeezed orange juice",
+                description_mm: "လတ်ဆတ်သောလိမ္မာရွှေတာရှိုင်း"
+            },
+            {
+                id: 5,
+                name: "Mango Pudding",
+                name_mm: "သရက်ဖြူ",
+                category: "dessert",
+                price: 4.99,
+                image: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400",
+                description: "Creamy mango pudding",
+                description_mm: "ချိုမြိန်သောသရက်ဖြူ"
+            },
+            {
+                id: 6,
+                name: "Beef Stir Fry",
+                name_mm: "အမဲသားအတိုချုံး",
+                category: "roast",
+                price: 12.99,
+                image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400",
+                description: "Tender beef stir fry",
+                description_mm: "နူးညံ့သောအမဲသားအတိုချုံး"
+            }
+        ];
 
-        grid.innerHTML = displayData.map(item => `
-            <div class="menu-card">
-                <img src="${item.image_url || 'https://via.placeholder.com/150'}" onerror="this.src='https://via.placeholder.com/150'">
-                <div class="item-name">${item.name}</div>
-                <div class="item-price">${item.price.toLocaleString()} K</div>
-                <div class="qty-box">
-                    <button class="btn-qty" onclick="updateQty('${item.name}', -1)">-</button>
-                    <span id="qty-${item.name}">${cart[item.name] || 0}</span>
-                    <button class="btn-qty" onclick="updateQty('${item.name}', 1)">+</button>
+        // Utility Functions
+        function getSafeId(name) {
+            return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        }
+
+        function showNotification(message, type = 'info') {
+            const badge = document.getElementById('notification-badge');
+            const count = parseInt(badge.textContent) + 1;
+            badge.textContent = count;
+            badge.classList.remove('hidden');
+            
+            // Show notification toast
+            const toast = document.createElement('div');
+            toast.className = `fixed top-20 right-4 p-4 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300`;
+            toast.classList.add(type === 'success' ? 'bg-green-500 text-white' : 
+                              type === 'error' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white');
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.style.transform = 'translateX(0)', 100);
+            setTimeout(() => {
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Data Fetching Functions
+        async function fetchMenu() {
+            // Simulate API call - Replace with Supabase fetch
+            try {
+                menuItems = sampleMenuItems;
+                renderMenu(menuItems);
+            } catch (error) {
+                console.error('Error fetching menu:', error);
+                showNotification('Error loading menu', 'error');
+            }
+        }
+
+        // Menu Rendering Functions
+        function renderMenu(items) {
+            const menuDisplay = document.getElementById('menu-display');
+            menuDisplay.innerHTML = '';
+            
+            items.forEach(item => {
+                const safeId = getSafeId(item.name);
+                const menuCard = document.createElement('div');
+                menuCard.className = 'bg-white rounded-2xl shadow-lg overflow-hidden card-hover animate-fade-in';
+                menuCard.innerHTML = `
+                    <div class="relative">
+                        <img src="${item.image}" alt="${item.name}" class="w-full h-48 object-cover">
+                        <div class="absolute top-4 right-4 bg-brand-orange text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            $${item.price}
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-brand-dark mb-2" data-name="${safeId}">${item.name}</h3>
+                        <p class="text-gray-600 mb-4">${item.description}</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <button onclick="updateQty('${safeId}', -1)" class="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                                    </svg>
+                                </button>
+                                <span id="qty-${safeId}" class="w-8 text-center font-semibold">0</span>
+                                <button onclick="updateQty('${safeId}', 1)" class="w-8 h-8 rounded-full bg-brand-orange hover:bg-brand-light-orange text-white flex items-center justify-center transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <button onclick="addToCart('${safeId}')" class="bg-brand-orange hover:bg-brand-light-orange text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                `;
+                menuDisplay.appendChild(menuCard);
+            });
+        }
+
+        // Cart Management Functions
+        function updateQty(name, change) {
+            const qtyElement = document.getElementById(`qty-${name}`);
+            let currentQty = parseInt(qtyElement.textContent) || 0;
+            let newQty = Math.max(0, currentQty + change);
+            
+            qtyElement.textContent = newQty;
+            
+            // Update cart object
+            if (newQty === 0) {
+                delete cart[name];
+            } else {
+                const item = menuItems.find(item => getSafeId(item.name) === name);
+                if (item) {
+                    cart[name] = {
+                        ...item,
+                        quantity: newQty,
+                        total: item.price * newQty
+                    };
+                }
+            }
+            
+            updateTotal();
+            saveCart();
+            
+            // Animation for cart addition
+            if (change > 0) {
+                qtyElement.parentElement.parentElement.querySelector('button:last-child').classList.add('animate-bounce-in');
+                setTimeout(() => qtyElement.parentElement.parentElement.querySelector('button:last-child').classList.remove('animate-bounce-in'), 600);
+            }
+        }
+
+        function deleteItem(name) {
+            delete cart[name];
+            const item = menuItems.find(item => getSafeId(item.name) === name);
+            if (item) {
+                const safeId = getSafeId(item.name);
+                document.getElementById(`qty-${safeId}`).textContent = '0';
+            }
+            updateTotal();
+            renderDrawerItems();
+            saveCart();
+        }
+    function addToCart(name) {
+            const qtyElement = document.getElementById(`qty-${name}`);
+            const currentQty = parseInt(qtyElement.textContent) || 0;
+            if (currentQty === 0) {
+                updateQty(name, 1);
+            }
+            showNotification('Item added to cart!', 'success');
+        }
+
+        function updateTotal() {
+            const total = Object.values(cart).reduce((sum, item) => sum + item.total, 0);
+            const itemCount = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
+            
+            updateTotalDisplay(total);
+            updateCheckoutBar(itemCount, total);
+            updateCartCount(itemCount);
+        }
+
+        function updateTotalDisplay(total) {
+            document.getElementById('total-price').textContent = `$${total.toFixed(2)}`;
+        }
+
+        function updateCheckoutBar(count, total) {
+            const checkoutBar = document.getElementById('checkout-bar');
+            const itemsCount = checkoutBar.querySelector('.text-sm');
+            const totalPrice = document.getElementById('total-price');
+            
+            itemsCount.textContent = `${count} ${currentLanguage === 'en' ? 'items' : 'ပစ္စည်း'}`;
+            totalPrice.textContent = `$${total.toFixed(2)}`;
+            
+            if (count > 0) {
+                checkoutBar.style.transform = 'translateY(0)';
+            } else {
+                checkoutBar.style.transform = 'translateY(100%)';
+            }
+        }
+
+        function updateCartCount(count) {
+            document.getElementById('cart-count').textContent = count;
+        }
+
+        function renderDrawerItems() {
+            const cartItems = document.getElementById('cart-items');
+            cartItems.innerHTML = '';
+            
+            if (Object.keys(cart).length === 0) {
+                cartItems.innerHTML = '<p class="text-gray-500 text-center py-8">Your cart is empty</p>';
+                return;
+            }
+            
+            Object.values(cart).forEach(item => {
+                const safeId = getSafeId(item.name);
+                const cartItem = document.createElement('div');
+                cartItem.className = 'flex items-center space-x-3 p-3 border border-gray-200 rounded-lg cart-item-enter';
+                cartItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-brand-dark">${item.name}</h4>
+                        <p class="text-brand-orange font-semibold">$${item.price}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="updateQty('${safeId}', -1)" class="w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                            </svg>
+                        </button>
+                        <span class="w-8 text-center font-semibold">${item.quantity}</span>
+                        <button onclick="updateQty('${safeId}', 1)" class="w-6 h-6 rounded-full bg-brand-orange hover:bg-brand-light-orange text-white flex items-center justify-center">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                        </button>
+                        <button onclick="deleteItem('${safeId}')" class="w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center ml-2">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                cartItems.appendChild(cartItem);
+            });
+            
+            // Update drawer total
+            const total = Object.values(cart).reduce((sum, item) => sum + item.total, 0);
+            document.getElementById('drawer-total').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Order Management Functions
+        function submitOrder(platform) {
+            const name = document.getElementById('customer-name').value;
+            const phone = document.getElementById('customer-phone').value;
+            const date = document.getElementById('pickup-date').value;
+            const time = document.getElementById('pickup-time').value;
+            const notes = document.getElementById('order-notes').value;
+            
+            if (!name || !phone || !date || !time) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            const order = {
+                id: Date.now(),
+                customer: { name, phone },
+                items: cart,
+                pickupDate: date,
+                pickupTime: time,
+                notes,
+                total: Object.values(cart).reduce((sum, item) => sum + item.total, 0),
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            };
+            
+            // Save order to history
+            saveToHistory(order);
+            
+            // Generate order message
+            const message = generateOrderMessage(order);
+            
+            // Show guide modal
+            showAppGuide(platform, message);
+        }
+
+        function generateOrderMessage(order) {
+            const lang = currentLanguage === 'mm' ? 'mm' : 'en';
+            
+            if (lang === 'mm') {
+                let message = `🍽️ *Myin Thar Roast - အော်ဒါ*\n\n`;
+                message += `👤 သုံးစွဲသူ: ${order.customer.name}\n`;
+                message += `📱 ဖုန်းနံပါတ်: ${order.customer.phone}\n`;
+                message += `📅 ကောက်ယူမည့်ရက်: ${order.pickupDate}\n`;
+                message += `🕐 ကောက်ယူမည့်အချိန်: ${order.pickupTime}\n\n`;
+                message += `📋 မှာယူထားသောပစ္စည်းများ:\n`;
+                
+                Object.values(order.items).forEach((item, index) => {
+                    message += `${index + 1}. ${item.name} x${item.quantity} - $${item.total.toFixed(2)}\n`;
+                });
+                
+                message += `\n💰 စုစုပေါင်း: $${order.total.toFixed(2)}\n`;
+                
+                if (order.notes) {
+                    message += `\n📝 မှတ်ချက်: ${order.notes}\n`;
+                }
+                
+                message += `\n⏰ အော်ဒါတင်ချိန်: ${new Date(order.timestamp).toLocaleString('my-MM')}\n`;
+                message += `\n📞 အကြောင်းကြားရန်: 09767287345`;
+                
+                return message;
+            } else {
+                let message = `🍽️ *Myin Thar Roast - Order*\n\n`;
+                message += `👤 Customer: ${order.customer.name}\n`;
+                message += `📱 Phone: ${order.customer.phone}\n`;
+                message += `📅 Pickup Date: ${order.pickupDate}\n`;
+                message += `🕐 Pickup Time: ${order.pickupTime}\n\n`;
+                message += `📋 Order Items:\n`;
+                
+                Object.values(order.items).forEach((item, index) => {
+                    message += `${index + 1}. ${item.name} x${item.quantity} - $${item.total.toFixed(2)}\n`;
+                });
+                
+                message += `\n💰 Total: $${order.total.toFixed(2)}\n`;
+                
+                if (order.notes) {
+                    message += `\n📝 Notes: ${order.notes}\n`;
+                }
+                
+                message += `\n⏰ Order Time: ${new Date(order.timestamp).toLocaleString()}\n`;
+                message += `\n📞 Call for confirmation: 09767287345`;
+                
+                return message;
+            }
+        }
+
+        function showAppGuide(platform, message) {
+            currentPlatform = platform;
+            const guideModal = document.getElementById('app-guide-modal');
+            
+            // Update modal content based on platform
+            const proceedBtn = document.getElementById(`proceed-${platform}`);
+            proceedBtn.onclick = () => {
+                proceedWithOrder(platform, message);
+            };
+            
+            guideModal.classList.remove('hidden');
+            setTimeout(() => guideModal.classList.add('opacity-100'), 10);
+        }
+
+        function proceedWithOrder(platform, message) {
+            const guideModal = document.getElementById('app-guide-modal');
+            
+            // Copy message to clipboard
+            copyToClipboard(message).then(() => {
+                showNotification('Order copied to clipboard!', 'success');
+                
+                // Close guide modal
+                guideModal.classList.add('hidden');
+                
+                // Open respective app
+                if (platform === 'viber') {
+                    window.open('viber://chat?number=959767287345', '_blank');
+                } else if (platform === 'telegram') {
+                    window.open('https://t.me/share/url?url=&text=', '_blank');
+                }
+                
+                // Generate and show invoice
+                generateInvoice();
+                
+                // Reset cart after delay
+                setTimeout(() => {
+                    resetCart();
+                    location.reload();
+                }, 2000);
+            }).catch(() => {
+                showNotification('Failed to copy to clipboard', 'error');
+            });
+        }
+    function copyToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(text);
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                
+                return new Promise((resolve, reject) => {
+                    if (document.execCommand('copy')) {
+                        resolve();
+                    } else {
+                        reject();
+                    }
+                    document.body.removeChild(textArea);
+                });
+            }
+        }
+
+        function generateInvoice() {
+            const name = document.getElementById('customer-name').value;
+            const phone = document.getElementById('customer-phone').value;
+            const date = new Date().toLocaleDateString();
+            
+            const invoiceContent = document.getElementById('invoice-content');
+            invoiceContent.innerHTML = `
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-brand-dark">Myin Thar Roast</h2>
+                    <p class="text-gray-600">Premium Roast & Delivery</p>
+                    <p class="text-sm text-gray-500">Invoice #${Date.now()}</p>
                 </div>
-            </div>`).join('');
-    }
+                
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <h4 class="font-semibold text-brand-dark">Customer Information</h4>
+                        <p class="text-sm text-gray-600">Name: ${name}</p>
+                        <p class="text-sm text-gray-600">Phone: ${phone}</p>
+                    </div>
+                    <div class="text-right">
+                        <h4 class="font-semibold text-brand-dark">Invoice Date</h4>
+                        <p class="text-sm text-gray-600">${date}</p>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-200 pt-4">
+                    <h4 class="font-semibold text-brand-dark mb-4">Order Items</h4>
+                    <div class="space-y-2">
+                        ${Object.values(cart).map(item => `
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">${item.name} x${item.quantity}</span>
+                                <span class="text-sm font-semibold">$${item.total.toFixed(2)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-200 pt-4 mt-4">
+                    <div class="flex justify-between items-center text-xl font-bold">
+                        <span>Total:</span>
+                        <span class="text-brand-orange">$${Object.values(cart).reduce((sum, item) => sum + item.total, 0).toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('invoice-modal').classList.remove('hidden');
+        }
 
-    function updateQty(name, change) {
-        cart[name] = (cart[name] || 0) + change;
-        if (cart[name] < 0) cart[name] = 0;
-        document.getElementById(`qty-${name}`).innerText = cart[name];
-        calculateTotal();
-    }
+        function resetCart() {
+            cart = {};
+            Object.keys(cart).forEach(key => delete cart[key]);
+            saveCart();
+            updateTotal();
+            
+            // Reset all quantity displays
+            menuItems.forEach(item => {
+                const safeId = getSafeId(item.name);
+                const qtyElement = document.getElementById(`qty-${safeId}`);
+                if (qtyElement) qtyElement.textContent = '0';
+            });
+        }
 
-    function calculateTotal() {
-        let total = 0;
-        menuData.forEach(i => total += (cart[i.name] || 0) * i.price);
-        document.getElementById('total-price').innerText = total.toLocaleString();
-        return total;
-    }
+        // History and Tracking Functions
+        function saveToHistory(order) {
+            let history = JSON.parse(localStorage.getItem('orderHistory') || '[]');
+            history.unshift(order);
+            history = history.slice(0, 50); // Keep last 50 orders
+            localStorage.setItem('orderHistory', JSON.stringify(history));
+        }
 
-    function toggleSidebar() {
-        document.getElementById('mySidebar').classList.toggle('active');
-        document.querySelector('.overlay').classList.toggle('active');
-    }
+        function showHistory() {
+            const history = JSON.parse(localStorage.getItem('orderHistory') || '[]');
+            const recentOrders = document.getElementById('recent-orders');
+            
+            if (history.length === 0) {
+                recentOrders.innerHTML = `
+                    <p class="text-gray-600 lang-no-orders">No orders yet</p>
+                    <p class="text-gray-600 lang-no-orders-mm hidden">မှာယူခြင့် မရှိသေး</p>
+                `;
+                return;
+            }
+            
+            recentOrders.innerHTML = history.slice(0, 5).map(order => `
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="font-semibold text-brand-dark">#${order.id}</span>
+                        <span class="text-sm text-brand-orange font-semibold">$${order.total.toFixed(2)}</span>
+                    </div>
+                    <p class="text-sm text-gray-600">${new Date(order.timestamp).toLocaleDateString()}</p>
+                    <p class="text-sm text-gray-600">${Object.values(order.items).length} items</p>
+                </div>
+            `).join('');
+        }
 
-    function changeCat(cat) {
-        renderMenu(cat);
-        toggleSidebar();
-    }
+        function trackOrder() {
+            const orderId = prompt(currentLanguage === 'mm' ? 'အော်ဒါ ID ရိုက်ထည့်ပါ:' : 'Enter Order ID:');
+            if (!orderId) return;
+            
+            const history = JSON.parse(localStorage.getItem('orderHistory') || '[]');
+            const order = history.find(o => o.id.toString() === orderId);
+            
+            if (order) {
+                showNotification(`Order Status: ${order.status}`, 'info');
+            } else {
+                showNotification(currentLanguage === 'mm' ? 'အော်ဒါမတွေ့ပါ' : 'Order not found', 'error');
+            }
+        }
 
-    function gotoAdmin() {
-        let pass = prompt("Admin Password:");
-        if (pass === "123456") window.location.href = "admin.html";
-        else alert("Password မှားယွင်းနေပါသည်။");
-    }
+        // Local Storage Functions
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
 
-    // Viber/Telegram သို့ ပို့ရန် function
-    function openOrderModal() {
-        const total = calculateTotal();
-        if (total === 0) return alert("ပစ္စည်း အရင်ရွေးပါ");
-        
-        let name = prompt("ဝယ်သူအမည် ရိုက်ထည့်ပါ:");
-        let phone = prompt("ဖုန်းနံပါတ် ရိုက်ထည့်ပါ:");
-        if (!name || !phone) return;
+        function loadCart() {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                
+                // Update UI to reflect loaded cart
+                Object.values(cart).forEach(item => {
+                    const safeId = getSafeId(item.name);
+                    const qtyElement = document.getElementById(`qty-${safeId}`);
+                    if (qtyElement) {
+                        qtyElement.textContent = item.quantity;
+                    }
+                });
+                
+                updateTotal();
+            }
+                }
 
-        let itemsArr = [];
-        menuData.forEach(i => {
-            if (cart[i.name] > 0) itemsArr.push(`${i.name} x ${cart[i.name]}`);
+    // Filter Functions
+        function filterMenu() {
+            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+            const categoryFilter = document.querySelector('.category-btn.active')?.dataset.category || 'all';
+            
+            let filteredItems = menuItems;
+            
+            // Filter by category
+            if (categoryFilter !== 'all') {
+                filteredItems = filteredItems.filter(item => item.category === categoryFilter);
+            }
+            
+            // Filter by search term
+            if (searchTerm) {
+                filteredItems = filteredItems.filter(item => 
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    item.description.toLowerCase().includes(searchTerm) ||
+                    (item.name_mm && item.name_mm.includes(searchTerm))
+                );
+            }
+            
+            renderMenu(filteredItems);
+        }
+
+        // UI Toggle Functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        function toggleDrawer() {
+            const drawer = document.getElementById('cart-drawer');
+            const drawerPanel = drawer.querySelector('.absolute.right-0');
+            
+            drawer.classList.toggle('hidden');
+            renderDrawerItems();
+            
+            if (!drawer.classList.contains('hidden')) {
+                setTimeout(() => drawerPanel.style.transform = 'translateX(0)', 10);
+            } else {
+                drawerPanel.style.transform = 'translateX(100%)';
+            }
+        }
+
+        function openCheckout() {
+            if (Object.keys(cart).length === 0) {
+                showNotification(currentLanguage === 'mm' ? 'လှည်းထဲတွင် ပစ္စည်းမရှိပါ' : 'Cart is empty', 'error');
+                return;
+            }
+            
+            const total = Object.values(cart).reduce((sum, item) => sum + item.total, 0);
+            document.getElementById('modal-total').textContent = `$${total.toFixed(2)}`;
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('pickup-date').min = today;
+            
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+        }
+
+        // Language Functions
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'mm' : 'en';
+            document.getElementById('current-lang').textContent = currentLanguage === 'en' ? 'EN' : 'MM';
+            
+            // Toggle language elements
+            const elementsToToggle = [
+                '.lang-all', '.lang-all-mm',
+                '.lang-roast', '.lang-roast-mm',
+                '.lang-soup', '.lang-soup-mm',
+                '.lang-drink', '.lang-drink-mm',
+                '.lang-dessert', '.lang-dessert-mm',
+                '.lang-profile', '.lang-profile-mm',
+                '.lang-history', '.lang-history-mm',
+                '.lang-tracking', '.lang-tracking-mm',
+                '.lang-welcome', '.lang-welcome-mm',
+                '.lang-welcome-desc', '.lang-welcome-desc-mm',
+                '.lang-checkout', '.lang-checkout-mm',
+                '.lang-cart', '.lang-cart-mm',
+                '.lang-total', '.lang-total-mm',
+                '.lang-proceed', '.lang-proceed-mm',
+                '.lang-order-form', '.lang-order-form-mm',
+                '.lang-name', '.lang-name-mm',
+                '.lang-phone', '.lang-phone-mm',
+                '.lang-date', '.lang-date-mm',
+                '.lang-time', '.lang-time-mm',
+                '.lang-notes', '.lang-notes-mm',
+                '.lang-order-total', '.lang-order-total-mm',
+                '.lang-viber', '.lang-viber-mm',
+                '.lang-telegram', '.lang-telegram-mm',
+                '.lang-guide-title', '.lang-guide-title-mm',
+                '.lang-guide-step1', '.lang-guide-step1-mm',
+                '.lang-guide-step1-text', '.lang-guide-step1-text-mm',
+                '.lang-guide-step2', '.lang-guide-step2-mm',
+                '.lang-guide-step2-text', '.lang-guide-step2-text-mm',
+                '.lang-guide-step3', '.lang-guide-step3-mm',
+                '.lang-guide-step3-text', '.lang-guide-step3-text-mm',
+                '.lang-guide-warning', '.lang-guide-warning-mm',
+                '.lang-guide-warning-text', '.lang-guide-warning-text-mm',
+                '.lang-proceed-viber', '.lang-proceed-viber-mm',
+                '.lang-proceed-telegram', '.lang-proceed-telegram-mm',
+                '.lang-customer-profile', '.lang-customer-profile-mm',
+                '.lang-total-orders', '.lang-total-orders-mm',
+                '.lang-total-spent', '.lang-total-spent-mm',
+                '.lang-recent-orders', '.lang-recent-orders-mm',
+                '.lang-no-orders', '.lang-no-orders-mm',
+                '.lang-invoice', '.lang-invoice-mm',
+                '.lang-download', '.lang-download-mm'
+            ];
+            
+            elementsToToggle.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(el => {
+                    if (selector.includes('-mm')) {
+                        el.classList.toggle('hidden', currentLanguage !== 'mm');
+                    } else {
+                        el.classList.toggle('hidden', currentLanguage !== 'en');
+                    }
+                });
+            });
+            
+            showNotification(currentLanguage === 'mm' ? 'မြန်မာဘာသာသို့ ပြောင်းလဲပါပြီ' : 'Language changed to English', 'success');
+                }
+    
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loader after page load
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'none';
+            }, 1500);
+            
+            // Load initial data
+            fetchMenu();
+            loadCart();
+            showHistory();
+            
+            // Menu toggle
+            document.getElementById('menu-toggle').addEventListener('click', toggleSidebar);
+            document.getElementById('close-sidebar').addEventListener('click', toggleSidebar);
+            document.getElementById('sidebar-overlay').addEventListener('click', toggleSidebar);
+            
+            // Cart toggle
+            document.getElementById('cart-toggle').addEventListener('click', toggleDrawer);
+            document.getElementById('cart-overlay').addEventListener('click', toggleDrawer);
+            document.getElementById('close-cart').addEventListener('click', toggleDrawer);
+            
+            // Checkout
+            document.getElementById('checkout-btn').addEventListener('click', openCheckout);
+            document.getElementById('drawer-checkout').addEventListener('click', () => {
+                toggleDrawer();
+                openCheckout();
+            });
+            document.getElementById('close-checkout').addEventListener('click', closeCheckout);
+            document.getElementById('checkout-overlay').addEventListener('click', closeCheckout);
+            
+            // Order submission
+            document.getElementById('viber-btn').addEventListener('click', () => submitOrder('viber'));
+            document.getElementById('telegram-btn').addEventListener('click', () => submitOrder('telegram'));
+            
+            // Guide modal
+            document.getElementById('close-guide').addEventListener('click', () => {
+                document.getElementById('app-guide-modal').classList.add('hidden');
+            });
+            document.getElementById('guide-overlay').addEventListener('click', () => {
+                document.getElementById('app-guide-modal').classList.add('hidden');
+            });
+            
+            // Profile modal
+            document.getElementById('profile-btn').addEventListener('click', () => {
+                document.getElementById('profile-modal').classList.remove('hidden');
+                updateProfileStats();
+            });
+            document.getElementById('close-profile').addEventListener('click', () => {
+                document.getElementById('profile-modal').classList.add('hidden');
+            });
+            document.getElementById('profile-overlay').addEventListener('click', () => {
+                document.getElementById('profile-modal').classList.add('hidden');
+            });
+            
+            // Invoice modal
+            document.getElementById('close-invoice').addEventListener('click', () => {
+                document.getElementById('invoice-modal').classList.add('hidden');
+            });
+            document.getElementById('invoice-overlay').addEventListener('click', () => {
+                document.getElementById('invoice-modal').classList.add('hidden');
+            });
+            document.getElementById('download-invoice').addEventListener('click', downloadInvoice);
+            
+            // Language toggle
+            document.getElementById('lang-toggle').addEventListener('click', toggleLanguage);
+            
+            // Search and filter
+            document.getElementById('search-bar').addEventListener('input', filterMenu);
+            
+            // Category buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active', 'bg-brand-orange', 'text-white'));
+                    this.classList.add('active', 'bg-brand-orange', 'text-white');
+                    filterMenu();
+                });
+            });
+            
+            // History and tracking
+            document.getElementById('history-btn').addEventListener('click', () => {
+                document.getElementById('profile-modal').classList.remove('hidden');
+                updateProfileStats();
+            });
+            document.getElementById('tracking-btn').addEventListener('click', trackOrder);
+            
+            // Notifications
+            document.getElementById('notification-btn').addEventListener('click', () => {
+                document.getElementById('notification-badge').classList.add('hidden');
+                showNotification(currentLanguage === 'mm' ? 'အသိပေးချက်များ အားလုံး ဖတ်ပြီးပါပြီ' : 'All notifications marked as read', 'success');
+            });
         });
 
-        const msg = `🍗 *မြင်သာကြက်ကင် - အော်ဒါ*\\n👤 *ဝယ်သူ:* ${name}\\n📞 *ဖုန်း:* ${phone}\\n━━━━━━━━━━━━━━\\n${itemsArr.join('\\n')}\\n━━━━━━━━━━━━━━\\n💰 *စုစုပေါင်း:* *${total.toLocaleString()} K*`;
-        
-        // Viber သို့ ပို့ခြင်း
-        window.location.href = `viber://forward?text=${encodeURIComponent(msg)}`;
-    }
+        function updateProfileStats() {
+            const history = JSON.parse(localStorage.getItem('orderHistory') || '[]');
+            const totalOrders = history.length;
+            const totalSpent = history.reduce((sum, order) => sum + order.total, 0);
+            
+            document.getElementById('total-orders').textContent = totalOrders;
+            document.getElementById('total-spent').textContent = `$${totalSpent.toFixed(2)}`;
+            
+            // Update recent orders
+            showHistory();
+        }
 
-    window.onload = fetchMenu;
-</script>
+        function downloadInvoice() {
+            const invoiceContent = document.getElementById('invoice-content').innerHTML;
+            const fullHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Myin Thar Roast - Invoice</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        .text-center { text-align: center; }
+                        .text-right { text-align: right; }
+                        .text-brand-orange { color: #FF6B35; }
+                        .text-brand-dark { color: #2C1810; }
+                        .font-bold { font-weight: bold; }
+                        .text-2xl { font-size: 24px; }
+                        .text-xl { font-size: 20px; }
+                        .text-sm { font-size: 14px; }
+                        .mb-4 { margin-bottom: 16px; }
+                        .mb-6 { margin-bottom: 24px; }
+                        .grid { display: grid; }
+                        .grid-cols-2 { grid-template-columns: 1fr 1fr; }
+                        .gap-4 { gap: 16px; }
+                        .border-t { border-top: 1px solid #e5e7eb; }
+                        .border-gray-200 { border-color: #e5e7eb; }
+                        .pt-4 { padding-top: 16px; }
+                        .mt-4 { margin-top: 16px; }
+                        .flex { display: flex; }
+                        .justify-between { justify-content: space-between; }
+                        .items-center { align-items: center; }
+                    </style>
+                </head>
+                <body>${invoiceContent}</body>
+                </html>
+    const blob = new Blob([fullHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `invoice-${Date.now()}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification(currentLanguage === 'mm' ? 'ဘေလ်တို ဒေါင်းလုတ်ပြီးပါပြီ' : 'Invoice downloaded successfully', 'success');
+        }
+    </script>
 </body>
 </html>
+    
 
