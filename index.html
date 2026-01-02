@@ -4,78 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
     <div class="container">
         <nav class="sidebar">
             <h2>Admin App</h2>
             <ul>
-    <li onclick="showView('dashboard')">🏠 Dashboard</li>
-    <li onclick="showView('orders')">📦 Orders</li>
-    <li onclick="showView('customers')">👥 Customers</li>
-</ul>
+                <li onclick="showView('dashboard')">🏠 Dashboard</li>
+                <li onclick="showView('orders')">📦 Orders</li>
+                <li onclick="showView('customers')">👥 Customers</li>
+            </ul>
         </nav>
         
         <main class="content">
             <div id="dashboard" class="view active">
                 <h1>Today Summary</h1>
                 <div class="stats-container">
-                    <div class="stat-card">
-                        <h3>Orders</h3>
-                        <p id="todayOrders">0 Orders</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Revenue</h3>
-                        <p id="todayRevenue">0 Ks</p>
-                    </div>
+                    <div class="stat-card"><h3>Orders</h3><p id="todayOrders">0</p></div>
+                    <div class="stat-card"><h3>Revenue</h3><p id="todayRevenue">0 Ks</p></div>
                 </div>
             </div>
-
-            <div id="orders" class="view">
-                <h1>All Orders</h1>
-                <div id="order-list"></div>
-            </div>
-
-            <div id="customers" class="view">
-                <h1>Our Customers</h1>
-                <div id="customer-list"></div>
-            </div>
+            <div id="orders" class="view"><h1>All Orders</h1><div id="order-list"></div></div>
+            <div id="customers" class="view"><h1>Customers</h1><div id="customer-list"></div></div>
         </main>
     </div>
 
-    <div id="menu" class="view">
-    <h1>Food Menu</h1>
-    <div class="menu-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-        <div class="menu-item">
-            <img src="https://i.ibb.co/PGcW9j6r/1767118749960.png" width="100%">
-            <p>ဆိတ်သားကင်</p>
-        </div>
-        <div class="menu-item">
-            <img src="https://i.ibb.co/rRd5P91j/1767118697374.png" width="100%">
-            <p>အသားချောင်း (ကြက်)</p>
-        </div>
-        <div class="menu-item">
-            <img src="https://i.ibb.co/MkJqnDyG/1767147480724.png" width="100%">
-            <p>အရေခွံ</p>
-        </div>
-        <div class="menu-item">
-            <img src="https://i.ibb.co/twRsK5S7/1767147537379.png" width="100%">
-            <p>အသည်းမြစ်</p>
-        </div>
-    </div>
-    </div>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script src=".supabase.js"></script>
-
-<script src=".orders.js"></script>
-<script src=".js/customers.js"></script>
-
-<script src=".app.js"></script>
-
+    <script src="supabase.js"></script>
+    <script src="orders.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
 
