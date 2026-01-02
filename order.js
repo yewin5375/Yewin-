@@ -1,13 +1,22 @@
 // orders.js
 
 async function loadOrders() {
+    console.log("Attempting to load orders...");
     const listDiv = document.getElementById('order-list');
     
-    // Loading ဖြစ်နေစဉ် ပြသရန်
+    if (!listDiv) {
+        console.error("order-list div ကို ရှာမတွေ့ပါ။ index.html ကို စစ်ပါ။");
+        return;
+    }
+
     listDiv.innerHTML = '<p style="padding: 20px;">အော်ဒါများ ရှာဖွေနေပါသည်...</p>';
 
     try {
-        // window.sb ကို သုံးပြီး database ထဲက orders table ကို လှမ်းခေါ်မယ်
+        // window.sb ရှိမရှိ အရင်စစ်မယ်
+        if (!window.sb) {
+            throw new Error("Supabase connection (sb) မရှိသေးပါ။");
+        }
+
         const { data, error } = await window.sb
             .from('orders')
             .select('*')
@@ -15,45 +24,37 @@ async function loadOrders() {
 
         if (error) throw error;
 
-        if (data.length === 0) {
+        console.log("Orders received:", data);
+
+        if (!data || data.length === 0) {
             listDiv.innerHTML = '<p style="padding: 20px;">အော်ဒါစာရင်း မရှိသေးပါ။</p>';
             return;
         }
 
-        // Data တွေကို HTML ပုံစံ ပြောင်းလဲခြင်း
         listDiv.innerHTML = data.map(order => `
             <div class="order-card" style="
                 background: white; 
-                margin-bottom: 15px; 
-                padding: 20px; 
-                border-radius: 12px; 
-                box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                margin-bottom: 12px; 
+                padding: 15px; 
+                border-radius: 8px; 
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 border-left: 5px solid ${order.status === 'completed' ? '#28a745' : '#ffc107'};
             ">
-                <div style="display: flex; justify-content: space-between; align-items: start;">
-                    <div>
-                        <h3 style="margin: 0; font-size: 1.1rem;">#${order.id} - ${order.customer_name}</h3>
-                        <p style="margin: 8px 0; color: #555; font-weight: bold;">${Number(order.total_amount).toLocaleString()} Ks</p>
-                    </div>
-                    <span style="
-                        padding: 4px 12px; 
-                        border-radius: 20px; 
-                        font-size: 12px; 
-                        text-transform: uppercase;
-                        background: ${order.status === 'completed' ? '#e8f5e9' : '#fff3e0'};
-                        color: ${order.status === 'completed' ? '#2e7d32' : '#ef6c00'};
-                    ">
-                        ${order.status || 'pending'}
-                    </span>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="font-weight: bold;">#${order.id} - ${order.customer_name}</span>
+                    <span style="color: #28a745; font-weight: bold;">${Number(order.total_amount).toLocaleString()} Ks</span>
                 </div>
-                <div style="margin-top: 10px; font-size: 0.85rem; color: #888;">
-                    📅 ${new Date(order.created_at).toLocaleString()}
+                <div style="margin-top: 5px; font-size: 13px; color: #666;">
+                    အခြေအနေ: ${order.status || 'pending'} <br>
+                    ${new Date(order.created_at).toLocaleString()}
                 </div>
             </div>
         `).join('');
 
     } catch (err) {
-        console.error("Orders load လုပ်ရာတွင် မှားယွင်းမှုရှိသည်:", err);
-        listDiv.innerHTML = `<p style="color: red; padding: 20px;">အော်ဒါများ ခေါ်ယူ၍မရပါ: ${err.message}</p>`;
+        console.error("Load Orders Error:", err);
+        alert("အော်ဒါများ ခေါ်ယူ၍မရပါ- " + err.message);
+        listDiv.innerHTML = `<p style="color: red; padding: 20px;">Error: ${err.message}</p>`;
     }
 }
+
