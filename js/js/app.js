@@ -1,43 +1,46 @@
-// js/app.js ရဲ့ ထိပ်ဆုံးမှာ ထည့်ရန်
-setTimeout(() => {
-    if (window.sb) {
-        console.log("✅ Supabase ချိတ်ဆက်မှု အောင်မြင်ပါတယ်!");
-        loadDashboard(); // dashboard ကို ခေါ်ခိုင်းမယ်
-    } else {
-        alert("❌ Supabase ကို ရှာမတွေ့ပါ။ js/supabase.js ကို ပြန်စစ်ပါ။");
-    }
-}, 1000);
+// js/app.js
 
+async function loadDashboard() {
+    console.log("Dashboard loading...");
+    
+    // sb ရှိမရှိ အရင်စစ်မယ်
+    if (typeof sb === 'undefined') {
+        alert("Supabase ချိတ်ဆက်မှု မရှိသေးပါ။ js/supabase.js ကို စစ်ဆေးပါ။");
+        return;
+    }
+
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        const { data, error } = await sb
+            .from('orders')
+            .select('*');
+
+        if (error) throw error;
+
+        console.log("Data received:", data);
+
+        document.getElementById('todayOrders').innerText = data.length + " Orders";
+        
+        const total = data.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+        document.getElementById('todayRevenue').innerText = total.toLocaleString() + " Ks";
+
+    } catch (err) {
+        console.error("Error Detail:", err);
+        alert("Data ဆွဲယူရာတွင် မှားယွင်းနေပါသည်။ Console ကိုကြည့်ပါ။");
+    }
+}
 
 // စာမျက်နှာ ပြောင်းလဲခြင်း Logic
 function showView(id) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const target = document.getElementById(id);
+    if(target) target.classList.add('active');
 
-  if (id === 'orders') loadOrders();
-  if (id === 'customers') loadCustomers();
-  if (id === 'dashboard') loadDashboard();
+    if (id === 'orders') loadOrders();
+    if (id === 'customers') loadCustomers();
+    if (id === 'dashboard') loadDashboard();
 }
 
-// Dashboard အတွက် Data တွက်ချက်ခြင်း
-async function loadDashboard() {
-  const today = new Date().toISOString().split('T')[0];
-
-  const { data, error } = await sb
-    .from('orders')
-    .select('*')
-    .gte('created_at', today);
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  document.getElementById('todayOrders').innerText = data.length + " Orders";
-  const total = data.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
-  document.getElementById('todayRevenue').innerText = total.toLocaleString() + " Ks";
-}
-
-// App စဖွင့်ရင် Dashboard ကို အရင်ပြမယ်
+// App စတက်တာနဲ့ Dashboard ကို ခေါ်မယ်
 window.onload = loadDashboard;
 
