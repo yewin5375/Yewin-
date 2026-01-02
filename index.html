@@ -1,89 +1,55 @@
 <!DOCTYPE html>
-<html lang="my">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MT Roast Admin</title>
-
-<link rel="manifest" href="manifest.json">
-
-<style>
-body{
-  font-family: sans-serif;
-  margin:0;
-  background:#f8fafc;
-}
-header{
-  background:#ff6b35;
-  color:white;
-  padding:15px;
-  display:flex;
-  justify-content:space-between;
-}
-nav{
-  display:flex;
-  background:#1e293b;
-}
-nav button{
-  flex:1;
-  border:none;
-  background:none;
-  color:white;
-  padding:15px;
-}
-.view{display:none;padding:20px;}
-.view.active{display:block;}
-.card{
-  background:white;
-  padding:15px;
-  border-radius:12px;
-  margin-bottom:10px;
-}
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
 </head>
-
 <body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Admin App</h2>
+            <ul>
+                <li onclick="showView('dashboard')">Dashboard</li>
+                <li onclick="showView('orders')">Orders</li>
+                <li onclick="showView('customers')">Customers</li>
+            </ul>
+        </nav>
+        
+        <main class="content">
+            <div id="dashboard" class="view active">
+                <h1>Today Summary</h1>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <h3>Orders</h3>
+                        <p id="todayOrders">0 Orders</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Revenue</h3>
+                        <p id="todayRevenue">0 Ks</p>
+                    </div>
+                </div>
+            </div>
 
-<header>
-  <h3>MT Roast Admin</h3>
-  <button onclick="enableNotification()">🔔</button>
-</header>
+            <div id="orders" class="view">
+                <h1>All Orders</h1>
+                <div id="order-list"></div>
+            </div>
 
-<nav>
-  <button onclick="showView('dashboard')">Dashboard</button>
-  <button onclick="showView('orders')">Orders</button>
-  <button onclick="showView('customers')">Customers</button>
-</nav>
+            <div id="customers" class="view">
+                <h1>Our Customers</h1>
+                <div id="customer-list"></div>
+            </div>
+        </main>
+    </div>
 
-<main>
-  <section id="dashboard" class="view active">
-    <h3>Today Summary</h3>
-    <p id="todayOrders">0 Orders</p>
-    <p id="todayRevenue">0 Ks</p>
-  </section>
-
-  <section id="orders" class="view">
-    <h3>All Orders</h3>
-    <div id="orderList"></div>
-  </section>
-
-  <section id="customers" class="view">
-    <h3>Customer Profiles</h3>
-    <div id="customerList"></div>
-  </section>
-</main>
-
-<audio id="notiSound"></audio>
-
-<script src="js/supabase.js"></script>
-<script src="js/app.js"></script>
-<script src="js/orders.js"></script>
-<script src="js/customers.js"></script>
-<script src="js/notifications.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/orders.js"></script>
+    <script src="js/customers.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
+
