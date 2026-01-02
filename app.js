@@ -54,3 +54,46 @@ function showView(id) {
     if (id === 'dashboard') loadDashboard();
 }
 
+// app.js ထဲမှာ ဒါကို ထည့်ပါ
+async function loadCustomers() {
+  const list = document.getElementById('customer-list'); // ID ကို သေချာစစ်ပါ (index.html မှာ customer-list ဖြစ်ရမယ်)
+  if (!list) return;
+
+  list.innerHTML = "Loading...";
+
+  const { data, error } = await window.sb
+    .from('customers')
+    .select(`
+      id,
+      name,
+      phone,
+      orders (
+        id,
+        total_amount,
+        created_at
+      )
+    `);
+
+  if (error) {
+    list.innerHTML = "Failed to load customers";
+    return;
+  }
+
+  list.innerHTML = data.map(c => {
+    const totalSpend = (c.orders || []).reduce((s, o) => s + Number(o.total_amount || 0), 0);
+    return `
+      <div class="stat-card" style="margin-bottom: 10px; text-align: left;">
+        <b>👤 ${c.name || 'No Name'}</b><br>
+        📞 ${c.phone || '-'}<br>
+        📦 Orders: ${(c.orders || []).length}<br>
+        💰 Total: ${totalSpend.toLocaleString()} Ks
+      </div>
+    `;
+  }).join('');
+}
+// app.js ရဲ့ window.onload မှာ ဒါလေး ဖြည့်လိုက်ပါ
+window.onload = function() {
+    loadDashboard();
+    initNotification(); // Firebase အတွက်
+    listenToOrders();   // Supabase Realtime အတွက် (အသစ်)
+};
