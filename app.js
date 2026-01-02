@@ -31,15 +31,40 @@ async function loadDashboard() {
 }
 
 // စာမျက်နှာ ပြောင်းလဲခြင်း Logic
-function showView(id) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    const target = document.getElementById(id);
-    if(target) target.classList.add('active');
+// app.js
 
-    if (id === 'orders') loadOrders();
-    if (id === 'customers') loadCustomers();
+function showView(id) {
+    // View အားလုံးကို ဖျောက်မယ်
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    
+    // ရွေးလိုက်တဲ့ view တစ်ခုပဲ ပြမယ်
+    const target = document.getElementById(id);
+    if (target) {
+        target.classList.add('active');
+    }
+
+    // Orders view ဖြစ်ရင် data ကို ခေါ်မယ်
+    if (id === 'orders') {
+        if (typeof loadOrders === 'function') {
+            loadOrders();
+        } else {
+            console.error("loadOrders function ကို ရှာမတွေ့ပါ။ orders.js ကို စစ်ပါ။");
+        }
+    }
+    
     if (id === 'dashboard') loadDashboard();
+    if (id === 'customers') loadCustomers();
 }
 
-// App စတက်တာနဲ့ Dashboard ကို ခေါ်မယ်
+async function loadDashboard() {
+    if (!window.sb) return;
+    const { data, error } = await window.sb.from('orders').select('*');
+    if (!error) {
+        document.getElementById('todayOrders').innerText = data.length + " Orders";
+        const total = data.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+        document.getElementById('todayRevenue').innerText = total.toLocaleString() + " Ks";
+    }
+}
+
 window.onload = loadDashboard;
+
