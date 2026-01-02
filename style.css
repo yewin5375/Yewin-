@@ -1,17 +1,96 @@
 /* css/style.css */
-body { margin: 0; font-family: sans-serif; background: #f0f2f5; }
-.container { display: flex; }
-.sidebar { width: 200px; height: 100vh; background: #333; color: #fff; padding: 20px; }
-.sidebar ul { list-style: none; padding: 0; }
-.sidebar li { padding: 15px; cursor: pointer; border-bottom: 1px solid #444; }
-.sidebar li:hover { background: #444; }
-.content { flex-grow: 1; padding: 20px; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-/* စာမျက်နှာ ပိတ်/ဖွင့် လုပ်ရန် */
-.view { display: none; }
-.view.active { display: block; }
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
 
-/* ကဒ်လေးများ ပုံစံ */
-.stats-container { display: flex; gap: 20px; }
-.stat-card { background: white; padding: 20px; border-radius: 10px; flex: 1; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar ပုံစံ */
+.sidebar {
+    width: 240px;
+    background: #212529;
+    color: #fff;
+    padding-top: 20px;
+    position: fixed;
+    height: 100%;
+}
+
+.sidebar h2 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    color: #00d4ff;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar li {
+    padding: 15px 25px;
+    cursor: pointer;
+    transition: 0.3s;
+    border-left: 4px solid transparent;
+}
+
+.sidebar li:hover {
+    background: #343a40;
+    border-left: 4px solid #00d4ff;
+}
+
+/* Content နေရာ */
+.content {
+    margin-left: 240px; /* sidebar အတွက် နေရာဖယ်ထားတာ */
+    padding: 40px;
+    width: 100%;
+}
+
+/* Views စနစ် */
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
+
+/* Dashboard Cards */
+.stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.stat-card h3 {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.stat-card p {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #212529;
+}
 
