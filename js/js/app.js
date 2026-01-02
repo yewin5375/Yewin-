@@ -1,3 +1,12 @@
+// js/app.js ရဲ့ ထိပ်ဆုံးမှာ ထည့်ရန်
+setTimeout(() => {
+    if (window.sb) {
+        console.log("✅ Supabase ချိတ်ဆက်မှု အောင်မြင်ပါတယ်!");
+        loadDashboard(); // dashboard ကို ခေါ်ခိုင်းမယ်
+    } else {
+        alert("❌ Supabase ကို ရှာမတွေ့ပါ။ js/supabase.js ကို ပြန်စစ်ပါ။");
+    }
+}, 1000);
 
 
 // စာမျက်နှာ ပြောင်းလဲခြင်း Logic
