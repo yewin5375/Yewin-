@@ -1,22 +1,24 @@
 let currentCart = [];
 
-// === ၁။ POS Modal ဖွင့်ခြင်း ===
+// Floating Window အဖွင့်အပိတ် Animation
 function openOrderModal() {
-    currentCart = [];
-    renderCart();
-    
-    // အချိန် အော်တိုပေးခြင်း
-    const now = new Date();
-    now.setMinutes(now.getMinutes() + 20);
-    document.getElementById('pickupTime').value = now.toISOString().slice(0, 16);
-    
-    document.getElementById('orderModal').style.display = 'flex';
-    loadMenuToOrder(); 
+    const modal = document.getElementById('orderModal');
+    const container = document.getElementById('posContainer');
+    modal.style.display = 'flex';
+    container.classList.remove('closing');
+    if (typeof loadMenuToOrder === "function") {
+        loadMenuToOrder(); // POS ထဲက Menu တွေကို ဆွဲတင်တဲ့ function
+    }
 }
 
 function closeOrderModal() {
-    document.getElementById('orderModal').style.display = 'none';
+    const container = document.getElementById('posContainer');
+    container.classList.add('closing'); // ပိတ်မယ့် Animation (slideOutDown) ကို ခေါ်တာပါ
+    setTimeout(() => {
+        document.getElementById('orderModal').style.display = 'none';
+    }, 400); // CSS Animation ကြာချိန် 0.4s ပြီးမှ ပိတ်ပေးတာပါ
 }
+
 
 // === ၂။ Menu များ ဆွဲထုတ်ခြင်း ===
 async function loadMenuToOrder() {
