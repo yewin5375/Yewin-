@@ -170,26 +170,44 @@ body {
     .cart-container { height: auto; border-left: none; border-top: 1px solid #eee; flex: none; }
     .stat-grid, .menu-grid { grid-template-columns: 1fr 1fr; }
 }
-/* === Add/Edit Menu Modal CSS === */
-.modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
-    display: none; justify-content: center; align-items: center; z-index: 4000;
-}
-
+/* === Add/Edit Modal Spacing & Design === */
 .menu-modal-content {
-    background: #ffffff; width: 90%; max-width: 450px;
-    padding: 30px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    animation: zoomIn 0.3s ease;
+    background: #ffffff;
+    width: 90%;
+    max-width: 450px;
+    padding: 35px; /* Padding တိုးလိုက်သည် */
+    border-radius: 35px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    position: relative;
 }
 
-.menu-modal-content h3 { margin-top: 0; font-weight: 800; color: var(--text-dark); text-align: center; }
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px; /* ခေါင်းစဉ်နှင့် အောက်က input ကြား ခြားလိုက်သည် */
+}
 
-.modal-input-group { margin-bottom: 15px; }
-.modal-input-group label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600; color: #666; }
+.modal-input-group {
+    margin-bottom: 20px; /* Input တစ်ခုနှင့်တစ်ခုကြား ခြားလိုက်သည် */
+}
+
+.modal-input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #4B5563;
+}
+
 .modal-input-group input, .modal-input-group select {
-    width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eee;
-    background: #f9f9f9; box-sizing: border-box; font-family: inherit;
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 15px;
+    border: 1.5px solid #f0f0f0;
+    background: #f9fafb;
+    font-size: 15px;
+    transition: 0.3s;
 }
 
 /* === အော်ဒါအသစ်ဖွင့်ရန် ခလုတ် (Premium Style) === */
@@ -250,36 +268,69 @@ body {
 }
 .btn-checkout:active { transform: scale(0.95); }
 
-/* === +/- Qty & Delete Animation === */
-.qty-control {
+/* === Checkout Quantity Control (Premium) === */
+.premium-cart-item {
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 20px;
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: #f8f9fa;
-    padding: 5px 10px;
-    border-radius: 12px;
+    justify-content: space-between;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
-.qty-btn {
-    width: 30px; height: 30px;
-    border-radius: 8px;
+
+.qty-control-premium {
+    display: flex;
+    align-items: center;
+    background: #f3f4f6;
+    border-radius: 50px;
+    padding: 5px;
+    gap: 5px;
+}
+
+.qty-btn-new {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
     border: none;
     background: white;
     color: var(--primary);
-    font-weight: bold;
+    font-weight: 900;
+    font-size: 18px;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     transition: 0.2s;
 }
-.qty-btn:active { transform: scale(0.8); background: var(--primary); color: white; }
 
-.item-delete-anim {
-    color: #ef4444;
-    cursor: pointer;
-    padding: 8px;
-    transition: 0.3s;
+.qty-btn-new:active { transform: scale(0.85); background: var(--primary); color: white; }
+
+.qty-input-new {
+    width: 45px;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-weight: 800;
+    font-size: 16px;
+    color: #1F2937;
 }
-.item-delete-anim:hover { transform: rotate(15deg) scale(1.2); }
 
+.delete-bin-btn {
+    color: #FF4B4B;
+    background: #FFF0F0;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+    border: none;
+    margin-left: 10px;
+}
+
+.delete-bin-btn:hover { background: #FF4B4B; color: white; transform: rotate(10deg); }
 /* Category Filter Tabs */
 .category-scroll {
     display: flex; gap: 10px; overflow-x: auto; padding: 10px 20px;
