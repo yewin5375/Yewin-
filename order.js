@@ -93,12 +93,41 @@ async function updateOrderStatus(orderId, newStatus) {
 let currentCart = [];
 
 // ၁။ အော်ဒါတင်မည့် Modal ကို ဖွင့်ခြင်း
+// Admin က အော်ဒါစတင်ဖွင့်ခြင်း
 function openOrderModal() {
     currentCart = [];
     renderCart();
+    
+    // Pickup Time ကို Admin အတွက် ၁၅ မိနစ်ပဲ ကြိုထားပေးမယ် (အမြန်ရအောင်)
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 15);
+    document.getElementById('pickupTime').value = now.toISOString().slice(0, 16);
+    
     document.getElementById('orderModal').style.display = 'flex';
-    loadMenuToOrder(); // Menu list ကို Modal ထဲမှာ ပြဖို့
+    document.getElementById('cPhone').value = ""; // Clear old data
+    document.getElementById('cName').value = "";
+    document.getElementById('customerMsg').innerText = "";
+    loadMenuToOrder(); 
 }
+
+// ဖုန်းနံပါတ်ရိုက်တာနဲ့ Database ထဲမှာ ရှိပြီးသား Customer လား စစ်မယ်
+async function lookupCustomer(phone) {
+    if (phone.length >= 7) {
+        const { data } = await window.sb
+            .from('customers')
+            .select('full_name')
+            .eq('phone_number', phone)
+            .single();
+        
+        if (data) {
+            document.getElementById('cName').value = data.full_name;
+            document.getElementById('customerMsg').innerText = "✅ VIP Customer";
+        } else {
+            document.getElementById('customerMsg').innerText = "🆕 New Customer";
+        }
+    }
+}
+
 
 // ၂။ Customer အချက်အလက် ရှာဖွေခြင်း (Smart Search)
 async function lookupCustomer(phone) {
