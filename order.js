@@ -165,22 +165,45 @@ function renderCart() {
     const cartDiv = document.getElementById('selectedItemsList');
     let total = 0;
     
-    if (currentCart.length === 0) {
-        cartDiv.innerHTML = "<p style='font-size:12px; color:#888;'>ရွေးထားသော ပစ္စည်းမရှိသေးပါ</p>";
-    } else {
-        cartDiv.innerHTML = currentCart.map((item, index) => {
-            total += item.price * item.qty;
-            return `
-                <div class="cart-row" style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:14px;">
-                    <span>${item.name} x ${item.qty}</span>
-                    <span>${(item.price * item.qty).toLocaleString()} Ks</span>
-                    <button onclick="removeFromCart(${index})" style="border:none; background:none; color:red;">❌</button>
+    cartDiv.innerHTML = currentCart.map((item, index) => {
+        total += item.price * item.qty;
+        return `
+            <div class="cart-item" id="item-${index}">
+                <img src="${item.image_url || 'https://via.placeholder.com/50'}" onerror="this.src='https://via.placeholder.com/50'">
+                <div class="item-info">
+                    <div style="font-weight:bold; font-size:13px;">${item.name}</div>
+                    <div style="color:#888; font-size:12px;">${item.price.toLocaleString()} Ks</div>
                 </div>
-            `;
-        }).join('');
-    }
+                <div class="qty-controls">
+                    <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
+                    <input type="number" class="qty-input" value="${item.qty}" onchange="directInputQty(${index}, this.value)">
+                    <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
+                </div>
+                <button onclick="removeFromCart(${index})" style="margin-left:10px; border:none; background:none; color:red;">🗑️</button>
+            </div>
+        `;
+    }).join('');
     document.getElementById('orderTotalAmount').innerText = total.toLocaleString() + " Ks";
 }
+
+function updateQty(index, change) {
+    currentCart[index].qty += change;
+    if (currentCart[index].qty < 1) return removeFromCart(index);
+    renderCart();
+}
+
+function directInputQty(index, value) {
+    const newVal = parseInt(value);
+    if (newVal > 0) {
+        currentCart[index].qty = newVal;
+        renderCart();
+    }
+}
+
+function closeOrderModal() {
+    document.getElementById('orderModal').style.display = 'none';
+}
+
 
 function removeFromCart(index) {
     currentCart.splice(index, 1);
