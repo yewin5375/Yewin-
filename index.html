@@ -118,40 +118,48 @@
 
     <div id="orderModal" class="modal-overlay">
     <div id="posContainer" class="floating-window">
-        <div class="pos-header">
-            <div class="back-btn" onclick="closeOrderModal()">←</div>
-            <div class="search-bar-container">
-                <span style="position:absolute; left:12px; top:10px;">🔍</span>
-                <input type="text" class="search-input" placeholder="Search menu..." oninput="filterPOSMenu(this.value)">
-            </div>
+        <div class="app-header" style="background: white; border-bottom: 1px solid #eee;">
+            <div class="back-btn" onclick="closeOrderModal()">← Back</div>
+            <h3 style="margin:0;">New Order</h3>
+            <div style="width:50px;"></div>
         </div>
 
-        <div class="category-scroll" id="posCategoryTabs">
-            <div class="cat-tab active" onclick="filterByCategory('All')">All</div>
-            <div class="cat-tab" onclick="filterByCategory('Food')">Food</div>
-            <div class="cat-tab" onclick="filterByCategory('Drinks')">Drinks</div>
-        </div>
-
-        <div class="pos-main-content">
-            <div class="menu-container">
-                <div id="itemSelectionGrid" class="pos-grid"></div>
-            </div>
-
-            <div class="cart-container">
-                <h3 style="margin:0 0 15px 0;">Order Summary</h3>
-                <div id="selectedItemsList" style="flex:1; overflow-y:auto;"></div>
-                
-                <div style="padding-top:15px; border-top:1px solid #eee;">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                        <span>Total:</span>
-                        <strong id="orderTotalAmount" style="color:var(--primary); font-size:22px;">0 Ks</strong>
-                    </div>
-                    <button class="confirm-btn" onclick="checkoutOrder()">Checkout Order</button>
+        <div class="pos-header-actions">
+            <input type="text" class="search-bar" id="posSearch" placeholder="Search Menu..." oninput="filterPOSMenu()">
+            <div class="category-tags" id="posCategories">
+                <div class="tag active" onclick="filterCategory('All')">All Items</div>
                 </div>
+        </div>
+
+        <div id="posMenuGrid" class="pos-menu-grid">
             </div>
+
+        <div class="checkout-bar" id="checkoutBar">
+            <div>
+                <span style="color: #6B7280; font-size: 14px;">Total Items: <b id="cartCount">0</b></span><br>
+                <strong style="font-size: 20px; color: var(--primary);" id="cartTotal">0 Ks</strong>
+            </div>
+            <button class="btn-checkout" onclick="openCheckoutDetails()">Go to Checkout →</button>
         </div>
     </div>
+</div>
+
+<div id="checkoutModal" class="modal-overlay">
+    <div class="menu-modal-content">
+        <h3>Order Details</h3>
+        <input type="text" id="cName" class="pos-input" placeholder="Customer Name">
+        <input type="number" id="cPhone" class="pos-input" placeholder="Customer Phone">
+        <select id="payStatus" class="pos-input">
+            <option value="Unpaid">Unpaid</option>
+            <option value="Paid">Paid</option>
+        </select>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button onclick="document.getElementById('checkoutModal').style.display='none'" class="pos-input" style="background:#eee;">Back</button>
+            <button onclick="submitFinalOrder()" class="confirm-btn">Confirm Order</button>
+        </div>
     </div>
+</div>
+    
     
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
