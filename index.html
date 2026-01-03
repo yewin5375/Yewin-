@@ -38,9 +38,16 @@
             </div>
 
             <div id="orders" class="view">
-                <h1 class="page-header">Pick-up Orders</h1>
-                <div id="order-list"></div>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 class="page-header">Live Orders</h2>
+        <button class="btn-primary" onclick="openOrderModal()" style="width: auto; padding: 10px 20px;">
+            ➕ အော်ဒါအသစ်ဖွင့်ရန်
+        </button>
+    </div>
+    <div id="order-list">
+        </div>
             </div>
+            
 
             <div id="menu-manager" class="view">
                 <h1 class="page-header">Menu Management</h1>
