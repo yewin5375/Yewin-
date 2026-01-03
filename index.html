@@ -111,49 +111,47 @@
         </div>
     </div>
 
-    
     <div id="orderModal" class="modal-overlay" style="display: none;">
     <div class="premium-pos">
         <div class="pos-top-nav">
-            <button class="back-btn" onclick="closeOrderModal()">
-                <i class="fas fa-chevron-left"></i> ရှေ့သို့
-            </button>
-            <h2>Admin Point of Sale</h2>
-            <div class="pos-status">Online</div>
-        </div>
+            <button class="back-btn" onclick="closeOrderModal()">← Back</button>
+            <h2 style="font-weight: 800;">Pearl POS System</h2>
+            <div style="width: 80px;"></div> </div>
 
         <div class="pos-main-content">
             <div class="menu-container">
-                <div class="search-bar">
-                    <input type="text" placeholder="Menu ရှာရန်..." onkeyup="filterMenu(this.value)">
-                </div>
-                <div id="itemSelectionGrid" class="premium-grid">
-                    </div>
+                <div id="itemSelectionGrid" class="premium-grid"></div>
             </div>
 
             <div class="cart-container">
-                <div class="cart-title">🛒 မှာယူထားသည့်စာရင်း</div>
-                
-                <div class="customer-section">
-                    <input type="number" id="cPhone" placeholder="ဖုန်းနံပါတ်..." oninput="lookupCustomer(this.value)">
-                    <input type="text" id="cName" placeholder="ဝယ်ယူသူအမည်...">
+                <h3 style="margin-top: 0;">Order Summary</h3>
+                <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                    <input type="number" id="cPhone" placeholder="Phone Number" style="flex:1; padding:12px; border-radius:15px; border:1px solid #eee;">
+                    <input type="text" id="cName" placeholder="Name" style="flex:1; padding:12px; border-radius:15px; border:1px solid #eee;">
                 </div>
-
-                <div id="selectedItemsList" class="premium-cart-list">
-                    </div>
+                
+                <div id="selectedItemsList" style="flex: 1; overflow-y: auto;"></div>
 
                 <div class="checkout-footer">
-                    <div class="billing-info">
-                        <div class="bill-row"><span>စုစုပေါင်း</span> <strong id="orderTotalAmount">0 Ks</strong></div>
+                    <div class="total-display">
+                        <span style="color: #888;">Grand Total</span>
+                        <h2 id="orderTotalAmount" style="margin:0; color:var(--accent-soft);">0 Ks</h2>
                     </div>
-                    <button class="confirm-btn" onclick="submitOrder()">
-                        အတည်ပြုမည် <span>→</span>
-                    </button>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <input type="datetime-local" id="pickupTime" style="flex:1; border:none; background:#f0f2f5; padding:10px; border-radius:10px;">
+                        <select id="payStatus" style="border:none; background:#f0f2f5; padding:10px; border-radius:10px;">
+                            <option value="Unpaid">Unpaid</option>
+                            <option value="Paid">Paid</option>
+                        </select>
+                    </div>
+                    <button class="confirm-btn" onclick="submitOrder()">Confirm Order & Print</button>
                 </div>
             </div>
         </div>
     </div>
     </div>
+    
+
     
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
