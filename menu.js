@@ -149,3 +149,27 @@ async function confirmDelete(id, name) {
     }
 }
 
+// ပုံရွေးလိုက်ရင် Modal မှာတင် ချက်ချင်းပြပေးဖို့
+function previewPhoto(input) {
+    const preview = document.getElementById('imagePreview');
+    const placeholder = document.getElementById('uploadPlaceholder');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Modal ပိတ်ရင် Preview ကိုပါ Reset လုပ်ဖို့
+function closeMenuModal() {
+    document.getElementById('menuModal').style.display = 'none';
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('uploadPlaceholder').style.display = 'block';
+    document.getElementById('itemImage').value = '';
+}
+
