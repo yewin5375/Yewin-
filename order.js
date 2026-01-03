@@ -90,3 +90,108 @@ async function updateOrderStatus(orderId, newStatus) {
     }
 }
 
+let currentCart = [];
+
+// ၁။ အော်ဒါတင်မည့် Modal ကို ဖွင့်ခြင်း
+function openOrderModal() {
+    currentCart = [];
+    renderCart();
+    document.getElementById('orderModal').style.display = 'flex';
+    loadMenuToOrder(); // Menu list ကို Modal ထဲမှာ ပြဖို့
+}
+
+// ၂။ Customer အချက်အလက် ရှာဖွေခြင်း (Smart Search)
+async function lookupCustomer(phone) {
+    if (phone.length < 7) return;
+    const { data, error } = await window.sb
+        .from('customers')
+        .select('full_name')
+        .eq('phone_number', phone)
+        .single();
+    
+    if (data) {
+        document.getElementById('cName').value = data.full_name;
+        document.getElementById('customerMsg').innerText = "VIP Customer ပြန်ရောက်လာပါပြီ! ✨";
+    }
+}
+
+// ၃။ Menu များကို ရွေးချယ်နိုင်အောင် ပြသခြင်း
+async function loadMenuToOrder() {
+    const { data } = await window.sb.from('menu').select('*').eq('is_available', true);
+    const menuGrid = document.getElementById('itemSelectionGrid');
+    menuGrid.innerHTML = data.map(item => `
+        <div class="selection-item" onclick="addToCart(${JSON.stringify(item).replace(/'/g, "&apos;")})">
+            <span>${item.name}</span>
+            <small>${item.price} Ks</small>
+        </div>
+    `).join('');
+}
+
+// ၄။ Cart ထဲသို့ ပစ္စည်းထည့်ခြင်း
+function addToCart(item) {
+    const existing = currentCart.find(i => i.id === item.id);
+    if (existing) {
+        existing.qty++;
+    } else {
+        currentCart.push({ id: item.id, name: item.name, price: item.price, qty: 1 });
+    }
+    renderCart();
+}
+
+// ၅။ Cart ထဲက စာရင်းကို ပြသခြင်း
+function renderCart() {
+    const cartDiv = document.getElementById('selectedItemsList');
+    let total = 0;
+    cartDiv.innerHTML = currentCart.map((item, index) => {
+        total += item.price * item.qty;
+        return `
+            <div class="cart-row">
+                <span>${item.name} x ${item.qty}</span>
+                <span>${(item.price * item.qty).toLocaleString()} Ks</span>
+                <button onclick="removeFromCart(${index})">❌</button>
+            </div>
+        `;
+    }).join('');
+    document.getElementById('orderTotalAmount').innerText = total.toLocaleString() + " Ks";
+}
+
+function removeFromCart(index) {
+    currentCart.splice(index, 1);
+    renderCart();
+}
+
+// ၆။ အော်ဒါ သိမ်းဆည်းခြင်း (Final Save)
+async function submitOrder() {
+    const phone = document.getElementById('cPhone').value;
+    const name = document.getElementById('cName').value;
+    const pTime = document.getElementById('pickupTime').value;
+    const pMethod = document.getElementById('payMethod').value;
+    const pStatus = document.getElementById('payStatus').value;
+    
+    if (!phone || !pTime || currentCart.length === 0) return alert("အချက်အလက် ပြည့်စုံအောင်ဖြည့်ပါ!");
+
+    const total = currentCart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+
+    try {
+        // Customer Profile ကို အရင် Update/Insert လုပ်မယ် (VIP Points အတွက်)
+        await window.sb.from('customers').upsert([
+            { phone_number: phone, full_name: name }
+        ], { onConflict: 'phone_number' });
+
+        // Order တင်မယ်
+        const { error } = await window.sb.from('orders').insert([{
+            customer_phone: phone,
+            customer_name: name,
+            items: currentCart,
+            total_amount: total,
+            pickup_time: pTime,
+            payment_method: pMethod,
+            payment_status: pStatus
+        }]);
+
+        if (error) throw error;
+        alert("ဘောက်ချာ ထုတ်ပြီးပါပြီ!");
+        document.getElementById('orderModal').style.display = 'none';
+        loadOrders();
+    } catch (e) { alert(e.message); }
+                                      }
