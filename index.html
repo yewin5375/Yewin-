@@ -101,6 +101,17 @@
                 <option value="Sides">Sides</option>
             </select>
         </div>
+        <div class="modal-input-group">
+    <label>Menu Photo</label>
+    <div class="photo-upload-container" onclick="document.getElementById('itemImage').click()">
+        <img id="imagePreview" src="">
+        <div class="upload-placeholder" id="uploadPlaceholder">
+            <span style="font-size: 24px;">📸</span>
+            <p style="margin: 5px 0 0; font-size: 12px;">Tap to upload photo</p>
+        </div>
+    </div>
+    <input type="file" id="itemImage" accept="image/*" style="display: none;" onchange="previewPhoto(this)">
+        </div>
 
         <button class="confirm-btn" id="uploadBtn" onclick="handleMenuSave()" style="margin-top: 10px;">Save Menu</button>
     </div>
@@ -115,7 +126,15 @@
         </div>
 
         <div class="pos-header-actions">
-            <input type="text" class="search-bar" id="posSearch" placeholder="Search Menu..." oninput="filterPOSMenu()">
+    <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" 
+               class="search-input-pearl" 
+               id="posSearch" 
+               placeholder="ဘာရှာချင်လဲ အစ်ကို..." 
+               oninput="filterPOSMenu()">
+    </div>
+        </div>        
             <div class="category-tags" id="posCategories">
                 <div class="tag active" onclick="filterCategory('All')">All Items</div>
                 </div>
