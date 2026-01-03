@@ -79,3 +79,20 @@ window.onload = () => {
     setInterval(loadDashboardStats, 30000);
 };
 
+// Back to Top Button Logic
+const backBtn = document.createElement('div');
+backBtn.id = "backToTop";
+backBtn.innerHTML = "↑";
+document.body.appendChild(backBtn);
+
+window.onscroll = function() {
+    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        backBtn.style.display = "flex";
+    } else {
+        backBtn.style.display = "none";
+    }
+};
+
+backBtn.onclick = function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
