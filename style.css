@@ -13,85 +13,55 @@
 
 body { 
     font-family: 'Inter', sans-serif; 
-    margin: 0; 
-    background-color: var(--bg); 
-    color: var(--text-dark); 
-    overflow-x: hidden; 
-    -webkit-tap-highlight-color: transparent; 
+    margin: 0; background-color: var(--bg); color: var(--text-dark); 
+    overflow-x: hidden; -webkit-tap-highlight-color: transparent; 
 }
 
 /* =========================================
    2. Header & Bottom Navigation
    ========================================= */
 .app-header { 
-    height: 60px; background: rgba(255,255,255,0.8); 
-    backdrop-filter: blur(10px); display: flex; align-items: center; 
-    justify-content: space-between; padding: 0 20px; 
-    position: sticky; top: 0; z-index: 1000; 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03); 
+    height: 60px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); 
+    display: flex; align-items: center; justify-content: space-between; padding: 0 20px; 
+    position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 3px rgba(0,0,0,0.03); 
 }
 
 .bottom-nav { 
     position: fixed; bottom: 0; left: 0; right: 0; height: 75px; 
     background: #ffffff; display: flex; justify-content: space-around; 
     align-items: center; z-index: 2000; padding-bottom: 10px; 
-    border-radius: 25px 25px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-    border-top: 1px solid #f1f1f1;
+    border-radius: 25px 25px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); border-top: 1px solid #f1f1f1;
 }
 
 .nav-item { 
-    font-size: 24px; color: #9CA3AF; cursor: pointer; 
-    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    font-size: 24px; color: #9CA3AF; cursor: pointer; transition: 0.4s;
     display: flex; flex-direction: column; align-items: center; 
 }
 .nav-item.active { color: var(--primary); transform: translateY(-10px) scale(1.1); }
 
 /* =========================================
-   3. Dashboard Overview (Stats Cards)
+   3. Dashboard & Admin Menu (ပုံအရွယ်အစားထိန်းညှိခြင်း)
    ========================================= */
 .content-area { padding: 20px; padding-bottom: 120px; }
 .page-header { font-size: 24px; margin-bottom: 20px; font-weight: 800; letter-spacing: -0.5px; }
 
 .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
-.stat-card { 
-    background: var(--white); padding: 20px; border-radius: 24px; 
-    display: flex; flex-direction: column; align-items: center; gap: 10px; 
-    box-shadow: var(--shadow); border: 1px solid #f8f9fa;
-}
-.card-icon { font-size: 28px; background: #FFF5F2; padding: 12px; border-radius: 18px; }
-.card-info h3 { margin: 0; font-size: 13px; color: #6B7280; font-weight: 600; text-align: center; }
-.card-info p { margin: 5px 0 0 0; font-size: 20px; font-weight: 800; color: var(--text-dark); text-align: center; }
+.stat-card { background: var(--white); padding: 20px; border-radius: 24px; box-shadow: var(--shadow); border: 1px solid #f8f9fa; text-align: center; }
 
-/* =========================================
-   4. Menu Management (Admin Cards)
-   ========================================= */
+/* Admin Menu Grid */
 .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-.menu-item-card { 
-    background: white; border-radius: 24px; overflow: hidden; 
-    box-shadow: var(--shadow); border: 1px solid #f1f1f1;
-}
-.card-image-wrapper { height: 120px; overflow: hidden; }
+.menu-item-card { background: white; border-radius: 24px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid #f1f1f1; }
+
+/* Admin Menu Image Size Fix */
+.card-image-wrapper { height: 110px; width: 100%; overflow: hidden; background: #f8f9fa; }
 .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
 .card-details { padding: 12px; }
-.card-details h4 { margin: 0; font-size: 14px; font-weight: 700; }
+.card-details h4 { margin: 0; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card-details .price { color: var(--primary); font-weight: 800; margin-top: 5px; font-size: 15px; }
 
 /* =========================================
-   5. Live Orders (Live List)
-   ========================================= */
-.order-card { 
-    background: white; border-radius: 22px; padding: 18px; 
-    margin-bottom: 15px; box-shadow: var(--shadow); 
-    border-left: 6px solid #e5e7eb;
-}
-.order-card.ready { border-left-color: #2ecc71; background: #fafffb; }
-.order-card.preparing { border-left-color: #f1c40f; }
-.order-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
-.customer-info h4 { margin: 0; font-size: 16px; font-weight: 700; }
-.customer-info p { margin: 2px 0; font-size: 13px; color: #6B7280; }
-
-/* =========================================
-   6. Pearl POS System (Modal)
+   4. Order အသစ်ဖွင့်သည့်နေရာ (Pearl POS Design)
    ========================================= */
 .modal-overlay { 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -107,33 +77,51 @@ body {
 
 .pos-main-content { display: flex; flex: 1; overflow: hidden; }
 
-/* POS Menu Items */
-.menu-container { flex: 1.5; padding: 20px; overflow-y: auto; }
-.pos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; }
-.menu-card { 
-    background: white; border-radius: 22px; padding: 10px; text-align: center;
-    box-shadow: var(--shadow); border: 1px solid transparent; transition: 0.3s;
-}
-.menu-card img { width: 100%; height: 90px; border-radius: 18px; object-fit: cover; }
+/* POS Menu Image Size Fix */
+.menu-container { flex: 1.6; padding: 15px; overflow-y: auto; }
+.pos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
 
-/* POS Cart Section */
+.menu-card { 
+    background: white; border-radius: 20px; padding: 8px; text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.03); border: 1px solid transparent; transition: 0.3s; cursor: pointer;
+}
+.menu-card img { 
+    width: 100%; height: 85px; /* ပုံအမြင့်ကို POS ထဲမှာလည်း ပုံသေကန့်သတ်လိုက်သည် */
+    border-radius: 15px; object-fit: cover; background: #f8f9fa;
+}
+
+.menu-card h4 { margin: 6px 0 2px; font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menu-card span { color: var(--primary); font-weight: 800; font-size: 13px; }
+
+/* POS Cart Section (ညာဘက်ခြမ်း) */
 .cart-container {
     flex: 1; background: rgba(255,255,255,0.5); border-left: 1px solid #eee;
     padding: 20px; display: flex; flex-direction: column;
 }
+
 .premium-cart-item {
     background: white; border-radius: 18px; padding: 12px; margin-bottom: 10px;
     display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
 }
-.qty-pill {
-    background: #f3f4f6; border-radius: 50px; display: flex; 
-    align-items: center; gap: 8px; padding: 5px 12px;
+
+.pos-input {
+    width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eee;
+    margin-bottom: 10px; background: #fdfdfd; font-family: inherit; box-sizing: border-box;
 }
-.qty-pill button { border: none; background: none; color: var(--primary); font-size: 18px; font-weight: bold; }
 
 /* =========================================
-   7. Buttons & FAB
+   5. Utility & Responsive
    ========================================= */
+.view { display: none; }
+.view.active { display: block; animation: fadeInUp 0.4s ease; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.confirm-btn {
+    width: 100%; background: #111827; color: white; border: none; padding: 18px;
+    border-radius: 20px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s;
+}
+.confirm-btn:active { transform: scale(0.98); }
+
 .fab-add { 
     position: fixed; bottom: 95px; right: 20px; width: 60px; height: 60px; 
     background: linear-gradient(135deg, var(--primary), var(--primary-light)); 
@@ -141,21 +129,9 @@ body {
     box-shadow: 0 10px 20px rgba(255, 112, 67, 0.3); z-index: 1500; 
 }
 
-.confirm-btn {
-    width: 100%; background: #111827; color: white; border: none; padding: 18px;
-    border-radius: 20px; font-weight: 800; font-size: 16px; cursor: pointer;
-}
-
-/* =========================================
-   8. Utility & Responsive
-   ========================================= */
-.view { display: none; }
-.view.active { display: block; animation: fadeInUp 0.4s ease; }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
 @media (max-width: 768px) {
     .pos-main-content { flex-direction: column; }
-    .menu-container { height: 55%; }
-    .cart-container { height: 45%; border-left: none; border-top: 1px solid #eee; }
+    .menu-container { height: 60%; }
+    .cart-container { height: 40%; border-left: none; border-top: 1px solid #eee; }
 }
 
