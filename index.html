@@ -5,48 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Myin Thar BBQ Admin</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     
-    <div class="container">
+    <div class="app-container">
         <header class="app-header">
             <div class="back-btn" onclick="goBack()">←</div>
-            <h2 id="viewTitle" style="margin:0; font-size:18px; color:#333;">Dashboard</h2>
-        </header>
+            <h2 id="viewTitle">Admin Overview</h2>
+            <div style="width: 40px;"></div> </header>
 
-        <main class="content">
+        <main class="content-area">
             
             <div id="dashboard" class="view active">
-                <h1>Daily Summary</h1>
-                <div class="grid-container"> 
+                <h1 class="page-header">Daily Summary</h1>
+                <div class="stat-grid"> 
                     <div class="stat-card">
                         <div class="card-icon">🛍️</div>
-                        <h3>Orders</h3>
-                        <p id="todayOrders">0 Orders</p>
+                        <div class="card-info">
+                            <h3>Orders</h3>
+                            <p id="todayOrders">0 Orders</p>
+                        </div>
                     </div>
                     <div class="stat-card">
                         <div class="card-icon">💰</div>
-                        <h3>Revenue</h3>
-                        <p id="todayRevenue">0 Ks</p>
+                        <div class="card-info">
+                            <h3>Revenue</h3>
+                            <p id="todayRevenue">0 Ks</p>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div id="orders" class="view">
-                <h1>Pick-up Orders</h1>
-                <div id="order-list" class="grid-container"></div>
+                <h1 class="page-header">Pick-up Orders</h1>
+                <div id="order-list"></div>
             </div>
 
             <div id="menu-manager" class="view">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h1>Menu Management</h1>
-                </div>
-                <div id="menu-list" class="grid-container"></div>
+                <h1 class="page-header">Menu Management</h1>
+                <div id="menu-list" class="menu-grid"></div>
                 <button class="fab-add" onclick="openMenuModal()">+</button>
             </div>
 
             <div id="customers" class="view">
-                <h1>Top Customers</h1>
+                <h1 class="page-header">Top Customers</h1>
                 <div id="customer-list"></div>
             </div>
 
@@ -61,42 +64,50 @@
 
         <div id="menuModal" class="modal-overlay">
             <div class="modal-content">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="modal-header">
                     <h2 id="modalTitle">Add New Menu</h2>
-                    <button onclick="closeMenuModal()" style="background:none; color:#333; box-shadow:none; font-size:24px;">×</button>
+                    <span class="close-modal" onclick="closeMenuModal()">&times;</span>
                 </div>
                 
-                <div class="add-form" style="margin-top: 20px;">
+                <div class="modal-form">
                     <input type="hidden" id="editItemId">
-                    <label>Item Name</label>
-                    <input type="text" id="itemName" placeholder="ဥပမာ - ကြက်တောင်ပံကင်">
+                    <div class="input-group">
+                        <label>Item Name</label>
+                        <input type="text" id="itemName" placeholder="ဥပမာ - ကြက်တောင်ပံကင်">
+                    </div>
                     
-                    <label>Price (Ks)</label>
-                    <input type="number" id="itemPrice" placeholder="5000">
+                    <div class="input-group">
+                        <label>Price (Ks)</label>
+                        <input type="number" id="itemPrice" placeholder="5000">
+                    </div>
                     
-                    <label>Category</label>
-                    <select id="itemCategory">
-                        <option value="BBQ">BBQ</option>
-                        <option value="Drinks">Drinks</option>
-                        <option value="Sides">Sides</option>
-                    </select>
+                    <div class="input-group">
+                        <label>Category</label>
+                        <select id="itemCategory">
+                            <option value="BBQ">BBQ</option>
+                            <option value="Drinks">Drinks</option>
+                            <option value="Sides">Sides</option>
+                        </select>
+                    </div>
                     
-                    <label>Photo</label>
-                    <input type="file" id="itemImage" accept="image/*">
+                    <div class="input-group">
+                        <label>Photo</label>
+                        <input type="file" id="itemImage" accept="image/*">
+                    </div>
                     
-                    <div style="display: flex; gap: 10px; margin-top: 20px;">
-                        <button onclick="closeMenuModal()" style="background: #ccc; flex: 1;">Back</button>
-                        <button onclick="handleMenuSave()" id="uploadBtn" style="flex: 2;">Save Menu</button>
+                    <div class="modal-actions">
+                        <button onclick="closeMenuModal()" class="btn-secondary">Back</button>
+                        <button onclick="handleMenuSave()" id="uploadBtn" class="btn-primary">Save Menu</button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-    </div> <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
     <script src="supabase.js"></script>
     <script src="app.js"></script>
     <script src="menu.js"></script>
