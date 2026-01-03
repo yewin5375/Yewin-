@@ -98,3 +98,15 @@ body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg);
 .btn-ready { background: #ff7043; color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 .btn-collected { background: #2ecc71; color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 .status-done { color: #2ecc71; font-weight: bold; font-size: 14px; }
+
+/* Selection Grid inside Modal */
+#itemSelectionGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-height: 200px; overflow-y: auto; margin-bottom: 15px; }
+.selection-item { background: #f0f2f5; padding: 10px; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; border: 1px solid transparent; }
+.selection-item:active { border-color: var(--primary); background: #fff5f2; }
+.selection-item span { font-weight: bold; font-size: 13px; }
+.selection-item small { color: var(--primary); }
+
+.cart-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+.cart-row button { background: none; border: none; color: red; cursor: pointer; }
+
+.order-summary { background: #111827; color: white; padding: 15px; border-radius: 15px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
