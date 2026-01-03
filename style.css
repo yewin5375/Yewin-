@@ -209,6 +209,81 @@ body {
     font-size: 15px;
     transition: 0.3s;
 }
+/* === Premium Photo Upload Area === */
+.photo-upload-container {
+    width: 100%;
+    height: 150px;
+    border: 2px dashed #e5e7eb;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f9fafb;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    transition: 0.3s;
+}
+
+.photo-upload-container:hover {
+    border-color: var(--primary);
+    background: #fffafa;
+}
+
+#imagePreview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none; /* ပုံမရှိခင် ဖျောက်ထားမည် */
+    position: absolute;
+    top: 0; left: 0;
+}
+
+.upload-placeholder {
+    text-align: center;
+    color: #9ca3af;
+}
+
+.upload-placeholder i { font-size: 30px; margin-bottom: 8px; }
+
+/* === အစ်ကို့ Style Search Bar (Glassmorphism + Pearl White) === */
+.pos-header-actions {
+    padding: 20px;
+    background: white;
+}
+
+.search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-wrapper .search-icon {
+    position: absolute;
+    left: 15px;
+    font-size: 18px;
+    color: #9ca3af;
+}
+
+.search-input-pearl {
+    width: 100%;
+    padding: 14px 14px 14px 45px;
+    background: #f3f4f6;
+    border: 1.5px solid transparent;
+    border-radius: 18px;
+    font-size: 15px;
+    font-family: inherit;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.search-input-pearl:focus {
+    background: white;
+    border-color: var(--primary-light);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    outline: none;
+}
 
 /* === အော်ဒါအသစ်ဖွင့်ရန် ခလုတ် (Premium Style) === */
 .btn-new-order-main {
@@ -228,21 +303,6 @@ body {
 .search-bar-container {
     padding: 10px 20px;
     background: white;
-}
-.search-input {
-    width: 100%;
-    background: #f1f5f9;
-    border: 2px solid transparent;
-    padding: 12px 15px;
-    border-radius: 15px;
-    font-size: 14px;
-    outline: none;
-    transition: 0.3s;
-}
-.search-input:focus {
-    border-color: var(--primary-light);
-    background: white;
-    box-shadow: 0 0 0 4px rgba(255, 112, 67, 0.1);
 }
 
 /* === Go to Checkout Button (Sticky Bottom) === */
