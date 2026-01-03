@@ -188,75 +188,88 @@ height: 55px;
     cursor: pointer;
     z-index: 1500;
 }
-/* Menu List Grid */
+/* Menu Grid System */
 .menu-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* ဖုန်းမှာ ဘေးတိုက် ၂ ခုပြမယ် */
+    grid-template-columns: repeat(2, 1fr);
     gap: 15px;
+    padding: 5px;
 }
 
-/* Edit Menu Card Style */
 .menu-item-card {
     background: white;
     border-radius: 20px;
-    padding: 12px;
+    overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.card-image-wrapper {
     position: relative;
-    border: 1px solid #f0f0f0;
+    height: 120px;
 }
 
-.menu-item-card img {
+.card-image-wrapper img {
     width: 100%;
-    height: 110px;
+    height: 100%;
     object-fit: cover;
-    border-radius: 15px;
-    margin-bottom: 10px;
 }
 
-.menu-item-card h4 {
-    margin: 5px 0;
+.availability-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: white;
+    font-size: 9px;
+    padding: 4px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.card-details {
+    padding: 12px;
+}
+
+.card-details h4 {
+    margin: 0;
     font-size: 14px;
-    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.menu-item-card .price {
+.card-details .price {
     color: var(--primary);
-    font-weight: 700;
-    font-size: 15px;
-    margin-bottom: 10px;
+    font-weight: bold;
+    margin: 5px 0 10px 0;
 }
 
-/* Edit & Delete Buttons inside Card */
 .card-actions {
     display: flex;
-    gap: 8px;
-    margin-top: 10px;
+    gap: 5px;
 }
 
 .btn-edit {
-    flex: 1;
-    background: #3498db;
-    color: white;
+    flex: 2;
+    background: #e3f2fd;
+    color: #1976d2;
     border: none;
     padding: 8px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.btn-toggle, .btn-delete {
+    flex: 1;
+    border: none;
+    padding: 8px;
+    border-radius: 10px;
 }
 
 .btn-delete {
-    background: #ffeded;
-    color: #e74c3c;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 8px;
-}
-
-/* Modal Form Labels */
-.modal-form label {
-    font-size: 13px;
-    color: #777;
-    margin-bottom: 6px;
-    display: block;
+    background: #fff0f0;
+    color: #dc3545;
 }
 
