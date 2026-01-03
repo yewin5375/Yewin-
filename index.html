@@ -3,120 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BBQ Business Admin</title>
+    <title>Myin Thar BBQ Admin</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     
-         <div class="container">
-    <header class="app-header">
-    <div class="back-btn" onclick="showView('dashboard')">←</div>
-    <h2 id="viewTitle" style="margin:0; font-size:18px; color:#333;">Dashboard</h2>
-</header>
+    <div class="container">
+        <header class="app-header">
+            <div class="back-btn" onclick="goBack()">←</div>
+            <h2 id="viewTitle" style="margin:0; font-size:18px; color:#333;">Dashboard</h2>
+        </header>
 
-<main class="content">
-    <div id="dashboard" class="view active">...</div>
-    <div id="orders" class="view">...</div>
-    
-    <div id="menu-manager" class="view">
-        <div id="menu-list" class="grid-container"></div>
-        <button class="fab-add" onclick="openMenuModal()">+</button>
-    </div>
-    
-    <div id="customers" class="view">...</div>
-</main>
-
-<nav class="bottom-nav">
-    <div class="nav-item active" onclick="changeNav('dashboard', this)">🏠</div>
-    <div class="nav-item" onclick="changeNav('orders', this)">📦</div>
-    <div class="nav-item" onclick="changeNav('menu-manager', this)">🍴</div>
-    <div class="nav-item" onclick="changeNav('customers', this)">👥</div>
-</nav>
-
-<div id="menuModal" class="modal-overlay">
-    <div class="modal-content">
-        </div>
-</div>
-             
-
-    <main class="content">
-        
-        <div id="dashboard" class="view active">
-            <h1>Daily Summary</h1>
-            <div class="grid-container"> 
-                <div class="stat-card">
-                    <div class="card-icon">🛍️</div>
-                    <h3>Orders</h3>
-                    <p id="todayOrders">0 Orders</p>
-                </div>
-                <div class="stat-card">
-                    <div class="card-icon">💰</div>
-                    <h3>Revenue</h3>
-                    <p id="todayRevenue">0 Ks</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="orders" class="view">
-            <h1>Pick-up Orders</h1>
-            <div id="order-list" class="grid-container">
-                </div>
-        </div>
-
-        <div id="menu-manager" class="view">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h1>Menu Management</h1>
-        <button onclick="openMenuModal()" style="background: var(--primary); font-size: 18px;">+ Add New Menu</button>
-    </div>
-
-    <div id="menu-list" class="grid-container"></div>
-
-    <div id="menuModal" class="modal-overlay">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2 id="modalTitle">Add New Menu</h2>
-                <button onclick="closeMenuModal()" style="background:none; color:#333; box-shadow:none; font-size:24px;">×</button>
-            </div>
+        <main class="content">
             
-            <div class="add-form" style="margin-top: 20px;">
-                <input type="hidden" id="editItemId">
-                <label>Item Name</label>
-                <input type="text" id="itemName" placeholder="ဥပမာ - ကြက်တောင်ပံကင်">
+            <div id="dashboard" class="view active">
+                <h1>Daily Summary</h1>
+                <div class="grid-container"> 
+                    <div class="stat-card">
+                        <div class="card-icon">🛍️</div>
+                        <h3>Orders</h3>
+                        <p id="todayOrders">0 Orders</p>
+                    </div>
+                    <div class="stat-card">
+                        <div class="card-icon">💰</div>
+                        <h3>Revenue</h3>
+                        <p id="todayRevenue">0 Ks</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="orders" class="view">
+                <h1>Pick-up Orders</h1>
+                <div id="order-list" class="grid-container"></div>
+            </div>
+
+            <div id="menu-manager" class="view">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h1>Menu Management</h1>
+                </div>
+                <div id="menu-list" class="grid-container"></div>
+                <button class="fab-add" onclick="openMenuModal()">+</button>
+            </div>
+
+            <div id="customers" class="view">
+                <h1>Top Customers</h1>
+                <div id="customer-list"></div>
+            </div>
+
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="changeNav('dashboard', this)">🏠</div>
+            <div class="nav-item" onclick="changeNav('orders', this)">📦</div>
+            <div class="nav-item" onclick="changeNav('menu-manager', this)">🍴</div>
+            <div class="nav-item" onclick="changeNav('customers', this)">👥</div>
+        </nav>
+
+        <div id="menuModal" class="modal-overlay">
+            <div class="modal-content">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 id="modalTitle">Add New Menu</h2>
+                    <button onclick="closeMenuModal()" style="background:none; color:#333; box-shadow:none; font-size:24px;">×</button>
+                </div>
                 
-                <label>Price (Ks)</label>
-                <input type="number" id="itemPrice" placeholder="5000">
-                
-                <label>Category</label>
-                <select id="itemCategory">
-                    <option value="BBQ">BBQ</option>
-                    <option value="Drinks">Drinks</option>
-                    <option value="Sides">Sides</option>
-                </select>
-                
-                <label>Photo</label>
-                <input type="file" id="itemImage" accept="image/*">
-                
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button onclick="closeMenuModal()" style="background: #ccc; flex: 1;">Back</button>
-                    <button onclick="handleMenuSave()" id="uploadBtn" style="flex: 2;">Save Menu</button>
+                <div class="add-form" style="margin-top: 20px;">
+                    <input type="hidden" id="editItemId">
+                    <label>Item Name</label>
+                    <input type="text" id="itemName" placeholder="ဥပမာ - ကြက်တောင်ပံကင်">
+                    
+                    <label>Price (Ks)</label>
+                    <input type="number" id="itemPrice" placeholder="5000">
+                    
+                    <label>Category</label>
+                    <select id="itemCategory">
+                        <option value="BBQ">BBQ</option>
+                        <option value="Drinks">Drinks</option>
+                        <option value="Sides">Sides</option>
+                    </select>
+                    
+                    <label>Photo</label>
+                    <input type="file" id="itemImage" accept="image/*">
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button onclick="closeMenuModal()" style="background: #ccc; flex: 1;">Back</button>
+                        <button onclick="handleMenuSave()" id="uploadBtn" style="flex: 2;">Save Menu</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-        </div>
-        
 
-        <div id="customers" class="view">
-            <h1>Top Customers</h1>
-            <div id="customer-list">
-                </div>
-        </div>
-
-    </main>
-         </div>
-            
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    </div> <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
