@@ -9,15 +9,35 @@
 <body>
     
          <div class="container">
-    <nav class="sidebar">
-        <h2>MYIN THAR ADMIN</h2>
-        <ul>
-            <li onclick="showView('dashboard')">📊 Dashboard</li>
-            <li onclick="showView('orders')">📦 Orders</li>
-            <li onclick="showView('menu-manager')">🍴 Menu Manager</li>
-            <li onclick="showView('customers')">👥 Customers</li>
-        </ul>
-    </nav>
+    <header class="app-header">
+    <div class="back-btn" onclick="showView('dashboard')">←</div>
+    <h2 id="viewTitle" style="margin:0; font-size:18px; color:#333;">Dashboard</h2>
+</header>
+
+<main class="content">
+    <div id="dashboard" class="view active">...</div>
+    <div id="orders" class="view">...</div>
+    
+    <div id="menu-manager" class="view">
+        <div id="menu-list" class="grid-container"></div>
+        <button class="fab-add" onclick="openMenuModal()">+</button>
+    </div>
+    
+    <div id="customers" class="view">...</div>
+</main>
+
+<nav class="bottom-nav">
+    <div class="nav-item active" onclick="changeNav('dashboard', this)">🏠</div>
+    <div class="nav-item" onclick="changeNav('orders', this)">📦</div>
+    <div class="nav-item" onclick="changeNav('menu-manager', this)">🍴</div>
+    <div class="nav-item" onclick="changeNav('customers', this)">👥</div>
+</nav>
+
+<div id="menuModal" class="modal-overlay">
+    <div class="modal-content">
+        </div>
+</div>
+             
 
     <main class="content">
         
