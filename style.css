@@ -110,16 +110,28 @@ body {
 
 /* POS Menu Grid Fix */
 .menu-container { flex: 1.6; padding: 15px; overflow-y: auto; }
-.pos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
-
-.menu-card { 
-    background: white; border-radius: 20px; padding: 8px; text-align: center;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.03); border: 1px solid transparent; transition: 0.3s; cursor: pointer;
+.pos-menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* ၂ ခုတွဲပြရန် */
+    gap: 12px;
+    padding: 15px;
+    overflow-y: auto;
+    flex: 1;
 }
-.menu-card img { width: 100%; height: 85px; border-radius: 15px; object-fit: cover; background: #f8f9fa; }
 
-.menu-card h4 { margin: 6px 0 2px; font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.menu-card span { color: var(--primary); font-weight: 800; font-size: 13px; }
+/* Menu Card ကို POS အတွက် သီးသန့်လှအောင်လုပ်ခြင်း */
+.menu-card {
+    background: white;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.menu-card:active { transform: scale(0.95); }
+.menu-card img { width: 100%; height: 100px; object-fit: cover; }
+.menu-card h4 { margin: 0; font-size: 14px; }
 
 /* POS Cart Section */
 .cart-container { flex: 1; background: rgba(255,255,255,0.5); border-left: 1px solid #eee; padding: 20px; display: flex; flex-direction: column; }
