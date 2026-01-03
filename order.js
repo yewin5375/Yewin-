@@ -39,12 +39,43 @@ function getStatusColor(status) {
     return colors[status] || '#eee';
 }
 
+// order.js ရဲ့ updateOrderStatus ထဲမှာ ဒါလေး ထည့်ပါ
 async function updateOrderStatus(id, status) {
-    await window.sb.from('orders').update({ status: status }).eq('id', id);
+    const { data: order } = await window.sb.from('orders').select('*').eq('id', id).single();
+    
+    const { error } = await window.sb.from('orders').update({ status: status }).eq('id', id);
+    
+    // အကယ်၍ အော်ဒါက သိမ်းပြီးသွားပြီ (Collected) ဆိုရင် Customer စာရင်းမှာသွားပေါင်းမယ်
+    if (status === 'collected' && order) {
+        await updateCustomerStats(order.customer_phone, order.customer_name, order.total_amount);
+    }
+    
     loadOrders();
+    loadDashboardStats();
 }
 
-async function markAsPaid(id) {
+async function updateCustomerStats(phone, name, amount) {
+    const pointEarned = Math.floor(amount / 1000); // ၁၀၀၀ ဖိုးဝယ်ရင် ၁ မှတ်ပေးခြင်း (အစ်ကို စိတ်ကြိုက်ပြင်နိုင်သည်)
+
+    // Customer ရှိမရှိအရင်စစ်မယ်
+    const { data: customer } = await window.sb.from('customers').select('*').eq('phone', phone).single();
+
+    if (customer) {
+        // ရှိပြီးသားဆိုရင် Update လုပ်မယ်
+        await window.sb.from('customers').update({
+            total_orders: customer.total_orders + 1,
+            total_spent: Number(customer.total_spent) + Number(amount),
+            points: customer.points + pointEarned
+        }).eq('phone', phone);
+    } else {
+        // မရှိသေးရင် အသစ်ဆောက်မယ်
+        await window.sb.from('customers').insert([{
+            phone, name, total_orders: 1, total_spent: amount, points: pointEarned
+        }]);
+    }
+}
+
+c function markAsPaid(id) {
     if(confirm("Confirm payment received?")) {
         await window.sb.from('orders').update({ payment_status: 'paid' }).eq('id', id);
         loadOrders();
