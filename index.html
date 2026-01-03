@@ -118,18 +118,40 @@
 
     <div id="orderModal" class="modal-overlay">
     <div id="posContainer" class="floating-window">
-        <div class="app-header" style="background: white; border-bottom: 1px solid #eee;">
+        <div class="pos-header">
             <div class="back-btn" onclick="closeOrderModal()">←</div>
-            <h3 style="margin:0;">အော်ဒါအသစ်ဖွင့်ရန်</h3>
-            <div style="width:24px;"></div> </div>
-
-        <div class="pos-main-content" style="display: flex; height: calc(100% - 60px);">
+            <div class="search-bar-container">
+                <span style="position:absolute; left:12px; top:10px;">🔍</span>
+                <input type="text" class="search-input" placeholder="Search menu..." oninput="filterPOSMenu(this.value)">
             </div>
+        </div>
+
+        <div class="category-scroll" id="posCategoryTabs">
+            <div class="cat-tab active" onclick="filterByCategory('All')">All</div>
+            <div class="cat-tab" onclick="filterByCategory('Food')">Food</div>
+            <div class="cat-tab" onclick="filterByCategory('Drinks')">Drinks</div>
+        </div>
+
+        <div class="pos-main-content">
+            <div class="menu-container">
+                <div id="itemSelectionGrid" class="pos-grid"></div>
+            </div>
+
+            <div class="cart-container">
+                <h3 style="margin:0 0 15px 0;">Order Summary</h3>
+                <div id="selectedItemsList" style="flex:1; overflow-y:auto;"></div>
+                
+                <div style="padding-top:15px; border-top:1px solid #eee;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                        <span>Total:</span>
+                        <strong id="orderTotalAmount" style="color:var(--primary); font-size:22px;">0 Ks</strong>
+                    </div>
+                    <button class="confirm-btn" onclick="checkoutOrder()">Checkout Order</button>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-
-    
-
+    </div>
     
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
