@@ -158,4 +158,60 @@ body {
     .cart-container { height: auto; border-left: none; border-top: 1px solid #eee; flex: none; }
     .stat-grid, .menu-grid { grid-template-columns: 1fr 1fr; }
 }
+/* === Add/Edit Menu Modal CSS === */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+    display: none; justify-content: center; align-items: center; z-index: 4000;
+}
+
+.menu-modal-content {
+    background: #ffffff; width: 90%; max-width: 450px;
+    padding: 30px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    animation: zoomIn 0.3s ease;
+}
+
+.menu-modal-content h3 { margin-top: 0; font-weight: 800; color: var(--text-dark); text-align: center; }
+
+.modal-input-group { margin-bottom: 15px; }
+.modal-input-group label { display: block; margin-bottom: 5px; font-size: 13px; font-weight: 600; color: #666; }
+.modal-input-group input, .modal-input-group select {
+    width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eee;
+    background: #f9f9f9; box-sizing: border-box; font-family: inherit;
+}
+
+/* === အော်ဒါအသစ်ဖွင့်ရန် ခလုတ် (Premium Style) === */
+.btn-new-order-main {
+    background: linear-gradient(135deg, #ff7043, #ff8a65);
+    color: white; border: none; width: 100%; padding: 18px;
+    border-radius: 20px; font-size: 17px; font-weight: 800;
+    cursor: pointer; box-shadow: 0 10px 20px rgba(255,112,67,0.3);
+    margin: 20px 0; display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+
+/* === Floating POS Header & Search === */
+.pos-header {
+    background: white; padding: 15px 20px; display: flex; 
+    align-items: center; gap: 15px; border-bottom: 1px solid #f1f1f1;
+}
+.search-bar-container {
+    flex: 1; position: relative;
+}
+.search-input {
+    width: 100%; background: #f3f4f6; border: none; padding: 10px 15px;
+    border-radius: 12px; padding-left: 35px; box-sizing: border-box;
+}
+
+/* Category Filter Tabs */
+.category-scroll {
+    display: flex; gap: 10px; overflow-x: auto; padding: 10px 20px;
+    background: white; border-bottom: 1px solid #eee;
+}
+.cat-tab {
+    padding: 8px 18px; background: #f3f4f6; border-radius: 50px;
+    font-size: 13px; white-space: nowrap; cursor: pointer;
+}
+.cat-tab.active { background: var(--primary); color: white; }
+
+@keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
