@@ -49,38 +49,37 @@ async function loadDashboardStats() {
     } catch (e) { console.error(e); }
 }
 
-// ၄။ Navigation Logic (Premium Bottom Nav & Header)
+// ၄။ Navigation Logic (Refresh ပတ်သက်သော logic အပါအဝင်)
 function changeNav(id, el) {
-    // Nav icons status ပြောင်းခြင်း
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    if (el) el.classList.add('active');
+    // လက်ရှိ Page ကို Browser မှာ မှတ်ထားမယ် (Refresh လုပ်ရင် ပြန်သုံးဖို့)
+    localStorage.setItem('activeView', id);
 
-    // Back Button Logic: Dashboard မှာဆိုရင် ဖျောက်မယ်၊ တခြား page ဆိုရင် ပြမယ်
-    const backBtn = document.querySelector('.back-btn');
-    if (id === 'dashboard') {
-        backBtn.style.visibility = 'hidden'; // Dashboard မှာ ဖျောက်ထားမယ်
+    // Nav Item အရောင်ပြောင်းခြင်း
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    if (el) {
+        el.classList.add('active');
     } else {
-        backBtn.style.visibility = 'visible'; // တခြား page တွေမှာ ပြမယ်
+        // ID အလိုက် Nav Item ကို ရှာပြီး Active ပေးခြင်း
+        const navMap = { 'dashboard': 0, 'orders': 1, 'menu-manager': 2, 'customers': 3 };
+        const items = document.querySelectorAll('.nav-item');
+        if (items[navMap[id]]) items[navMap[id]].classList.add('active');
     }
 
+    // Back Button ဖျောက်/ပြ Logic
+    const backBtn = document.querySelector('.back-btn');
+    if (backBtn) backBtn.style.visibility = (id === 'dashboard') ? 'hidden' : 'visible';
+
     // Header Title ပြောင်းခြင်း
-    const titles = {
-        'dashboard': 'Admin Overview',
-        'orders': 'Live Orders',
-        'menu-manager': 'Menu Gallery',
-        'customers': 'VIP Customers'
+    const titles = { 
+        'dashboard': 'Admin Overview', 
+        'orders': 'Live Orders', 
+        'menu-manager': 'Menu Gallery', 
+        'customers': 'VIP Customers' 
     };
-    document.getElementById('viewTitle').innerText = titles[id];
+    if (document.getElementById('viewTitle')) document.getElementById('viewTitle').innerText = titles[id];
 
     showView(id);
 }
-
-// Back arrow နှိပ်ရင် Dashboard ကို ပြန်ပို့ပြီး Button ပြန်ဖျောက်မယ်
-function goBack() {
-    const dashboardNavItem = document.querySelector('.nav-item:first-child');
-    changeNav('dashboard', dashboardNavItem);
-}
-
 
 function showView(id) {
     document.querySelectorAll('.view').forEach(v => {
@@ -94,40 +93,44 @@ function showView(id) {
         target.style.display = 'block';
     }
 
-    // Data Loading
+    // သက်ဆိုင်ရာ Data Load လုပ်ခြင်း
     if (id === 'dashboard') loadDashboardStats();
     if (id === 'menu-manager') typeof loadMenuItems === 'function' && loadMenuItems();
     if (id === 'customers') typeof loadCustomers === 'function' && loadCustomers();
     if (id === 'orders') typeof loadOrders === 'function' && loadOrders();
 }
 
-// ၅။ Back Arrow (Header)
+// Back Arrow နှိပ်လျှင် Dashboard ပြန်သွားခြင်း
 function goBack() {
     changeNav('dashboard', null);
 }
 
-// ၆။ Window Load
+// ၅။ Window Load (Refresh လုပ်လျှင် Page မပျောက်စေရန်)
 window.onload = () => {
-    changeNav('dashboard', document.querySelector('.nav-item'));
+    // သိမ်းထားတဲ့ Page ရှိရင် အဲ့ဒီကိုသွားမယ်၊ မရှိရင် Dashboard သွားမယ်
+    const savedView = localStorage.getItem('activeView') || 'dashboard';
+    changeNav(savedView, null);
+    
     initNotification();
-    setInterval(loadDashboardStats, 30000);
+    setInterval(loadDashboardStats, 30000); // ၃၀ စက္ကန့်တစ်ခါ Dashboard update လုပ်မယ်
 };
 
-// ၇။ Back to Top Button
-const backBtn = document.createElement('div');
-backBtn.id = "backToTop";
-backBtn.innerHTML = "↑";
-document.body.appendChild(backBtn);
+// ၆။ Back to Top Button
+const backToTopBtn = document.createElement('div');
+backToTopBtn.id = "backToTop";
+backToTopBtn.innerHTML = "↑";
+document.body.appendChild(backToTopBtn);
 
 window.onscroll = function() {
     if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-        backBtn.style.display = "flex";
+        backToTopBtn.style.display = "flex";
     } else {
-        backBtn.style.display = "none";
+        backToTopBtn.style.display = "none";
     }
 };
 
-backBtn.onclick = function() {
+backToTopBtn.onclick = function() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
+
 
