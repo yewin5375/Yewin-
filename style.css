@@ -1,48 +1,31 @@
-/* style.css */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: sans-serif; background: #f4f7f6; }
+body { font-family: sans-serif; margin: 0; background: #f4f4f9; }
+.container { display: flex; min-height: 100vh; }
 
-.container { display: flex; flex-direction: column; } /* ဖုန်းမှာ အပေါ်အောက် ပြရန် */
+/* Sidebar */
+.sidebar { width: 250px; background: #2c3e50; color: white; padding: 20px; }
+.sidebar h2 { text-align: center; color: #e67e22; }
+.sidebar ul { list-style: none; padding: 0; }
+.sidebar li { padding: 15px; cursor: pointer; border-bottom: 1px solid #34495e; }
+.sidebar li:hover { background: #34495e; color: #e67e22; }
 
-.sidebar {
-    background: #2c3e50;
-    color: white;
-    padding: 10px;
-    display: flex;
-    justify-content: space-around; /* Menu တွေကို ဘေးတိုက်ပြရန် */
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.sidebar h2 { display: none; } /* ဖုန်းမှာ ခေါင်းစဉ်ဖျောက်ထားမယ် */
-.sidebar ul { display: flex; width: 100%; justify-content: space-around; list-style: none; }
-.sidebar li { padding: 10px; font-size: 14px; cursor: pointer; }
-
-.content { padding: 15px; width: 100%; }
-
+/* Content Area */
+.content { flex: 1; padding: 20px; }
 .view { display: none; }
 .view.active { display: block; }
 
-.stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-.stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-.stat-card p { font-size: 18px; font-weight: bold; color: #2c3e50; }
+/* Cards & Grid */
+.grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+.stat-card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 10px; }
 
-/* PC အတွက် ပြန်ပြင်ရန် (Screen ကြီးရင်) */
-@media (min-width: 768px) {
-    .container { flex-direction: row; }
-    .sidebar { width: 200px; height: 100vh; flex-direction: column; justify-content: flex-start; }
-    .sidebar h2 { display: block; margin-bottom: 20px; text-align: center; }
-    .sidebar ul { flex-direction: column; }
-    .content { margin-left: 0; }
-}
-button:active {
-    transform: scale(0.95);
-    opacity: 0.8;
+/* Form & Inputs */
+.add-form input, .add-form select, .add-form button { display: block; width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
+.add-form button { background: #e67e22; color: white; border: none; font-weight: bold; cursor: pointer; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container { flex-direction: column; }
+    .sidebar { width: 100%; padding: 10px; }
+    .sidebar ul { display: flex; overflow-x: auto; }
+    .sidebar li { white-space: nowrap; padding: 10px; }
 }
 
-.order-card button {
-    font-size: 12px;
-    font-weight: bold;
-    transition: 0.2s;
-}
