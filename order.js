@@ -1,14 +1,61 @@
 let currentCart = [];
+let allMenuItems = [];
 
-// Floating Window အဖွင့်အပိတ် Animation
-function openOrderModal() {
-    const modal = document.getElementById('orderModal');
-    const container = document.getElementById('posContainer');
-    modal.style.display = 'flex';
-    container.classList.remove('closing');
-    if (typeof loadMenuToOrder === "function") {
-        loadMenuToOrder(); // POS ထဲက Menu တွေကို ဆွဲတင်တဲ့ function
+// ၁။ အော်ဒါဖွင့်လိုက်ရင် Menu ဆွဲတင်ခြင်း
+async function openOrderModal() {
+    document.getElementById('orderModal').style.display = 'flex';
+    currentCart = []; 
+    updateCartUI();
+    
+    const { data, error } = await window.sb.from('menu').select('*');
+    if (!error) {
+        allMenuItems = data;
+        renderPOSMenu(data);
     }
+}
+
+// ၂။ Menu များကို POS Grid ထဲပြသခြင်း
+function renderPOSMenu(items) {
+    const grid = document.getElementById('posMenuGrid');
+    grid.innerHTML = items.map(item => `
+        <div class="menu-card" onclick='addToCart(${JSON.stringify(item)})'>
+            <img src="${item.image_url || 'https://via.placeholder.com/150'}">
+            <h4>${item.name}</h4>
+            <span>${item.price} Ks</span>
+            ${item.stock < 1 ? '<div style="color:red; font-size:10px;">Out of Stock</div>' : ''}
+        </div>
+    `).join('');
+}
+
+// ၃။ ပစ္စည်းရွေးခြင်း (Add to Cart)
+function addToCart(item) {
+    const found = currentCart.find(i => i.id === item.id);
+    if (found) {
+        found.qty += 1;
+    } else {
+        currentCart.push({ ...item, qty: 1 });
+    }
+    updateCartUI();
+}
+
+function updateCartUI() {
+    const count = currentCart.reduce((s, i) => s + i.qty, 0);
+    const total = currentCart.reduce((s, i) => s + (i.qty * i.price), 0);
+    document.getElementById('cartCount').innerText = count;
+    document.getElementById('cartTotal').innerText = total.toLocaleString() + " Ks";
+}
+
+// ၄။ Category & Search Filter
+function filterPOSMenu() {
+    const term = document.getElementById('posSearch').value.toLowerCase();
+    const filtered = allMenuItems.filter(i => i.name.toLowerCase().includes(term));
+    renderPOSMenu(filtered);
+}
+
+// ၅။ Checkout အဆင့်
+function openCheckoutDetails() {
+    if (currentCart.length === 0) return alert("ပစ္စည်း အရင်ရွေးပါ!");
+    document.getElementById('checkoutModal').style.display = 'flex';
 }
 
 function closeOrderModal() {
