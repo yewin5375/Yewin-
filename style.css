@@ -1,119 +1,130 @@
-:root {
-    --pearl-bg: #F0F2F5;
-    --pearl-white: #ffffff;
-    --pearl-gradient: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
-    --accent-soft: #ff7043;
-    --glass: rgba(255, 255, 255, 0.7);
-    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+/* Core & Reset - Original by User with Pearl Polish */
+:root { 
+    --primary: #ff7043; 
+    --primary-light: #ff8a65; 
+    --bg: #fdfdfd; /* ပိုဖြူအောင် */
+    --text-dark: #1F2937; 
+    --white: #ffffff; 
+    --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); 
+    --pearl-gradient: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
 }
 
-body { background-color: var(--pearl-bg); font-family: 'Plus Jakarta Sans', sans-serif; }
-
-/* Modal Overlay with Blur */
-.modal-overlay {
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(15px);
+body { 
+    font-family: 'Inter', sans-serif; 
+    margin: 0; 
+    background-color: var(--bg); 
+    color: var(--text-dark); 
+    overflow-x: hidden; 
+    -webkit-tap-highlight-color: transparent; 
 }
 
-/* Main POS Container */
+/* Header & Navigation */
+.app-header { 
+    height: 60px; background: rgba(255,255,255,0.8); 
+    backdrop-filter: blur(10px); display: flex; align-items: center; 
+    justify-content: space-between; padding: 0 20px; 
+    position: sticky; top: 0; z-index: 1000; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03); 
+}
+
+.bottom-nav { 
+    position: fixed; bottom: 0; left: 0; right: 0; height: 75px; 
+    background: #ffffff; display: flex; justify-content: space-around; 
+    align-items: center; z-index: 2000; padding-bottom: 10px; 
+    border-radius: 30px 30px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.03);
+    border-top: 1px solid #f1f1f1;
+}
+
+.nav-item { 
+    font-size: 24px; color: #9CA3AF; cursor: pointer; 
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    display: flex; flex-direction: column; align-items: center; 
+}
+.nav-item.active { color: var(--primary); transform: translateY(-10px) scale(1.1); }
+
+/* Pearl Dashboard Stat Cards */
+.stat-card { 
+    background: var(--white); padding: 20px; border-radius: 28px; 
+    display: flex; align-items: center; gap: 20px; 
+    box-shadow: var(--shadow); border: 1px solid #f8f9fa;
+}
+
+/* Pearl POS System Styles */
+.modal-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(255,255,255,0.5); backdrop-filter: blur(15px);
+    display: none; justify-content: center; align-items: center; z-index: 3000; 
+}
+
 .premium-pos {
-    width: 96vw; height: 92vh;
-    background: var(--pearl-gradient);
-    border-radius: 40px;
-    display: flex; flex-direction: column;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.1);
-    border: 1px solid rgba(255,255,255,0.8);
-    overflow: hidden;
-    animation: pearlFadeIn 0.5s ease-out;
+    width: 96vw; height: 94vh; background: var(--pearl-gradient);
+    border-radius: 40px; display: flex; flex-direction: column;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.08); border: 2px solid white;
+    overflow: hidden; animation: popUp 0.4s ease;
 }
 
-@keyframes pearlFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-/* Header Navigation */
-.pos-top-nav {
-    padding: 25px 40px;
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--glass);
-    border-bottom: 1px solid rgba(0,0,0,0.03);
-}
-
-.back-btn {
-    background: white; border: none; color: #333;
-    padding: 12px 24px; border-radius: 20px;
-    font-weight: 700; cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    transition: 0.3s;
-}
-
-.back-btn:hover { transform: translateX(-5px); background: var(--accent-soft); color: white; }
-
-/* Grid & Cards */
 .pos-main-content { display: flex; flex: 1; overflow: hidden; }
 
-.menu-container { flex: 1.6; padding: 30px; overflow-y: auto; }
+/* Menu Grid in POS */
+.menu-container { flex: 1.5; padding: 25px; overflow-y: auto; }
+.pos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px; }
 
-.premium-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 25px;
+.menu-card { 
+    background: white; border-radius: 25px; padding: 12px; 
+    box-shadow: var(--shadow); transition: 0.3s; text-align: center;
+    border: 1px solid transparent;
 }
+.menu-card:active { transform: scale(0.96); border-color: var(--primary); }
+.menu-card img { width: 100%; height: 110px; border-radius: 20px; object-fit: cover; }
 
-.menu-item-card {
-    background: white; border-radius: 30px; padding: 10px;
-    box-shadow: var(--shadow-soft); transition: 0.4s;
-    border: 1px solid transparent; text-align: center;
-}
-
-.menu-item-card:hover { 
-    transform: translateY(-10px); 
-    border-color: var(--accent-soft);
-    box-shadow: 0 20px 40px rgba(255, 112, 67, 0.1);
-}
-
-.menu-item-card img { width: 100%; height: 140px; border-radius: 25px; object-fit: cover; }
-
-/* Pearl Cart Style */
+/* Cart Styling */
 .cart-container {
-    flex: 1; background: var(--glass);
-    border-left: 1px solid rgba(0,0,0,0.03);
-    padding: 30px; display: flex; flex-direction: column;
+    flex: 1; background: rgba(255,255,255,0.6); 
+    border-left: 1px solid #f1f1f1; padding: 25px; display: flex; flex-direction: column;
 }
 
 .premium-cart-item {
-    display: flex; align-items: center; padding: 15px;
-    background: white; border-radius: 22px;
-    margin-bottom: 15px; box-shadow: var(--shadow-soft);
-    animation: slideInRight 0.3s ease;
+    display: flex; align-items: center; padding: 12px;
+    background: white; border-radius: 22px; margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
 }
-
-@keyframes slideInRight { from { transform: translateX(50px); opacity: 0; } }
 
 .qty-pill {
-    background: #f0f2f5; border-radius: 50px;
-    display: flex; align-items: center; padding: 5px 15px; gap: 12px;
+    background: #f4f6f9; border-radius: 50px; display: flex; 
+    align-items: center; gap: 10px; padding: 5px 15px;
 }
+.qty-pill button { border: none; background: none; color: var(--primary); font-size: 20px; cursor: pointer; font-weight: bold; }
+.qty-pill input { width: 35px; border: none; background: none; text-align: center; font-weight: 800; font-size: 15px; }
 
-.qty-pill button { 
-    background: none; border: none; font-size: 20px; 
-    color: var(--accent-soft); cursor: pointer; font-weight: bold;
+/* Original User Cards (Live List) */
+.order-card { 
+    background: white; border-radius: 24px; padding: 20px; 
+    margin-bottom: 18px; box-shadow: var(--shadow); 
+    border: 1px solid #f8f9fa;
 }
+.order-card.ready { border-left: 8px solid #2ecc71; }
+.order-card.preparing { border-left: 8px solid #f1c40f; }
 
-.qty-pill input { width: 30px; border: none; background: none; text-align: center; font-weight: 700; }
-
-/* Footer & Button */
-.checkout-footer { margin-top: auto; padding-top: 20px; }
-
-.total-display {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 20px; padding: 0 10px;
+/* FAB & Buttons */
+.fab-add { 
+    position: fixed; bottom: 95px; right: 20px; width: 65px; height: 65px; 
+    background: linear-gradient(135deg, var(--primary), var(--primary-light)); 
+    color: white; border-radius: 22px; border: none; font-size: 32px; 
+    box-shadow: 0 12px 24px rgba(255, 112, 67, 0.3); z-index: 1500; 
 }
 
 .confirm-btn {
-    width: 100%; background: linear-gradient(135deg, #333, #000);
-    color: white; border: none; padding: 22px;
-    border-radius: 25px; font-size: 18px; font-weight: 800;
-    cursor: pointer; transition: 0.3s;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    width: 100%; background: #111827; color: white; border: none; padding: 20px;
+    border-radius: 22px; font-weight: 800; font-size: 16px; cursor: pointer; 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
-.confirm-btn:active { transform: scale(0.96); }
+@keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .pos-main-content { flex-direction: column; }
+    .menu-container { height: 60%; }
+    .cart-container { height: 40%; border-left: none; border-top: 1px solid #eee; }
+}
 
