@@ -86,24 +86,39 @@ function openCheckoutDetails() {
     renderCartList();
 }
 
-// ၇။ Checkout ထဲက Cart List (+/- ခလုတ်များ)
+// Checkout ထဲမှာ Cart List ကို ပြသခြင်း
 function renderCartList() {
     const list = document.getElementById('selectedItemsList');
-    if(!list) return; // HTML မှာ ဒီ ID ထည့်ထားဖို့လိုမယ်
+    if(!list) return;
+    
     list.innerHTML = currentCart.map((item, index) => `
         <div class="premium-cart-item">
             <div style="flex: 1;">
-                <b>${item.name}</b><br>
-                <small>${item.price.toLocaleString()} Ks</small>
+                <div style="font-weight: 800; color: #1F2937;">${item.name}</div>
+                <div style="font-size: 13px; color: var(--primary); font-weight: 700;">${(item.price * item.qty).toLocaleString()} Ks</div>
             </div>
-            <div class="qty-control">
-                <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
-                <input type="number" value="${item.qty}" readonly style="width:30px; border:none; text-align:center; background:none;">
-                <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
+            
+            <div class="qty-control-premium">
+                <button class="qty-btn-new" onclick="updateQty(${index}, -1)">-</button>
+                <input type="number" class="qty-input-new" value="${item.qty}" 
+                       onchange="directQtyInput(${index}, this.value)">
+                <button class="qty-btn-new" onclick="updateQty(${index}, 1)">+</button>
             </div>
-            <div class="item-delete-anim" onclick="removeFromCart(${index})">🗑️</div>
+            
+            <button class="delete-bin-btn" onclick="removeFromCart(${index})">🗑️</button>
         </div>
     `).join('');
+}
+
+// လက်နဲ့ Quantity ရိုက်ထည့်ရင် စစ်ဆေးခြင်း
+function directQtyInput(index, val) {
+    let newQty = parseInt(val);
+    if (isNaN(newQty) || newQty < 1) {
+        newQty = 1;
+    }
+    currentCart[index].qty = newQty;
+    updateCartUI();
+    renderCartList();
 }
 
 function updateQty(index, change) {
@@ -114,10 +129,14 @@ function updateQty(index, change) {
 }
 
 function removeFromCart(index) {
-    currentCart.splice(index, 1);
-    updateCartUI();
-    renderCartList();
+    // ပျောက်သွားတဲ့ Animation လေးဖြစ်အောင် Confirm အရင်တောင်းတာ ပိုကောင်းပါတယ်
+    if(confirm("ဒီပစ္စည်းကို ဖျက်မှာ သေချာပါသလား?")) {
+        currentCart.splice(index, 1);
+        updateCartUI();
+        renderCartList();
+    }
 }
+
 
 // ၈။ Final Order တင်ခြင်း (Confirm Button)
 async function submitFinalOrder() {
