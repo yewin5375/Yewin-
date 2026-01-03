@@ -18,22 +18,29 @@ async function loadMenuItems() {
 
         // Card ဒီဇိုင်းကို ပိုမို Premium ဖြစ်အောင် ပြောင်းလဲထားသည်
         // loadMenuItems ထဲက Button အပိုင်းကိုပဲ ပြောင်းလဲဖော်ပြပေးထားပါတယ်
-listDiv.innerHTML = data.map(item => `
-    <div class="menu-item-card">
+         listDiv.innerHTML = data.map(item => `
+    <div class="menu-item-card" style="animation: fadeInUp 0.4s ease forwards;">
         <div class="card-image-wrapper">
-            <img src="${item.image_url || 'https://via.placeholder.com/150'}">
-            <div class="availability-badge" style="background: ${item.is_available ? '#28a745' : '#dc3545'}">
+            <img src="${item.image_url || 'https://via.placeholder.com/150'}" loading="lazy">
+            <div class="availability-badge" style="background: ${item.is_available ? 'linear-gradient(45deg, #2ecc71, #27ae60)' : 'linear-gradient(45deg, #e74c3c, #c0392b)'}">
                 ${item.is_available ? 'In Stock' : 'Out of Stock'}
             </div>
         </div>
         <div class="card-details">
             <h4>${item.name}</h4>
-            <p class="price">${Number(item.price).toLocaleString()} Ks</p>
+            <p class="price">${Number(item.price).toLocaleString()} <span style="font-size:10px;">Ks</span></p>
             
             <div class="card-actions">
                 <button class="btn-edit" onclick='openMenuModal(true, ${JSON.stringify(item).replace(/'/g, "&apos;")})'>
-                   ✏️ Edit Menu
+                   ✏️ Edit
                 </button>
+                
+                <button class="btn-toggle ${item.is_available ? 'active' : ''}" 
+                        onclick="toggleAvailability(${item.id}, ${!item.is_available})"
+                        title="${item.is_available ? 'Make Out of Stock' : 'Make In Stock'}">
+                    ${item.is_available ? '📦' : '❌'}
+                </button>
+
                 <button class="btn-delete" onclick="confirmDelete(${item.id}, '${item.name}')">
                     🗑️
                 </button>
@@ -41,6 +48,8 @@ listDiv.innerHTML = data.map(item => `
         </div>
     </div>
 `).join('');
+        
+
         
         
     } catch (e) {
