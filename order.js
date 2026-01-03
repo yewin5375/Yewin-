@@ -1,10 +1,12 @@
-// ၁။ အော်ဒါများကို ဆွဲထုတ်ပြသခြင်း
+let currentCart = [];
+
+// === ၁။ အော်ဒါများကို ဆွဲထုတ်ပြသခြင်း (Live Orders View) ===
 async function loadOrders() {
     try {
         const { data, error } = await window.sb
             .from('orders')
             .select('*')
-            .order('pickup_time', { ascending: true }); // လာယူမယ့်အချိန် အစောဆုံးကို အပေါ်ကပြမယ်
+            .order('pickup_time', { ascending: true });
 
         if (error) throw error;
 
@@ -21,7 +23,7 @@ async function loadOrders() {
                 <div class="order-header">
                     <div class="customer-info">
                         <span class="order-id">#${order.id.toString().slice(-4)}</span>
-                        <h4>${order.customer_name}</h4>
+                        <h4>${order.customer_name || 'ဧည့်သည်'}</h4>
                         <p>${order.customer_phone}</p>
                     </div>
                     <div class="pickup-tag">
@@ -51,14 +53,11 @@ async function loadOrders() {
     }
 }
 
-// ၂။ မှာယူထားသော ပစ္စည်းများစာရင်းကို ဖော်ပြခြင်း
 function renderOrderItems(items) {
-    // items သည် JSONB format ဖြစ်သောကြောင့် parse လုပ်ရန်
     const itemList = typeof items === 'string' ? JSON.parse(items) : items;
     return itemList.map(i => `<span>${i.name} x ${i.qty}</span>`).join(', ');
 }
 
-// ၃။ Status ခလုတ်များ (Preparing -> Ready -> Collected)
 function renderStatusButtons(order) {
     if (order.order_status === 'Preparing') {
         return `<button class="btn-ready" onclick="updateOrderStatus(${order.id}, 'Ready')">🔔 Mark Ready</button>`;
@@ -69,7 +68,6 @@ function renderStatusButtons(order) {
     }
 }
 
-// ၄။ Status Update လုပ်ခြင်းနှင့် Notification ပို့ခြင်း
 async function updateOrderStatus(orderId, newStatus) {
     try {
         const { error } = await window.sb
@@ -78,46 +76,36 @@ async function updateOrderStatus(orderId, newStatus) {
             .eq('id', orderId);
 
         if (error) throw error;
-
-        if (newStatus === 'Ready') {
-            alert("အော်ဒါအဆင်သင့်ဖြစ်ကြောင်း Customer ဆီ Noti ပို့လိုက်ပါပြီ!");
-            // ဤနေရာတွင် Firebase Notification Logic ကို ထည့်သွင်းပါမည်
-        }
-
-        loadOrders(); // List ကို Update ပြန်လုပ်မယ်
+        loadOrders(); 
     } catch (e) {
         alert("Status Update Error: " + e.message);
     }
 }
 
-let currentCart = [];
+// === ၂။ Admin POS (အော်ဒါအသစ်ဖွင့်ခြင်း) ===
 
-// ၁။ အော်ဒါတင်မည့် Modal ကို ဖွင့်ခြင်း
-// Admin က အော်ဒါစတင်ဖွင့်ခြင်း
 function openOrderModal() {
     currentCart = [];
     renderCart();
     
-    // Pickup Time ကို Admin အတွက် ၁၅ မိနစ်ပဲ ကြိုထားပေးမယ် (အမြန်ရအောင်)
     const now = new Date();
-    now.setMinutes(now.getMinutes() + 15);
+    now.setMinutes(now.getMinutes() + 30); // အော်ဒါပြင်ချိန် မိနစ် ၃၀ ကြိုပေးထားမယ်
     document.getElementById('pickupTime').value = now.toISOString().slice(0, 16);
     
     document.getElementById('orderModal').style.display = 'flex';
-    document.getElementById('cPhone').value = ""; // Clear old data
+    document.getElementById('cPhone').value = "";
     document.getElementById('cName').value = "";
     document.getElementById('customerMsg').innerText = "";
     loadMenuToOrder(); 
 }
 
-// ဖုန်းနံပါတ်ရိုက်တာနဲ့ Database ထဲမှာ ရှိပြီးသား Customer လား စစ်မယ်
 async function lookupCustomer(phone) {
     if (phone.length >= 7) {
         const { data } = await window.sb
             .from('customers')
             .select('full_name')
             .eq('phone_number', phone)
-            .single();
+            .maybeSingle();
         
         if (data) {
             document.getElementById('cName').value = data.full_name;
@@ -128,59 +116,69 @@ async function lookupCustomer(phone) {
     }
 }
 
+// Menu များကို ပုံနှင့်တကွ ဆွဲထုတ်ပြသခြင်း
+async function loadMenuToOrder() {
+    const menuGrid = document.getElementById('itemSelectionGrid');
+    if (!menuGrid) return;
 
-// ၂။ Customer အချက်အလက် ရှာဖွေခြင်း (Smart Search)
-async function lookupCustomer(phone) {
-    if (phone.length < 7) return;
-    const { data, error } = await window.sb
-        .from('customers')
-        .select('full_name')
-        .eq('phone_number', phone)
-        .single();
-    
-    if (data) {
-        document.getElementById('cName').value = data.full_name;
-        document.getElementById('customerMsg').innerText = "VIP Customer ပြန်ရောက်လာပါပြီ! ✨";
+    try {
+        const { data, error } = await window.sb.from('menu').select('*');
+        if (error) throw error;
+
+        menuGrid.innerHTML = data.map(item => {
+            const imgTag = item.image_url 
+                ? `<img src="${item.image_url}" class="mini-thumb">` 
+                : `<div class="mini-thumb-empty">🍗</div>`;
+
+            return `
+                <div class="selection-item" onclick='handleAddToCart(${JSON.stringify(item)})'>
+                    ${imgTag}
+                    <div class="selection-info">
+                        <span>${item.name}</span>
+                        <small>${Number(item.price).toLocaleString()} Ks</small>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (e) {
+        console.error("Menu Load Error:", e.message);
     }
 }
 
-// ၃။ Menu များကို ရွေးချယ်နိုင်အောင် ပြသခြင်း
-async function loadMenuToOrder() {
-    const { data } = await window.sb.from('menu').select('*').eq('is_available', true);
-    const menuGrid = document.getElementById('itemSelectionGrid');
-    menuGrid.innerHTML = data.map(item => `
-        <div class="selection-item" onclick="addToCart(${JSON.stringify(item).replace(/'/g, "&apos;")})">
-            <span>${item.name}</span>
-            <small>${item.price} Ks</small>
-        </div>
-    `).join('');
-}
-
-// ၄။ Cart ထဲသို့ ပစ္စည်းထည့်ခြင်း
-function addToCart(item) {
+// Cart ထဲသို့ ပစ္စည်းထည့်ခြင်း
+function handleAddToCart(item) {
     const existing = currentCart.find(i => i.id === item.id);
     if (existing) {
         existing.qty++;
     } else {
-        currentCart.push({ id: item.id, name: item.name, price: item.price, qty: 1 });
+        currentCart.push({ 
+            id: item.id, 
+            name: item.name, 
+            price: Number(item.price), 
+            qty: 1 
+        });
     }
     renderCart();
 }
 
-// ၅။ Cart ထဲက စာရင်းကို ပြသခြင်း
 function renderCart() {
     const cartDiv = document.getElementById('selectedItemsList');
     let total = 0;
-    cartDiv.innerHTML = currentCart.map((item, index) => {
-        total += item.price * item.qty;
-        return `
-            <div class="cart-row">
-                <span>${item.name} x ${item.qty}</span>
-                <span>${(item.price * item.qty).toLocaleString()} Ks</span>
-                <button onclick="removeFromCart(${index})">❌</button>
-            </div>
-        `;
-    }).join('');
+    
+    if (currentCart.length === 0) {
+        cartDiv.innerHTML = "<p style='font-size:12px; color:#888;'>ရွေးထားသော ပစ္စည်းမရှိသေးပါ</p>";
+    } else {
+        cartDiv.innerHTML = currentCart.map((item, index) => {
+            total += item.price * item.qty;
+            return `
+                <div class="cart-row" style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:14px;">
+                    <span>${item.name} x ${item.qty}</span>
+                    <span>${(item.price * item.qty).toLocaleString()} Ks</span>
+                    <button onclick="removeFromCart(${index})" style="border:none; background:none; color:red;">❌</button>
+                </div>
+            `;
+        }).join('');
+    }
     document.getElementById('orderTotalAmount').innerText = total.toLocaleString() + " Ks";
 }
 
@@ -189,7 +187,7 @@ function removeFromCart(index) {
     renderCart();
 }
 
-// ၆။ အော်ဒါ သိမ်းဆည်းခြင်း (Final Save)
+// အော်ဒါသိမ်းဆည်းခြင်း
 async function submitOrder() {
     const phone = document.getElementById('cPhone').value;
     const name = document.getElementById('cName').value;
@@ -202,12 +200,12 @@ async function submitOrder() {
     const total = currentCart.reduce((sum, i) => sum + (i.price * i.qty), 0);
 
     try {
-        // Customer Profile ကို အရင် Update/Insert လုပ်မယ် (VIP Points အတွက်)
+        // Customer Profile Update
         await window.sb.from('customers').upsert([
             { phone_number: phone, full_name: name }
         ], { onConflict: 'phone_number' });
 
-        // Order တင်မယ်
+        // Order Insert
         const { error } = await window.sb.from('orders').insert([{
             customer_phone: phone,
             customer_name: name,
@@ -215,12 +213,16 @@ async function submitOrder() {
             total_amount: total,
             pickup_time: pTime,
             payment_method: pMethod,
-            payment_status: pStatus
+            payment_status: pStatus,
+            order_status: 'Preparing'
         }]);
 
         if (error) throw error;
         alert("ဘောက်ချာ ထုတ်ပြီးပါပြီ!");
         document.getElementById('orderModal').style.display = 'none';
-        loadOrders();
-    } catch (e) { alert(e.message); }
-                                      }
+        loadOrders(); // စာရင်းပြန်ဖွင့်မည်
+    } catch (e) { 
+        alert("Order Submit Error: " + e.message); 
+    }
+}
+
