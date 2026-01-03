@@ -7,34 +7,47 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <nav class="sidebar">
-            <h2>BBQ Admin</h2>
-            <ul>
-                <li onclick="showView('dashboard')">🏠 Dashboard</li>
-                <li onclick="showView('orders')">📦 Orders</li>
-                <li onclick="showView('menu-manager')">🍴 Menu Manager</li>
-                <li onclick="showView('customers')">👥 Customers</li>
-            </ul>
-        </nav>
+    
+         <div class="container">
+    <nav class="sidebar">
+        <h2>MYIN THAR ADMIN</h2>
+        <ul>
+            <li onclick="showView('dashboard')">📊 Dashboard</li>
+            <li onclick="showView('orders')">📦 Orders</li>
+            <li onclick="showView('menu-manager')">🍴 Menu Manager</li>
+            <li onclick="showView('customers')">👥 Customers</li>
+        </ul>
+    </nav>
 
-        <main class="content">
-            <div id="dashboard" class="view active">
-                <h1>Daily Summary</h1>
-                <div class="stats-container">
-                    <div class="stat-card"><h3>Orders</h3><p id="todayOrders">0</p></div>
-                    <div class="stat-card"><h3>Revenue</h3><p id="todayRevenue">0 Ks</p></div>
+    <main class="content">
+        
+        <div id="dashboard" class="view active">
+            <h1>Daily Summary</h1>
+            <div class="grid-container"> 
+                <div class="stat-card">
+                    <div class="card-icon">🛍️</div>
+                    <h3>Orders</h3>
+                    <p id="todayOrders">0 Orders</p>
+                </div>
+                <div class="stat-card">
+                    <div class="card-icon">💰</div>
+                    <h3>Revenue</h3>
+                    <p id="todayRevenue">0 Ks</p>
                 </div>
             </div>
+        </div>
 
-            <div id="orders" class="view">
-                <h1>Pick-up Orders</h1>
-                <div id="order-list"></div>
-            </div>
+        <div id="orders" class="view">
+            <h1>Pick-up Orders</h1>
+            <div id="order-list" class="grid-container">
+                </div>
+        </div>
 
-            <div id="menu-manager" class="view">
-                <h1>Menu Management</h1>
-                <div class="add-form">
+        <div id="menu-manager" class="view">
+            <h1>Menu Management</h1>
+            <div class="stat-card add-form">
+                <h3>Add New Item</h3>
+                <div style="display: grid; gap: 15px; margin-top: 15px;">
                     <input type="text" id="itemName" placeholder="Item Name">
                     <input type="number" id="itemPrice" placeholder="Price (Ks)">
                     <select id="itemCategory">
@@ -42,19 +55,24 @@
                         <option value="Drinks">Drinks</option>
                         <option value="Sides">Sides</option>
                     </select>
-                    <input type="file" id="itemImage" accept="image/*">
-                    <button onclick="handleMenuUpload()" id="uploadBtn">Add New Menu</button>
+                    <input type="file" id="itemImage" accept="image/*" style="padding: 5px; border: none;">
+                    <button onclick="handleMenuUpload()" id="uploadBtn">✨ Add New Menu</button>
                 </div>
-                <hr>
-                <div id="menu-list" class="grid-container"></div>
             </div>
+            <hr style="margin: 30px 0; border: 0.5px solid #eee;">
+            <div id="menu-list" class="grid-container">
+                </div>
+        </div>
 
-            <div id="customers" class="view">
-                <h1>Top Customers</h1>
-                <div id="customer-list"></div>
-            </div>
-        </main>
-    </div>
+        <div id="customers" class="view">
+            <h1>Top Customers</h1>
+            <div id="customer-list">
+                </div>
+        </div>
+
+    </main>
+         </div>
+            
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
