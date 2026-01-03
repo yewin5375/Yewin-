@@ -51,15 +51,16 @@ async function loadDashboardStats() {
 
 // ၄။ Navigation Logic (Premium Bottom Nav & Header)
 function changeNav(id, el) {
-    // Nav icons အရောင်ပြောင်းခြင်း
+    // Nav icons status ပြောင်းခြင်း
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    if (el) {
-        el.classList.add('active');
+    if (el) el.classList.add('active');
+
+    // Back Button Logic: Dashboard မှာဆိုရင် ဖျောက်မယ်၊ တခြား page ဆိုရင် ပြမယ်
+    const backBtn = document.querySelector('.back-btn');
+    if (id === 'dashboard') {
+        backBtn.style.visibility = 'hidden'; // Dashboard မှာ ဖျောက်ထားမယ်
     } else {
-        // အကယ်၍ el မပါရင် id အလိုက် ရှာပြီး active ပေးမယ် (goBack အတွက်)
-        const items = document.querySelectorAll('.nav-item');
-        const navMap = { 'dashboard': 0, 'orders': 1, 'menu-manager': 2, 'customers': 3 };
-        if (items[navMap[id]]) items[navMap[id]].classList.add('active');
+        backBtn.style.visibility = 'visible'; // တခြား page တွေမှာ ပြမယ်
     }
 
     // Header Title ပြောင်းခြင်း
@@ -69,11 +70,17 @@ function changeNav(id, el) {
         'menu-manager': 'Menu Gallery',
         'customers': 'VIP Customers'
     };
-    const titleEl = document.getElementById('viewTitle');
-    if (titleEl) titleEl.innerText = titles[id];
+    document.getElementById('viewTitle').innerText = titles[id];
 
     showView(id);
 }
+
+// Back arrow နှိပ်ရင် Dashboard ကို ပြန်ပို့ပြီး Button ပြန်ဖျောက်မယ်
+function goBack() {
+    const dashboardNavItem = document.querySelector('.nav-item:first-child');
+    changeNav('dashboard', dashboardNavItem);
+}
+
 
 function showView(id) {
     document.querySelectorAll('.view').forEach(v => {
