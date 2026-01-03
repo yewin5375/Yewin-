@@ -188,4 +188,75 @@ height: 55px;
     cursor: pointer;
     z-index: 1500;
 }
+/* Menu List Grid */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* ဖုန်းမှာ ဘေးတိုက် ၂ ခုပြမယ် */
+    gap: 15px;
+}
+
+/* Edit Menu Card Style */
+.menu-item-card {
+    background: white;
+    border-radius: 20px;
+    padding: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    position: relative;
+    border: 1px solid #f0f0f0;
+}
+
+.menu-item-card img {
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+
+.menu-item-card h4 {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.menu-item-card .price {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+/* Edit & Delete Buttons inside Card */
+.card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.btn-edit {
+    flex: 1;
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.btn-delete {
+    background: #ffeded;
+    color: #e74c3c;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+/* Modal Form Labels */
+.modal-form label {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 6px;
+    display: block;
+}
 
