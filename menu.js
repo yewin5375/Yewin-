@@ -17,35 +17,32 @@ async function loadMenuItems() {
         }
 
         // Card ဒီဇိုင်းကို ပိုမို Premium ဖြစ်အောင် ပြောင်းလဲထားသည်
-        listDiv.innerHTML = data.map(item => `
-            <div class="menu-item-card">
-                <div class="card-image-wrapper">
-                    <img src="${item.image_url || 'https://via.placeholder.com/150'}" alt="${item.name}">
-                    <div class="availability-badge" style="background: ${item.is_available ? '#28a745' : '#dc3545'}">
-                        ${item.is_available ? 'In Stock' : 'Out of Stock'}
-                    </div>
-                </div>
-                <div class="card-details">
-                    <h4>${item.name}</h4>
-                    <p class="price">${Number(item.price).toLocaleString()} Ks</p>
-                    
-                    <div class="card-actions">
-                        <button class="btn-edit" onclick='openMenuModal(true, ${JSON.stringify(item).replace(/'/g, "&apos;")})'>
-                            ✏️ Edit
-                        </button>
-                        
-                        <button class="btn-toggle" onclick="toggleAvailability(${item.id}, ${!item.is_available})" 
-                            style="background:${item.is_available ? '#f0f0f0' : '#fff0f0'}; color:${item.is_available ? '#666' : '#dc3545'}">
-                            🔄
-                        </button>
-
-                        <button class="btn-delete" onclick="confirmDelete(${item.id}, '${item.name}')">
-                            🗑️
-                        </button>
-                    </div>
-                </div>
+        // loadMenuItems ထဲက Button အပိုင်းကိုပဲ ပြောင်းလဲဖော်ပြပေးထားပါတယ်
+listDiv.innerHTML = data.map(item => `
+    <div class="menu-item-card">
+        <div class="card-image-wrapper">
+            <img src="${item.image_url || 'https://via.placeholder.com/150'}">
+            <div class="availability-badge" style="background: ${item.is_available ? '#28a745' : '#dc3545'}">
+                ${item.is_available ? 'In Stock' : 'Out of Stock'}
             </div>
-        `).join('');
+        </div>
+        <div class="card-details">
+            <h4>${item.name}</h4>
+            <p class="price">${Number(item.price).toLocaleString()} Ks</p>
+            
+            <div class="card-actions">
+                <button class="btn-edit" onclick='openMenuModal(true, ${JSON.stringify(item).replace(/'/g, "&apos;")})'>
+                   ✏️ Edit Menu
+                </button>
+                <button class="btn-delete" onclick="confirmDelete(${item.id}, '${item.name}')">
+                    🗑️
+                </button>
+            </div>
+        </div>
+    </div>
+`).join('');
+        
+        
     } catch (e) {
         console.error("Menu Load Error:", e.message);
     }
