@@ -194,13 +194,79 @@ body {
     background: white; padding: 15px 20px; display: flex; 
     align-items: center; gap: 15px; border-bottom: 1px solid #f1f1f1;
 }
+/* === Search Bar Design === */
 .search-bar-container {
-    flex: 1; position: relative;
+    padding: 10px 20px;
+    background: white;
 }
 .search-input {
-    width: 100%; background: #f3f4f6; border: none; padding: 10px 15px;
-    border-radius: 12px; padding-left: 35px; box-sizing: border-box;
+    width: 100%;
+    background: #f1f5f9;
+    border: 2px solid transparent;
+    padding: 12px 15px;
+    border-radius: 15px;
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
 }
+.search-input:focus {
+    border-color: var(--primary-light);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(255, 112, 67, 0.1);
+}
+
+/* === Go to Checkout Button (Sticky Bottom) === */
+.checkout-bar {
+    padding: 20px;
+    background: white;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 -10px 20px rgba(0,0,0,0.03);
+}
+
+.btn-checkout {
+    background: linear-gradient(135deg, #111827, #374151);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 18px;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn-checkout:active { transform: scale(0.95); }
+
+/* === +/- Qty & Delete Animation === */
+.qty-control {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f8f9fa;
+    padding: 5px 10px;
+    border-radius: 12px;
+}
+.qty-btn {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: none;
+    background: white;
+    color: var(--primary);
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: 0.2s;
+}
+.qty-btn:active { transform: scale(0.8); background: var(--primary); color: white; }
+
+.item-delete-anim {
+    color: #ef4444;
+    cursor: pointer;
+    padding: 8px;
+    transition: 0.3s;
+}
+.item-delete-anim:hover { transform: rotate(15deg) scale(1.2); }
 
 /* Category Filter Tabs */
 .category-scroll {
