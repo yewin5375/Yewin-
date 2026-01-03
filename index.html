@@ -110,63 +110,44 @@
             </div>
         </div>
     </div>
+
     <div id="orderModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content" style="max-width: 500px; max-height: 90vh; overflow-y: auto;">
-        <div class="modal-header">
-            <h2>📝 ဘောက်ချာအသစ်</h2>
-            <span class="close-modal" onclick="document.getElementById('orderModal').style.display='none'">&times;</span>
+    <div class="pos-container">
+        <div class="pos-menu-section">
+            <div class="pos-header">
+                <h3>🍴 Menu</h3>
+                <span class="close-pos" onclick="closeOrderModal()">&times;</span>
+            </div>
+            <div id="itemSelectionGrid" class="pos-grid">
+                </div>
         </div>
-        
-        <div class="modal-form">
-            <div class="input-group">
-                <label>ဖုန်းနံပါတ်</label>
-                <input type="number" id="cPhone" placeholder="09xxxxxxx" oninput="lookupCustomer(this.value)">
-                <small id="customerMsg" style="color: var(--primary); font-weight: bold;"></small>
+
+        <div class="pos-cart-section">
+            <div class="cart-header">
+                <h3>🛒 လက်ရှိအော်ဒါ</h3>
             </div>
             
-            <div class="input-group">
-                <label>ဝယ်ယူသူအမည်</label>
-                <input type="text" id="cName" placeholder="Customer Name">
+            <div class="customer-quick-input">
+                <input type="number" id="cPhone" placeholder="ဖုန်းနံပါတ်ရိုက်ပါ" oninput="lookupCustomer(this.value)">
+                <input type="text" id="cName" placeholder="ဝယ်သူအမည်">
             </div>
 
-            <label style="font-weight: bold; font-size: 14px;">Menu ရွေးရန် (နှိပ်ထည့်ပါ)</label>
-            <div id="itemSelectionGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0;">
+            <div id="selectedItemsList" class="pos-cart-list">
                 </div>
 
-            <div id="selectedItemsList" style="background: #f8f9fa; padding: 12px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #eee;">
-                <p style="font-size: 12px; color: #888;">ရွေးထားသော ပစ္စည်းမရှိသေးပါ</p>
-            </div>
-
-            <div class="input-group">
-                <label>လာယူမည့်အချိန် (Pickup Time)</label>
-                <input type="datetime-local" id="pickupTime">
-            </div>
-
-            <div style="display: flex; gap: 10px;">
-                <div class="input-group" style="flex: 1;">
-                    <label>ငွေချေစနစ်</label>
-                    <select id="payMethod">
-                        <option value="Cash">Cash</option>
-                        <option value="KPay">KPay</option>
-                        <option value="Wave">Wave</option>
-                    </select>
-                </div>
-                <div class="input-group" style="flex: 1;">
-                    <label>အခြေအနေ</label>
+            <div class="pos-footer">
+                <div class="time-pay-row">
+                    <input type="datetime-local" id="pickupTime">
                     <select id="payStatus">
                         <option value="Unpaid">Unpaid</option>
                         <option value="Paid">Paid</option>
                     </select>
                 </div>
-            </div>
-
-            <div class="order-summary" style="background: #111827; color: white; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                <span>စုစုပေါင်း:</span>
-                <strong id="orderTotalAmount" style="font-size: 18px;">0 Ks</strong>
-            </div>
-
-            <div class="modal-actions" style="margin-top: 20px;">
-                <button class="btn-primary" onclick="submitOrder()" style="width: 100%; padding: 15px; font-size: 16px;">✅ ဘောက်ချာထုတ်မည်</button>
+                <div class="total-bar">
+                    <span>စုစုပေါင်း</span>
+                    <strong id="orderTotalAmount">0 Ks</strong>
+                </div>
+                <button class="btn-checkout" onclick="submitOrder()">✅ အော်ဒါအတည်ပြုမည်</button>
             </div>
         </div>
     </div>
