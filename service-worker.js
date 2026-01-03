@@ -1,35 +1,28 @@
-const CACHE_NAME = "mt-roast-admin-v1";
+// ၁။ Firebase Libraries များကို ချိတ်ဆက်ခြင်း
+importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js');
 
-const ASSETS = [
-  "./",
-  "./index.html",
-  "./manifest.json"
-];
-
-self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(ASSETS);
-    })
-  );
-  self.skipWaiting();
+// ၂။ Firebase ကို ပဏာမ ခြေလှမ်းအဖြစ် သတ်မှတ်ခြင်း (Initialize)
+// သင့်ရဲ့ Firebase Config ကို အတိအကျ သုံးထားပါတယ်
+firebase.initializeApp({
+  apiKey: "AIzaSyCW_jACdwWmN2nwlEOxR6tdTBqLXHyvE0w",
+  projectId: "myin-thar-chicken-bbq",
+  messagingSenderId: "45639130854",
+  appId: "1:45639130854:web:779ecef328580d10e9e527"
 });
 
-self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-      )
-    )
-  );
-  self.clients.claim();
+const messaging = firebase.messaging();
+
+// ၃။ Background မှာ Notification ကို လက်ခံရယူခြင်း
+messaging.onBackgroundMessage(function(payload) {
+  console.log('[firebase-messaging-sw.js] Background message received: ', payload);
+
+  const notificationTitle = payload.notification.title;
+  const notificationOptions = {
+    body: payload.notification.body,
+    icon: '/icon.png' // သင့်မှာ icon ရှိရင် ထည့်ပေးပါ
+  };
+
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
 
-self.addEventListener("fetch", event => {
-  event.respondWith(
-    caches.match(event.request).then(res => {
-      return res || fetch(event.request);
-    })
-  );
-});
