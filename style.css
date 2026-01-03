@@ -1,31 +1,142 @@
-body { font-family: sans-serif; margin: 0; background: #f4f4f9; }
-.container { display: flex; min-height: 100vh; }
+:root {
+    --primary-color: #ff7043; /* Customer app ထဲက လိမ္မော်ရောင် */
+    --secondary-color: #2c3e50;
+    --bg-light: #f8f9fa;
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --shadow: 0 8px 30px rgba(0,0,0,0.05);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
 
-/* Sidebar */
-.sidebar { width: 250px; background: #2c3e50; color: white; padding: 20px; }
-.sidebar h2 { text-align: center; color: #e67e22; }
-.sidebar ul { list-style: none; padding: 0; }
-.sidebar li { padding: 15px; cursor: pointer; border-bottom: 1px solid #34495e; }
-.sidebar li:hover { background: #34495e; color: #e67e22; }
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    margin: 0;
+    background-color: var(--bg-light);
+    color: #333;
+    overflow-x: hidden;
+}
 
-/* Content Area */
-.content { flex: 1; padding: 20px; }
-.view { display: none; }
-.view.active { display: block; }
+/* Container Layout */
+.container {
+    display: flex;
+    min-height: 100vh;
+}
 
-/* Cards & Grid */
-.grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
-.stat-card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 10px; }
+/* Sidebar Styling - Premium Dark */
+.sidebar {
+    width: 260px;
+    background: var(--secondary-color);
+    color: white;
+    padding: 30px 20px;
+    position: fixed;
+    height: 100vh;
+    transition: var(--transition);
+    z-index: 1000;
+}
 
-/* Form & Inputs */
-.add-form input, .add-form select, .add-form button { display: block; width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc; }
-.add-form button { background: #e67e22; color: white; border: none; font-weight: bold; cursor: pointer; }
+.sidebar h2 {
+    color: var(--primary-color);
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+}
 
-/* Responsive */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    padding: 14px 20px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar li:hover, .sidebar li.active-link {
+    background: rgba(255, 112, 67, 0.15);
+    color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+/* Main Content Area */
+.content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 40px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Card Styling - Premium Look */
+.stat-card {
+    background: var(--glass-bg);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: var(--transition);
+    backdrop-filter: blur(10px);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+}
+
+/* Grid System */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+/* Buttons - Consistent with Customer App */
+button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 15px rgba(255, 112, 67, 0.3);
+}
+
+button:hover {
+    filter: brightness(1.1);
+    transform: scale(1.03);
+}
+
+/* Back to Top Button */
+#backToTop {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    display: none; /* JS နဲ့ ပြန်ဖော်မယ် */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    z-index: 999;
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
-    .container { flex-direction: column; }
-    .sidebar { width: 100%; padding: 10px; }
-    .sidebar ul { display: flex; overflow-x: auto; }
-    .sidebar li { white-space: nowrap; padding: 10px; }
+    .sidebar { width: 0; padding: 0; overflow: hidden; }
+    .content { margin-left: 0; padding: 20px; }
 }
 
