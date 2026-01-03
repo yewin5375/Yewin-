@@ -1,116 +1,82 @@
-const onst firebaseC = i
-   {
-  a: Key: "AIzaSyCW_jACdwWmN2nwlEOxR6tdTBqLXHy,
-  ",
-  authD: ain: "myin-thar-chicken-bbq.firebaseapp,
-  ",
-  proj: tId: "myin-thar-chicken,
-  ",
-  storageB: ket: "myin-thar-chicken-bbq.firebasestorage,
-  ",
-  messagingSen: rId: "4563913,
-  ",
-  : pId: "1:45639130854:web:779ecef328580d10e9
-5;
-
-
+// ၁။ Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyCW_jACdwWmN2nwlEOxR6tdTBqLXHy",
+    authDomain: "myin-thar-chicken-bbq.firebaseapp.com",
+    projectId: "myin-thar-chicken",
+    storageBucket: "myin-thar-chicken-bbq.appspot.com",
+    messagingSenderId: "45639130854",
+    appId: "1:45639130854:web:779ecef328580d10e95"
 };
 
-fir.base.initializeApp(firebaseCo;
-ig);
- onst mess = ng = fir.base.messag;
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
 
-();
+// ၂။ Notification စနစ်
+async function initNotification() {
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            const registration = await navigator.serviceWorker.register('firebase-messaging-sw.js');
+            const token = await messaging.getToken({
+                serviceWorkerRegistration: registration,
+                vapidKey: "BKEpbLekJWc0eS5TDIKyB-Wp79lnfff9wF3ivDJj0LQG_s5Z7R2kKasvRAOaMvTxkRS6rkPfdIqLaIqR50O"
+            });
 
-// app.js ထဲက initNotification function ကို ဒါလေးနဲ့ အစားထိုးလိ
-
-
-ပါ
-
-
-// app.js ထဲက initNotification အပိုင်းမှာ ဒါလေး ပါရ
-ါမယ်
- sync fun tion initNotificat o
-    
-     onst permi = on =  wait Notific.tion.requestPermiss;
-    
-    if (permi ===  === 'gran e
-             // Service worker ကို register လုပ်တာ သေချ
-              onst registr = on =  wait navi.ator.serviceW.rker.register('firebase-messaging-sw;
-        
-              onst  = en =  wait mess.ging.getTo
-                 serviceWorkerRegistr: ion: registr, ion, // ဒါကို ထည့်ပေးရ
-                 vap: Key: "BKEpbLekJWc0eS5TDIKyB-Wp79lnfff9wF3ivDJj0LQG_s5Z7R2kKasvRAOaMvTxkRS6rkPfdIqLaIqR50O
-          ;
-        
-             if (t k
-                  wait w.nd.w.sb.from('user_tok.ns').upse t([{ : ken:  ok,   ], { onCon: ict: 't ke;
-                 co.sole.log("Token Saved Successful;
-         
-    
-
- 
-
-
-
-}
-
-
- sync fun tion loadDashbo r
-    
-     o st {, ata,  r =  } =  wait w.nd.w.sb.from('ord.rs').select;
-    
-   !if (!e r
-             doc.ment.getElementById('todayOrd.rs').inne = xt =.data.l + th + " Or;
-              onst  = al =.data.redu, (( => ) +  s + Num.er(o.total_a || t ,  0;
-             doc.ment.getElementById('todayReve.ue').inne = xt = .otal.toLocaleStr + () + ;
-    
-
- 
-
-}
-}
-
- sync fun tion loadCustom {
-    
-     o st {, ata,  r =  } =  wait w.nd.w.sb.from('custom.rs').select.'*').order('total_s, n ', { asce: ing:  al;
-    
-     onst li = iv = doc.ment.getElementById('customer-l;
-    
-   !if (!e r
-             li.tDiv.inne = ML =.data. => c => `
-            <div class="stat-card" style="text-align:left;">
-                <b>�. ${c || e || 'Unknown'}.(${c.phone})</b>
-                <p>Total Spent: ${Num.er(c.total_s.ent).toLocaleString()} Ks</p>
-                <p>Points. ${c.points} pts | Orders. ${c.total_orders}</p>
-            </div>
-     .  `).joi;
-    
-
-}
-// app.js ထဲမှာ ဒါလေးတွေ ထပ်ဖြည့်ပါ
-async function loadDashboardStats() {
-    const today = new Date().toISOString().split('T')[0];
-    
-    // ဒီနေ့အော်ဒါများယူခြင်း
-    const { data: orders, error } = await window.sb
-        .from('orders')
-        .select('total_amount')
-        .gte('created_at', today);
-
-    if (!error) {
-        const totalRevenue = orders.reduce((sum, order) => sum + Number(order.total_amount), 0);
-        document.getElementById('todayOrders').innerText = orders.length;
-        document.getElementById('todayRevenue').innerText = totalRevenue.toLocaleString() + " Ks";
+            if (token) {
+                await window.sb.from('user_tokens').upsert([{ token: token }], { onConflict: 'token' });
+                console.log("Token Saved Successfully");
+            }
+        }
+    } catch (error) {
+        console.error("Notification Error:", error);
     }
 }
 
-// window.onload မှာ ဒါလေးပြောင်းပါ
+// ၃။ Dashboard Stats
+async function loadDashboardStats() {
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        const { data: orders, error } = await window.sb
+            .from('orders')
+            .select('total_amount')
+            .gte('created_at', today);
+
+        if (!error) {
+            const totalRevenue = orders.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
+            document.getElementById('todayOrders').innerText = orders.length + " Orders";
+            document.getElementById('todayRevenue').innerText = totalRevenue.toLocaleString() + " Ks";
+        }
+    } catch (error) {
+        console.error("Dashboard Error:", error);
+    }
+}
+
+// ၄။ Navigation (View Switcher)
+function showView(id) {
+    // View များအားလုံးကို ဖျောက်ရန်
+    document.querySelectorAll('.view').forEach(v => {
+        v.classList.remove('active');
+        v.style.display = 'none';
+    });
+
+    // ရွေးထားသော View ကိုပြရန်
+    const targetView = document.getElementById(id);
+    if (targetView) {
+        targetView.classList.add('active');
+        targetView.style.display = 'block';
+    }
+
+    // Data Load လုပ်ရန်
+    if (id === 'dashboard') loadDashboardStats();
+    if (id === 'menu-manager') typeof loadMenuItems === 'function' && loadMenuItems();
+    if (id === 'customers') typeof loadCustomers === 'function' && loadCustomers();
+    if (id === 'orders') typeof loadOrders === 'function' && loadOrders();
+}
+
+// ၅။ Window Load
 window.onload = () => {
     showView('dashboard');
-    loadDashboardStats(); // Dashboard ကိန်းဂဏန်းများတင်ရန်
-    setInterval(loadDashboardStats, 30000); // ၃၀ စက္ကန့်တစ်ခါ Update လုပ်ရန်
+    initNotification();
+    setInterval(loadDashboardStats, 30000);
 };
-
-
 
