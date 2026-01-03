@@ -33,40 +33,39 @@ async function initNotification() {
 }
 
 // ၃။ Dashboard Stats
+// ၁။ Dashboard Stats တွက်ချက်ခြင်း
 async function loadDashboardStats() {
     try {
         const today = new Date().toISOString().split('T')[0];
-        const { data: orders, error } = await window.sb
+        const { data, error } = await window.sb
             .from('orders')
             .select('total_amount')
             .gte('created_at', today);
 
         if (!error) {
-            const totalRevenue = orders.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
-            document.getElementById('todayOrders').innerText = orders.length + " Orders";
+            const totalRevenue = data.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
+            document.getElementById('todayOrders').innerText = data.length + " Orders";
             document.getElementById('todayRevenue').innerText = totalRevenue.toLocaleString() + " Ks";
         }
-    } catch (error) {
-        console.error("Dashboard Error:", error);
-    }
+    } catch (e) { console.error(e); }
 }
 
-// ၄။ Navigation (View Switcher)
+// ၂။ Page ပြောင်းလဲခြင်း (Sidebar Logic)
 function showView(id) {
-    // View များအားလုံးကို ဖျောက်ရန်
+    // View အားလုံးကို အရင်ဖျောက်မယ်
     document.querySelectorAll('.view').forEach(v => {
         v.classList.remove('active');
         v.style.display = 'none';
     });
 
-    // ရွေးထားသော View ကိုပြရန်
-    const targetView = document.getElementById(id);
-    if (targetView) {
-        targetView.classList.add('active');
-        targetView.style.display = 'block';
+    // ရွေးလိုက်တဲ့ View ကို ပြမယ်
+    const target = document.getElementById(id);
+    if (target) {
+        target.classList.add('active');
+        target.style.display = 'block';
     }
 
-    // Data Load လုပ်ရန်
+    // သက်ဆိုင်ရာ Data Load လုပ်မယ်
     if (id === 'dashboard') loadDashboardStats();
     if (id === 'menu-manager') typeof loadMenuItems === 'function' && loadMenuItems();
     if (id === 'customers') typeof loadCustomers === 'function' && loadCustomers();
