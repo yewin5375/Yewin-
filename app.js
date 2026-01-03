@@ -96,3 +96,28 @@ window.onscroll = function() {
 backBtn.onclick = function() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
+
+function changeNav(id, el) {
+    // Nav icon status ပြောင်းရန်
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    el.classList.add('active');
+
+    // Header Title ပြောင်းရန်
+    const titles = {
+        'dashboard': 'Admin Overview',
+        'orders': 'Live Orders',
+        'menu-manager': 'Menu Gallery',
+        'customers': 'VIP Customers'
+    };
+    document.getElementById('viewTitle').innerText = titles[id];
+
+    // Page Switch လုပ်ရန်
+    showView(id);
+}
+
+// Back arrow အတွက် Dashboard ကို အမြဲပြန်ပို့ပေးရန်
+function goBack() {
+    showView('dashboard');
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    document.querySelector('.nav-item:first-child').classList.add('active');
+}
