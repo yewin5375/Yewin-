@@ -1,193 +1,122 @@
 :root {
-    --primary: #ff7043; /* Customer App Orange */
+    --primary: #ff7043;
     --primary-dark: #e64a19;
-    --secondary: #2c3e50;
-    --bg: #fdfdfd;
-    --card-bg: #ffffff;
-    --text: #333;
-    --shadow: 0 10px 30px rgba(0,0,0,0.05);
+    --bg: #f8f9fe;
+    --white: #ffffff;
+    --card-shadow: 0 10px 25px rgba(255, 112, 67, 0.1);
+    --glass: rgba(255, 255, 255, 0.85);
 }
 
 body {
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     margin: 0;
-    background-color: var(--bg);
-    color: var(--text);
-}
-
-/* Sidebar Styling */
-.sidebar {
-    width: 260px;
-    background: var(--secondary);
-    color: white;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    padding: 30px 15px;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
-    z-index: 100;
-}
-
-.sidebar h2 {
-    color: var(--primary);
-    text-align: center;
-    margin-bottom: 40px;
-    font-size: 22px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-.sidebar ul {
-    list-style: none;
     padding: 0;
+    background: var(--bg);
+    padding-bottom: 90px; /* Bottom Nav အတွက် နေရာချန်ထားခြင်း */
+    overflow-x: hidden;
 }
 
-.sidebar li {
+/* Premium Header with Back Arrow */
+.app-header {
+    background: var(--white);
     padding: 15px 20px;
-    margin-bottom: 10px;
-    border-radius: 15px;
-    cursor: pointer;
-    transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    font-weight: 500;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.03);
 }
 
-.sidebar li:hover {
-    background: rgba(255, 112, 67, 0.15);
+.back-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff5f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: var(--primary);
+    font-size: 20px;
+    cursor: pointer;
+    margin-right: 15px;
+    transition: 0.3s;
 }
 
-/* Content Area */
-.content {
-    margin-left: 260px;
-    padding: 40px;
-    min-height: 100vh;
+/* Bottom Navigation Bar */
+.bottom-nav {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: #1a1a1a; /* Dark Premium Theme */
+    height: 70px;
+    border-radius: 35px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    z-index: 2000;
 }
 
-/* Premium Cards */
-.stat-card {
-    background: var(--card-bg);
-    border-radius: 25px; /* အစ်ကို့ပုံထဲကလို အဝိုင်းလေးတွေ */
-    padding: 30px;
-    box-shadow: var(--shadow);
-    border: 1px solid rgba(0,0,0,0.02);
-    margin-bottom: 25px;
-    transition: transform 0.3s ease;
+.nav-item {
+    color: #888;
+    font-size: 22px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.stat-card:hover {
+.nav-item.active {
+    color: var(--primary);
     transform: translateY(-5px);
 }
 
-.stat-card h3 {
-    margin: 0;
-    font-size: 24px;
-    color: var(--secondary);
-}
-
-.stat-card p {
-    font-size: 18px;
-    color: #666;
-    margin-top: 10px;
-}
-
-/* Back to Top Button */
-#backToTop {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 50px;
-    height: 50px;
-    background: var(--primary);
-    color: white;
-    border-radius: 50%;
+/* View Animations */
+.view {
     display: none;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 5px 20px rgba(255, 112, 67, 0.4);
-    z-index: 1000;
-    font-weight: bold;
-    border: none;
+    padding: 20px;
+    animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        padding: 15px;
-    }
-    .sidebar ul {
-        display: flex;
-        overflow-x: auto;
-        gap: 10px;
-    }
-    .sidebar li {
-        white-space: nowrap;
-        padding: 10px 15px;
-    }
-    .content {
-        margin-left: 0;
-        padding: 20px;
-    }
+.view.active { display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.card-icon {
-    font-size: 30px;
-    margin-bottom: 10px;
-    background: rgba(255, 112, 67, 0.1);
-    width: 60px;
-    height: 60px;
+/* Premium Menu Cards */
+.menu-card {
+    background: var(--white);
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: 0.3s;
+    border: 1px solid rgba(0,0,0,0.02);
+}
+
+.menu-card:hover { transform: scale(1.02); }
+
+/* Floating Add Button (Mobile Style) */
+.fab-add {
+    position: fixed;
+    bottom: 105px;
+    right: 25px;
+    background: var(--primary);
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 8px 20px rgba(255, 112, 67, 0.3);
+    border: none;
+    cursor: pointer;
+    z-index: 1500;
 }
 
-.add-form input, .add-form select {
-    background: #f9f9f9;
-    border: 1px solid #eee;
-    padding: 12px;
-    border-radius: 12px;
-    font-size: 16px;
-}
-/* Modal Overlay */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: none; /* စဖွင့်ရင် ဖျောက်ထားမယ် */
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    backdrop-filter: blur(5px);
-}
-
-/* Modal Content Box */
-.modal-content {
-    background: white;
-    padding: 30px;
-    border-radius: 25px;
-    width: 90%;
-    max-width: 450px;
-    animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-}
-
-@keyframes popIn {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-.add-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: #666;
-    }
