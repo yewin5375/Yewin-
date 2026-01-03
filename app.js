@@ -33,7 +33,6 @@ async function initNotification() {
 }
 
 // ၃။ Dashboard Stats
-// ၁။ Dashboard Stats တွက်ချက်ခြင်း
 async function loadDashboardStats() {
     try {
         const today = new Date().toISOString().split('T')[0];
@@ -50,43 +49,71 @@ async function loadDashboardStats() {
     } catch (e) { console.error(e); }
 }
 
-// ၂။ Page ပြောင်းလဲခြင်း (Sidebar Logic)
+// ၄။ Navigation Logic (Premium Bottom Nav & Header)
+function changeNav(id, el) {
+    // Nav icons အရောင်ပြောင်းခြင်း
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    if (el) {
+        el.classList.add('active');
+    } else {
+        // အကယ်၍ el မပါရင် id အလိုက် ရှာပြီး active ပေးမယ် (goBack အတွက်)
+        const items = document.querySelectorAll('.nav-item');
+        const navMap = { 'dashboard': 0, 'orders': 1, 'menu-manager': 2, 'customers': 3 };
+        if (items[navMap[id]]) items[navMap[id]].classList.add('active');
+    }
+
+    // Header Title ပြောင်းခြင်း
+    const titles = {
+        'dashboard': 'Admin Overview',
+        'orders': 'Live Orders',
+        'menu-manager': 'Menu Gallery',
+        'customers': 'VIP Customers'
+    };
+    const titleEl = document.getElementById('viewTitle');
+    if (titleEl) titleEl.innerText = titles[id];
+
+    showView(id);
+}
+
 function showView(id) {
-    // View အားလုံးကို အရင်ဖျောက်မယ်
     document.querySelectorAll('.view').forEach(v => {
         v.classList.remove('active');
         v.style.display = 'none';
     });
 
-    // ရွေးလိုက်တဲ့ View ကို ပြမယ်
     const target = document.getElementById(id);
     if (target) {
         target.classList.add('active');
         target.style.display = 'block';
     }
 
-    // သက်ဆိုင်ရာ Data Load လုပ်မယ်
+    // Data Loading
     if (id === 'dashboard') loadDashboardStats();
     if (id === 'menu-manager') typeof loadMenuItems === 'function' && loadMenuItems();
     if (id === 'customers') typeof loadCustomers === 'function' && loadCustomers();
     if (id === 'orders') typeof loadOrders === 'function' && loadOrders();
 }
 
-// ၅။ Window Load
+// ၅။ Back Arrow (Header)
+function goBack() {
+    changeNav('dashboard', null);
+}
+
+// ၆။ Window Load
 window.onload = () => {
-    showView('dashboard');
+    changeNav('dashboard', document.querySelector('.nav-item'));
     initNotification();
     setInterval(loadDashboardStats, 30000);
 };
 
-// Back to Top Button Logic
+// ၇။ Back to Top Button
 const backBtn = document.createElement('div');
 backBtn.id = "backToTop";
 backBtn.innerHTML = "↑";
 document.body.appendChild(backBtn);
 
 window.onscroll = function() {
-    if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
         backBtn.style.display = "flex";
     } else {
         backBtn.style.display = "none";
@@ -97,27 +124,3 @@ backBtn.onclick = function() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-function changeNav(id, el) {
-    // Nav icon status ပြောင်းရန်
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    el.classList.add('active');
-
-    // Header Title ပြောင်းရန်
-    const titles = {
-        'dashboard': 'Admin Overview',
-        'orders': 'Live Orders',
-        'menu-manager': 'Menu Gallery',
-        'customers': 'VIP Customers'
-    };
-    document.getElementById('viewTitle').innerText = titles[id];
-
-    // Page Switch လုပ်ရန်
-    showView(id);
-}
-
-// Back arrow အတွက် Dashboard ကို အမြဲပြန်ပို့ပေးရန်
-function goBack() {
-    showView('dashboard');
-    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-    document.querySelector('.nav-item:first-child').classList.add('active');
-}
