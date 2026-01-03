@@ -44,25 +44,47 @@
         </div>
 
         <div id="menu-manager" class="view">
-            <h1>Menu Management</h1>
-            <div class="stat-card add-form">
-                <h3>Add New Item</h3>
-                <div style="display: grid; gap: 15px; margin-top: 15px;">
-                    <input type="text" id="itemName" placeholder="Item Name">
-                    <input type="number" id="itemPrice" placeholder="Price (Ks)">
-                    <select id="itemCategory">
-                        <option value="BBQ">BBQ</option>
-                        <option value="Drinks">Drinks</option>
-                        <option value="Sides">Sides</option>
-                    </select>
-                    <input type="file" id="itemImage" accept="image/*" style="padding: 5px; border: none;">
-                    <button onclick="handleMenuUpload()" id="uploadBtn">✨ Add New Menu</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1>Menu Management</h1>
+        <button onclick="openMenuModal()" style="background: var(--primary); font-size: 18px;">+ Add New Menu</button>
+    </div>
+
+    <div id="menu-list" class="grid-container"></div>
+
+    <div id="menuModal" class="modal-overlay">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 id="modalTitle">Add New Menu</h2>
+                <button onclick="closeMenuModal()" style="background:none; color:#333; box-shadow:none; font-size:24px;">×</button>
+            </div>
+            
+            <div class="add-form" style="margin-top: 20px;">
+                <input type="hidden" id="editItemId">
+                <label>Item Name</label>
+                <input type="text" id="itemName" placeholder="ဥပမာ - ကြက်တောင်ပံကင်">
+                
+                <label>Price (Ks)</label>
+                <input type="number" id="itemPrice" placeholder="5000">
+                
+                <label>Category</label>
+                <select id="itemCategory">
+                    <option value="BBQ">BBQ</option>
+                    <option value="Drinks">Drinks</option>
+                    <option value="Sides">Sides</option>
+                </select>
+                
+                <label>Photo</label>
+                <input type="file" id="itemImage" accept="image/*">
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button onclick="closeMenuModal()" style="background: #ccc; flex: 1;">Back</button>
+                    <button onclick="handleMenuSave()" id="uploadBtn" style="flex: 2;">Save Menu</button>
                 </div>
             </div>
-            <hr style="margin: 30px 0; border: 0.5px solid #eee;">
-            <div id="menu-list" class="grid-container">
-                </div>
         </div>
+    </div>
+        </div>
+        
 
         <div id="customers" class="view">
             <h1>Top Customers</h1>
