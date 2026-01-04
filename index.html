@@ -3,17 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Myin Thar BBQ Admin</title>
+    <title>Chicken BBQ Admin System</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     
     <div class="app-container">
         <header class="app-header">
-            <div class="back-btn" onclick="goBack()">←</div>
+            <div class="back-btn" id="headerBackBtn" onclick="goBack()" style="visibility: hidden;">←</div>
             <h2 id="viewTitle">Admin Overview</h2>
-            <div style="width: 40px;"></div> </header>
+            <div style="width: 40px;"></div> 
+        </header>
 
         <main class="content-area">
             
@@ -38,26 +39,26 @@
             </div>
 
             <div id="orders" class="view">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 class="page-header">Live Orders</h2>
-        <button class="btn-primary" onclick="openOrderModal()" style="width: auto; padding: 10px 20px;">
-            ➕ အော်ဒါအသစ်ဖွင့်ရန်
-        </button>
-    </div>
-    <div id="order-list">
-        </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 5px;">
+                    <h2 class="page-header">Live Orders</h2>
+                    <button class="btn-primary" onclick="openOrderModal()" style="width: auto; padding: 10px 20px;">
+                        ➕ အော်ဒါအသစ်
+                    </button>
+                </div>
+                <div id="order-list" class="order-container">
+                    </div>
             </div>
-            
 
             <div id="menu-manager" class="view">
-                <h1 class="page-header">Menu Management</h1>
+                <h1 class="page-header">Menu Gallery</h1>
                 <div id="menu-list" class="menu-grid"></div>
                 <button class="fab-add" onclick="openMenuModal()">+</button>
             </div>
 
             <div id="customers" class="view">
                 <h1 class="page-header">Top Customers</h1>
-                <div id="customer-list"></div>
+                <div id="customer-list" class="customer-container">
+                    </div>
             </div>
 
         </main>
@@ -70,115 +71,121 @@
         </nav>
 
         <div id="menuModal" class="modal-overlay">
-    <div class="menu-modal-content">
-        <div class="modal-header">
-            <div class="back-btn" onclick="closeMenuModal()" style="font-size: 24px;">←</div>
-            <h3 id="modalTitle" style="margin:0;">Add New Menu</h3>
-        </div>
-        
-        <input type="hidden" id="editItemId">
-        
-        <div class="modal-input-group">
-            <label>Menu Name</label>
-            <input type="text" id="itemName" placeholder="ဥပမာ - ကြက်တောင်ပံကင်">
-        </div>
-        
-        <div class="modal-input-group">
-            <label>Price (Ks)</label>
-            <input type="number" id="itemPrice" placeholder="5000">
-        </div>
-
-        <div class="modal-input-group">
-            <label>Stock (Pieces)</label>
-            <input type="number" id="itemStock" placeholder="0">
-        </div>
-
-        <div class="modal-input-group">
-            <label>Category</label>
-            <select id="itemCategory">
-                <option value="BBQ">BBQ</option>
-                <option value="Drinks">Drinks</option>
-                <option value="Sides">Sides</option>
-            </select>
-        </div>
-        <div class="modal-input-group">
-    <label>Menu Photo</label>
-    <div class="photo-upload-container" onclick="document.getElementById('itemImage').click()">
-        <img id="imagePreview" src="">
-        <div class="upload-placeholder" id="uploadPlaceholder">
-            <span style="font-size: 24px;">📸</span>
-            <p style="margin: 5px 0 0; font-size: 12px;">Tap to upload photo</p>
-        </div>
-    </div>
-    <input type="file" id="itemImage" accept="image/*" style="display: none;" onchange="previewPhoto(this)">
-        </div>
-
-        <button class="confirm-btn" id="uploadBtn" onclick="handleMenuSave()" style="margin-top: 10px;">Save Menu</button>
-    </div>
-</div>
-
-    <div id="orderModal" class="modal-overlay">
-    <div id="posContainer" class="floating-window">
-        <div class="app-header" style="background: white; border-bottom: 1px solid #eee;">
-            <div class="back-btn" onclick="closeOrderModal()">← Back</div>
-            <h3 style="margin:0;">New Order</h3>
-            <div style="width:50px;"></div>
-        </div>
-
-        <div class="pos-header-actions">
-    <div class="search-wrapper">
-        <span class="search-icon">🔍</span>
-        <input type="text" 
-               class="search-input-pearl" 
-               id="posSearch" 
-               placeholder="ဘာရှာချင်လဲ အစ်ကို..." 
-               oninput="filterPOSMenu()">
-    </div>     
-            
-            <div class="category-tags" id="posCategories">
-                <div class="tag active" onclick="filterCategory('All')">All Items</div>
+            <div class="menu-modal-content">
+                <div class="modal-header">
+                    <div class="back-btn" onclick="closeMenuModal()" style="font-size: 24px;">←</div>
+                    <h3 id="modalTitle" style="margin:0;">Add New Menu</h3>
                 </div>
-        </div>
+                
+                <input type="hidden" id="editItemId">
+                
+                <div class="modal-input-group">
+                    <label>Menu Name</label>
+                    <input type="text" id="itemName" placeholder="ဥပမာ - ကြက်တောင်ပံကင်">
+                </div>
+                
+                <div class="modal-input-group">
+                    <label>Price (Ks)</label>
+                    <input type="number" id="itemPrice" placeholder="5000">
+                </div>
 
-        <div id="posMenuGrid" class="pos-menu-grid">
+                <div class="modal-input-group">
+                    <label>Stock (Pieces)</label>
+                    <input type="number" id="itemStock" placeholder="0">
+                </div>
+
+                <div class="modal-input-group">
+                    <label>Category</label>
+                    <select id="itemCategory">
+                        <option value="BBQ">BBQ</option>
+                        <option value="Drinks">Drinks</option>
+                        <option value="Sides">Sides</option>
+                    </select>
+                </div>
+
+                <div class="modal-input-group">
+                    <label>Menu Photo</label>
+                    <div class="photo-upload-container" onclick="document.getElementById('itemImage').click()">
+                        <img id="imagePreview" src="">
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <span style="font-size: 24px;">📸</span>
+                            <p style="margin: 5px 0 0; font-size: 12px;">Tap to upload photo</p>
+                        </div>
+                    </div>
+                    <input type="file" id="itemImage" accept="image/*" style="display: none;" onchange="previewPhoto(this)">
+                </div>
+
+                <button class="confirm-btn" id="saveMenuBtn" onclick="handleMenuSave()" style="margin-top: 10px;">Save Menu</button>
             </div>
+        </div>
 
-        <div class="checkout-bar" id="checkoutBar">
-            <div>
-                <span style="color: #6B7280; font-size: 14px;">Total Items: <b id="cartCount">0</b></span><br>
-                <strong style="font-size: 20px; color: var(--primary);" id="cartTotal">0 Ks</strong>
+        <div id="orderModal" class="modal-overlay">
+            <div id="posContainer" class="floating-window">
+                <div class="app-header" style="background: white; border-bottom: 1px solid #eee;">
+                    <div class="back-btn" onclick="closeOrderModal()">← Back</div>
+                    <h3 style="margin:0;">New Order</h3>
+                    <div style="width:50px;"></div>
+                </div>
+
+                <div class="pos-header-actions">
+                    <div class="search-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input-pearl" id="posSearch" placeholder="ဘာရှာချင်လဲ အစ်ကို..." oninput="filterPOSMenu()">
+                    </div>     
+                    
+                    <div class="category-tags" id="posCategories">
+                        </div>
+                </div>
+
+                <div id="posMenuGrid" class="pos-menu-grid">
+                    </div>
+
+                <div class="checkout-bar" id="checkoutBar">
+                    <div>
+                        <span style="color: #6B7280; font-size: 14px;">Total Items: <b id="cartCount">0</b></span><br>
+                        <strong style="font-size: 20px; color: var(--primary);" id="cartTotal">0 Ks</strong>
+                    </div>
+                    <button class="btn-checkout" onclick="openCheckoutDetails()">Checkout →</button>
+                </div>
             </div>
-            <button class="btn-checkout" onclick="openCheckoutDetails()">Go to Checkout →</button>
         </div>
-    </div>
-</div>
-    
-<div id="checkoutModal" class="modal-overlay">
-    <div class="menu-modal-content" style="max-height: 80vh; overflow-y: auto;">
-        <h3>Order Details</h3>
-        
-        <div id="selectedItemsList" style="margin-bottom: 20px;"></div>
+            
+        <div id="checkoutModal" class="modal-overlay">
+            <div class="menu-modal-content" style="max-height: 85vh; overflow-y: auto;">
+                <h3 style="margin-top:0;">Order Summary</h3>
+                
+                <div id="selectedItemsList" style="margin-bottom: 20px;"></div>
 
-        <input type="text" id="cName" class="pos-input" placeholder="Customer Name">
-        <input type="number" id="cPhone" class="pos-input" placeholder="Customer Phone">
-        <select id="payStatus" class="pos-input">
-            <option value="Unpaid">Unpaid</option>
-            <option value="Paid">Paid</option>
-        </select>
-        
-        <div style="display:flex; gap:10px; margin-top:20px;">
-            <button onclick="document.getElementById('checkoutModal').style.display='none'" class="pos-input" style="background:#eee; flex:1;">Back</button>
-            <button onclick="submitFinalOrder()" class="confirm-btn" style="flex:2;">Confirm Order</button>
+                <div class="modal-input-group">
+                    <label>Customer Name</label>
+                    <input type="text" id="cName" class="pos-input" placeholder="Guest">
+                </div>
+                <div class="modal-input-group">
+                    <label>Customer Phone</label>
+                    <input type="number" id="cPhone" class="pos-input" placeholder="09xxxxxxxxx">
+                </div>
+                <div class="modal-input-group">
+                    <label>Payment Status</label>
+                    <select id="payStatus" class="pos-input">
+                        <option value="Unpaid">Unpaid (Cash)</option>
+                        <option value="Paid">Paid (Digital)</option>
+                    </select>
+                </div>
+                
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button onclick="document.getElementById('checkoutModal').style.display='none'" class="pos-input" style="background:#f1f5f9; flex:1; border:none; border-radius:15px;">Edit</button>
+                    <button onclick="submitFinalOrder()" class="confirm-btn" style="flex:2;">Confirm & Post</button>
+                </div>
+            </div>
         </div>
+
     </div>
-</div>
-    
-    
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <script src="supabase.js"></script>
     <script src="app.js"></script>
     <script src="menu.js"></script>
