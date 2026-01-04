@@ -215,27 +215,31 @@
     <script src="customer.js"></script>
 
     <script>
-        function showPage(pageId, event) {
-    if (event) event.preventDefault(); 
-    
-    // စာမျက်နှာအားလုံးကို ဝှက်
+      function showPage(pageId, event) {
+    // ၁။ စာမျက်နှာအားလုံး ပိတ်
     document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
     
-    // ရွေးထားတဲ့ စာမျက်နှာကို ပြ
+    // ၂။ ရွေးချယ်ထားသော စာမျက်နှာကို ဖွင့်
     const targetPage = document.getElementById(pageId);
     if (targetPage) targetPage.classList.remove('hidden');
     
-    // အောက်ခြေ Nav က Active class ကို ပြောင်း
+    // ၃။ Navigation Active ပြောင်း
     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
     
-    // နှိပ်လိုက်တဲ့ nav item ကို active ပေးရန်
-    if (event && event.currentTarget) {
+    // ၄။ ဘယ် Button ကို နှိပ်လိုက်သလဲဆိုတာကို ရှာပြီး Active ပေးခြင်း
+    if (event) {
         event.currentTarget.classList.add('active');
     } else {
-        // ပထမဆုံးအကြိမ် screen တက်လာရင် menu ကို active ပေးထားရန်
-        const menuNav = document.querySelector(`[onclick="showPage('${pageId}')"]`);
-        if (menuNav) menuNav.classList.add('active');
+        // Refresh လုပ်တဲ့အခါ Menu ကနေ ရှာပြီး active ပေးခြင်း
+        document.querySelectorAll('.nav-item').forEach(nav => {
+            if (nav.getAttribute('onclick').includes(pageId)) {
+                nav.classList.add('active');
+            }
+        });
     }
+
+    // ၅။ အရေးကြီးဆုံးအချက် - လက်ရှိရောက်နေတဲ့ Page ID ကို သိမ်းထားခြင်း
+    localStorage.setItem('lastPage', pageId);
 }
         
     </script>
