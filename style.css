@@ -236,3 +236,42 @@ body {
     border: none; padding: 12px 25px; border-radius: 12px; width: 100%; margin-top: 20px;
     font-weight: 600;
 }
+.order-card {
+    background: var(--crystal-clear);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: var(--soft-shadow);
+    border: var(--glass-border);
+}
+
+.customer-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    color: var(--primary-accent);
+    cursor: pointer;
+}
+
+.status-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.status-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-btn.preparing.active { background: #FFEAA7; color: #D6A31E; }
+.status-btn.ready.active { background: #55E6C1; color: #1B8E72; }
