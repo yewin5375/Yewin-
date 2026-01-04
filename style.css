@@ -197,3 +197,42 @@ body {
     font-size: 12px;
 }
 
+/* --- MODAL STYLES --- */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.2); /* အလင်းအမှောင် */
+    backdrop-filter: blur(8px); /* Glass effect */
+    display: flex; justify-content: center; align-items: center;
+    z-index: 2000;
+}
+
+.modal-content.glass-card {
+    background: var(--crystal-clear);
+    width: 90%; max-width: 400px;
+    border-radius: 25px;
+    padding: 20px;
+    box-shadow: var(--soft-shadow);
+}
+
+.image-upload-area {
+    width: 100%; height: 150px;
+    background: #fff; border-radius: 15px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    overflow: hidden; cursor: pointer; border: 1px dashed #ccc;
+}
+
+.image-upload-area img { width: 100%; height: 100%; object-fit: cover; }
+
+.input-group { margin-top: 15px; display: flex; flex-direction: column; }
+.input-group label { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+.input-group input { 
+    padding: 12px; border-radius: 10px; border: 1px solid #eee; 
+    background: #fff; font-size: 14px;
+}
+
+.btn-save { 
+    background: var(--primary-accent); color: white; 
+    border: none; padding: 12px 25px; border-radius: 12px; width: 100%; margin-top: 20px;
+    font-weight: 600;
+}
