@@ -33,17 +33,19 @@ async function fetchMenuItems() {
     `).join('');
 }
 
-// ၂။ ပုံတင်သည့် function (နာမည်ကို သေချာစစ်ပါ)
+// ၂။ ပုံတင်သည့် function (Upsert ပါဝင်ပြီးသား)
 async function uploadImage(file) {
     try {
         const fileExt = file.name.split('.').pop();
-        const fileName = `${Math.random()}.${fileExt}`;
+        const fileName = `${Date.now()}.${fileExt}`; // ပိုသေချာအောင် Date.now() သုံးထားပါသည်
         const filePath = `menu-images/${fileName}`;
 
-        // Bucket နာမည် 'images' ဖြစ်ကြောင်း သေချာပါစေ
         let { error: uploadError } = await supabase.storage
             .from('images') 
-            .upload(filePath, file);
+            .upload(filePath, file, {
+                cacheControl: '3600',
+                upsert: true 
+            });
 
         if (uploadError) throw uploadError;
 
@@ -51,53 +53,48 @@ async function uploadImage(file) {
         return data.publicUrl;
     } catch (err) {
         console.error('Upload error:', err);
-        throw new Error('Image upload failed');
+        throw new Error('Image upload failed: ' + err.message);
     }
 }
 
-// ၃။ Save Item Logic
+// ၃။ Save Item Logic (Database Column နှစ်ခုလုံးအတွက်)
 async function saveItem() {
     const name = document.getElementById('edit-name').value;
     const price = document.getElementById('edit-price').value;
-    const stock = document.getElementById('edit-stock').value;
+    const stockVal = document.getElementById('edit-stock').value;
     const available = document.getElementById('edit-available').checked;
     const fileInput = document.getElementById('file-input');
 
     if (!name || !price) return alert("အမည်နှင့် ဈေးနှုန်း ထည့်ပေးပါ");
 
-    if (confirm("အချက်အလက်များကို သိမ်းဆည်းရန် သေချာပါသလား?")) {
-        try {
-            let imageUrl = document.getElementById('preview-img').src;
+    try {
+        let imageUrl = document.getElementById('preview-img').src;
 
-            // ပုံအသစ်ပါလျှင် uploadImage ကိုခေါ်မည်
-            if (fileInput.files && fileInput.files.length > 0) {
-                imageUrl = await uploadImage(fileInput.files[0]);
-            }
-
-               // menu.js ထဲက saveItem function အပိုင်း
-const itemData = {
-    name: name,
-    price: parseFloat(price),
-    stock: parseInt(stock), // အစ်ကို့ table ထဲက 'stock' column အတွက်
-    stock_count: parseInt(stock), // 'stock_count' အတွက်ပါ တစ်ခါတည်းထည့်ပေးထားပါတယ်
-    is_available: available,
-    image_url: imageUrl
-};
-
-             ;
-
-            const { error } = currentEditingId 
-                ? await supabase.from('menu').update(itemData).eq('id', currentEditingId)
-                : await supabase.from('menu').insert([itemData]);
-
-            if (error) throw error;
-
-            alert("Success!");
-            closeModal();
-            fetchMenuItems();
-        } catch (err) {
-            alert("Error: " + err.message);
+        // ပုံအသစ်ပါလျှင် upload လုပ်မည်
+        if (fileInput.files && fileInput.files.length > 0) {
+            imageUrl = await uploadImage(fileInput.files[0]);
         }
+
+        const itemData = {
+            name: name,
+            price: parseFloat(price),
+            stock: parseInt(stockVal) || 0,        // 'stock' column
+            stock_count: parseInt(stockVal) || 0,  // 'stock_count' column
+            is_available: available,
+            image_url: imageUrl
+        };
+
+        const { error } = currentEditingId 
+            ? await supabase.from('menu').update(itemData).eq('id', currentEditingId)
+            : await supabase.from('menu').insert([itemData]);
+
+        if (error) throw error;
+
+        alert("အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+        closeModal();
+        fetchMenuItems();
+    } catch (err) {
+        alert("Error: " + err.message);
     }
 }
 
@@ -112,22 +109,25 @@ function previewImage(event) {
 
 function enterAddMode() {
     currentEditingId = null; 
-; 
- toggleMenuOptions()s(    document.getElementById('modal-title').innerText = "Add New Item";
+    document.getElementById('modal-title').innerText = "Add New Item";
     document.getElementById('edit-name').value = "";
     document.getElementById('edit-price').value = "";
+    document.getElementById('edit-stock').value = "0";
+    document.getElementById('edit-available').checked = true;
     document.getElementById('preview-img').src = 'placeholder.jpg';
     document.getElementById('edit-modal').classList.remove('hidden');
+    toggleMenuOptions();
 }
 
 async function openEditModal(id) {
     currentEditingId = id;
-    const { data } = await supabase.from('menu').select('*').eq('id', id).single();
+    const { data, error } = await supabase.from('menu').select('*').eq('id', id).single();
     if (data) {
         document.getElementById('modal-title').innerText = "Edit Menu Item";
         document.getElementById('edit-name').value = data.name;
         document.getElementById('edit-price').value = data.price;
-        document.getElementById('edit-stock').value = data.stock_count;
+        // အစ်ကို့ table မှာ stock လို့ ပေးထားရင် data.stock လို့ ပြင်သုံးပါ
+        document.getElementById('edit-stock').value = data.stock || data.stock_count || 0;
         document.getElementById('edit-available').checked = data.is_available;
         document.getElementById('preview-img').src = data.image_url || 'placeholder.jpg';
         document.getElementById('edit-modal').classList.remove('hidden');
@@ -152,11 +152,3 @@ function handleItemClick(id) {
 function closeModal() {
     document.getElementById('edit-modal').classList.add('hidden');
 }
-
-// menu.js ထဲက uploadImage အပိုင်း
-let { error: uploadError } = await supabase.storage
-    .from('images') 
-    .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: true // ဒါလေး ထည့်လိုက်ပါ (ရှိပြီးသားပုံဆိုရင် အစားထိုးဖို့)
-    });
