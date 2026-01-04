@@ -10,15 +10,15 @@
     
     <link rel="stylesheet" href="style.css">
     
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
 </head>
 <body class="pearl-theme">
 
     <nav class="bottom-nav">
-        <a href="#" class="nav-item" onclick="showPage('order-page')">
-            <i class="fas fa-shopping-basket"></i>
-            <span>Orders</span>
-        </a>
+    <a href="#" class="nav-item" onclick="showPage('order-page', event)"> <i class="fas fa-shopping-basket"></i>
+        <span>Orders</span>
+    </a> 
         <a href="#" class="nav-item active" onclick="showPage('menu-page')">
             <i class="fas fa-utensils"></i>
             <span>Menu</span>
