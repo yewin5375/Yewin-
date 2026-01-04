@@ -65,24 +65,34 @@ async function fetchOrders() {
 
 // ၃။ Status Update
 async function updateStatus(orderId, status) {
-    const { error } = await supabase.from('orders').update({ order_status: status }).eq('id', orderId);
-    if (!error) fetchOrders();
+    const { error } = await supabase
+        .from('orders')
+        .update({ order_status: status })
+        .eq('id', orderId);
+
+    if (error) {
+        alert("Status update လုပ်လို့မရပါ: " + error.message);
+    } else {
+        // အောင်မြင်ရင် စာရင်းကို ပြန်ဆွဲထုတ်မယ်
+        fetchOrders();
+    }
 }
 
 // ၄။ အော်ဒါပိတ်သိမ်းခြင်း
 async function finalizeOrder(orderId) {
-    if (confirm("ငွေလက်ခံရရှိပြီး အော်ဒါလွှဲပြောင်းပေးလိုက်ပြီလား?")) {
-        const { error } = await supabase.from('orders')
+    if (confirm("ဒီအော်ဒါကို ငွေချေပြီးကြောင်း မှတ်တမ်းတင်မလား?")) {
+        const { error } = await supabase
+            .from('orders')
             .update({ order_status: 'Collected', payment_status: 'Paid' })
             .eq('id', orderId);
 
-        if (!error) {
-            alert("အောင်မြင်ပါသည်။");
+        if (error) {
+            alert("အော်ဒါပိတ်လို့မရပါ: " + error.message);
+        } else {
             fetchOrders();
         }
     }
 }
-
 function playNotificationSound() {
     const audio = new Audio('notification.mp3');
     audio.play();
