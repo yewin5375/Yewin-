@@ -325,3 +325,63 @@ body {
 .status-btn.collected:active {
     transform: scale(0.9);
 }
+
+/* --- ORDER PAGE CONTROLS --- */
+.order-controls {
+    margin: 0 20px 20px 20px;
+    padding: 15px;
+    border-radius: 20px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 10px 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #eee;
+}
+
+.search-box input {
+    border: none;
+    outline: none;
+    margin-left: 10px;
+    width: 100%;
+    font-size: 14px;
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.filter-btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: none;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: var(--soft-shadow);
+}
+
+.filter-btn.active {
+    background: var(--primary-accent);
+    color: white;
+}
+
+.order-container {
+    padding: 0 20px 100px 20px;
+}
+
+.loading-state {
+    text-align: center;
+    padding: 50px 0;
+    color: var(--text-muted);
+}
