@@ -133,4 +133,19 @@ backToTopBtn.onclick = function() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
+async function loadDashboardStats() {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // ယနေ့ အော်ဒါများယူခြင်း
+    const { data, error } = await window.sb
+        .from('orders')
+        .select('total_amount')
+        .gte('created_at', today);
+
+    if (!error) {
+        const totalRevenue = data.reduce((sum, row) => sum + row.total_amount, 0);
+        document.getElementById('todayRevenue').innerText = totalRevenue.toLocaleString() + " Ks";
+        document.getElementById('todayOrders').innerText = data.length + " Orders";
+    }
+}
 
