@@ -215,16 +215,27 @@
     <script src="customer.js"></script>
 
     <script>
-        // Simple Page Switcher Logic
-     function showPage(pageId, event) {
-    if (event) event.preventDefault(); // ဒါလေး ထည့်လိုက်ရင် URL မှာ # မပေါ်တော့ပါဘူး
+        function showPage(pageId, event) {
+    if (event) event.preventDefault(); 
     
+    // စာမျက်နှာအားလုံးကို ဝှက်
     document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+    
+    // ရွေးထားတဲ့ စာမျက်နှာကို ပြ
     const targetPage = document.getElementById(pageId);
     if (targetPage) targetPage.classList.remove('hidden');
     
+    // အောက်ခြေ Nav က Active class ကို ပြောင်း
     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-    // active class ပြောင်းတဲ့ logic
+    
+    // နှိပ်လိုက်တဲ့ nav item ကို active ပေးရန်
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    } else {
+        // ပထမဆုံးအကြိမ် screen တက်လာရင် menu ကို active ပေးထားရန်
+        const menuNav = document.querySelector(`[onclick="showPage('${pageId}')"]`);
+        if (menuNav) menuNav.classList.add('active');
+    }
 }
         
     </script>
