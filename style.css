@@ -2,7 +2,6 @@
 :root {
     --pearl-white: #F8F9FA;
     --pure-white: #FFFFFF;
-    --crystal-clear: rgba(255, 255, 255, 0.7);
     --primary-accent: #FF4500;
     --text-main: #2D3436;
     --text-muted: #636E72;
@@ -20,8 +19,6 @@ body {
     background-color: var(--pearl-white);
     color: var(--text-main);
     font-family: 'Inter', sans-serif;
-    line-height: 1.6;
-    overflow-x: hidden;
 }
 
 .hidden { display: none !important; }
@@ -32,37 +29,11 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: sticky; top: 0;
-    background: var(--pearl-white);
-    z-index: 100;
 }
 
-.title { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+.title { font-size: 24px; font-weight: 700; }
 
-/* --- 4. MENU GRID & CARDS --- */
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    padding: 0 20px 100px 20px;
-}
-
-.menu-card {
-    background: var(--pure-white);
-    border-radius: 20px;
-    box-shadow: var(--soft-shadow);
-    overflow: hidden;
-    position: relative;
-    border: var(--glass-border);
-}
-
-.image-container { width: 100%; height: 120px; background: #f0f0f0; }
-.image-container img { width: 100%; height: 100%; object-fit: cover; }
-.item-info { padding: 12px; }
-.item-name { font-size: 14px; font-weight: 600; color: var(--text-main); }
-.item-price { color: var(--primary-accent); font-weight: 700; font-size: 13px; }
-
-/* --- 5. MODAL STYLES (Add/Edit Menu) --- */
+/* --- 4. MODAL (ADD/EDIT MENU) --- */
 .modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
@@ -71,13 +42,7 @@ body {
 
 .modal-content {
     background: #fff; width: 90%; max-width: 400px;
-    border-radius: 25px; padding: 25px; 
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
-
-.modal-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 20px;
+    border-radius: 25px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
 }
 
 .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
@@ -88,54 +53,40 @@ body {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     margin-bottom: 20px; overflow: hidden; cursor: pointer;
 }
-
 .image-upload-area img { width: 100%; height: 100%; object-fit: cover; }
-.image-upload-area p { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
 
 .input-group { margin-bottom: 15px; display: flex; flex-direction: column; }
-.input-group label { font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
-.input-group input { padding: 12px; border: 1px solid #eee; border-radius: 12px; font-size: 14px; background: #fdfdfd; }
+.input-group label { font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 5px; }
+.input-group input { padding: 12px; border: 1px solid #eee; border-radius: 12px; font-size: 14px; width: 100%; }
 
-/* Price & Stock Row Alignment */
+/* Price & Stock Row */
 .input-row { display: flex; gap: 12px; margin-bottom: 15px; }
 .input-row .input-group { flex: 1; margin-bottom: 0; }
 
-.toggle-group { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 14px; font-weight: 600; }
-
 .modal-footer { display: flex; gap: 10px; margin-top: 25px; }
-.btn-cancel { flex: 1; padding: 14px; border: none; border-radius: 14px; background: #f1f2f6; font-weight: 600; color: var(--text-muted); }
+.btn-cancel { flex: 1; padding: 14px; border: none; border-radius: 14px; background: #f1f2f6; font-weight: 600; }
 .btn-save { flex: 2; padding: 14px; border: none; border-radius: 14px; background: var(--primary-accent); color: #fff; font-weight: 700; }
 
-/* --- 6. ORDER PAGE STYLES --- */
-.order-card {
-    background: #fff; border-radius: 20px; padding: 18px;
-    margin: 0 20px 15px 20px; box-shadow: var(--soft-shadow);
-    border-left: 6px solid var(--primary-accent);
-}
-.order-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 700; }
-.status-buttons { display: flex; gap: 8px; margin-top: 15px; }
-.status-btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 11px; font-weight: 700; }
-.status-btn.preparing.active { background: #fff3cd; color: #856404; }
-.status-btn.ready.active { background: #d4edda; color: #155724; }
+/* --- 5. ORDER PAGE --- */
+.order-controls { margin: 0 20px 20px 20px; padding: 15px; background: white; border-radius: 20px; box-shadow: var(--soft-shadow); }
+.search-box { display: flex; align-items: center; background: #f8f9fa; padding: 12px; border-radius: 12px; margin-bottom: 15px; }
+.search-box input { border: none; background: transparent; outline: none; margin-left: 10px; width: 100%; }
 
-/* --- 7. CUSTOMER & REPORT PAGE --- */
-.customer-card {
-    background: #fff; padding: 18px; border-radius: 18px;
-    display: flex; justify-content: space-between; align-items: center;
-    margin: 0 20px 12px 20px; box-shadow: var(--soft-shadow);
-}
-.report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-.report-card { background: #fff; padding: 20px; border-radius: 22px; box-shadow: var(--soft-shadow); }
-.report-card .value { font-size: 18px; font-weight: 800; color: var(--primary-accent); }
+.filter-tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+.filter-btn { padding: 10px 20px; border-radius: 20px; border: none; background: #f1f2f6; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.filter-btn.active { background: var(--primary-accent); color: white; }
 
-/* --- 8. BOTTOM NAVIGATION --- */
+/* --- 6. MENU GRID --- */
+.grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 20px 100px 20px; }
+.menu-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: var(--soft-shadow); position: relative; }
+
+/* --- 7. BOTTOM NAV --- */
 .bottom-nav {
-    position: fixed; bottom: 0; width: 100%; height: 80px;
+    position: fixed; bottom: 0; width: 100%; height: 75px;
     background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
     display: flex; justify-content: space-around; align-items: center;
-    border-top: 1px solid #eee; z-index: 1000; padding-bottom: 10px;
+    border-top: 1px solid #eee; z-index: 1000;
 }
 .nav-item { text-decoration: none; color: var(--text-muted); text-align: center; font-size: 10px; font-weight: 600; }
 .nav-item.active { color: var(--primary-accent); }
-.nav-item i { font-size: 22px; display: block; margin-bottom: 5px; }
-
+.nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
