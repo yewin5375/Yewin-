@@ -18,7 +18,7 @@ body {
 }
 
 /* =========================================
-   2. Header & Bottom Navigation
+   2. Layout & Components
    ========================================= */
 .app-header { 
     height: 60px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); 
@@ -39,120 +39,126 @@ body {
 }
 .nav-item.active { color: var(--primary); transform: translateY(-10px) scale(1.1); }
 
-/* =========================================
-   3. Dashboard & Admin Menu
-   ========================================= */
 .content-area { padding: 20px; padding-bottom: 120px; }
 .page-header { font-size: 24px; margin-bottom: 20px; font-weight: 800; letter-spacing: -0.5px; }
 
+/* =========================================
+   3. Dashboard & Orders (Phase 5)
+   ========================================= */
 .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
-.stat-card { background: var(--white); padding: 20px; border-radius: 24px; box-shadow: var(--shadow); border: 1px solid #f8f9fa; text-align: center; }
-
-/* Menu Grid Settings */
-.menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-.menu-item-card { position: relative; background: white; border-radius: 24px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid #f1f1f1; }
-
-.card-image-wrapper { height: 110px; width: 100%; overflow: hidden; background: #f8f9fa; }
-.card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
-
-.card-details { padding: 12px; }
-.card-details h4 { margin: 0; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.card-details .price { color: var(--primary); font-weight: 800; margin-top: 5px; font-size: 15px; }
-
-/* === Stock & Action Buttons (Admin Page) === */
-.stock-badge {
-    position: absolute; top: 10px; left: 10px; background: rgba(255, 255, 255, 0.9);
-    padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; color: #4B5563; z-index: 10;
+.stat-card { 
+    background: var(--white); padding: 20px; border-radius: 24px; 
+    box-shadow: var(--shadow); border: 1px solid #f8f9fa; text-align: center; 
 }
 
-.menu-actions-box { display: flex; gap: 8px; margin-top: 10px; }
-
-.btn-edit-stock {
-    flex: 1; background: #f0f7ff; color: #007aff; border: 1px solid #e0eeff;
-    padding: 10px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer;
+/* Order Card Styling */
+.order-card-new {
+    background: white; border-radius: 25px; padding: 20px; 
+    margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
+    border: 1px solid #f8f9fa; animation: zoomIn 0.3s ease;
 }
 
-.btn-delete-item {
-    width: 40px; background: #fff0f0; color: #ff3b30; border: none;
-    border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;
+.badge-status {
+    padding: 6px 12px; border-radius: 50px; font-size: 11px; font-weight: 800;
 }
+.status-preparing { background: #fff7ed; color: #ea580c; }
+.status-ready { background: #f0fdf4; color: #16a34a; }
+.status-collected { background: #f1f5f9; color: #64748b; }
+
+/* Status Toggle Box */
+.status-toggle-box {
+    display: flex; gap: 8px; margin-top: 15px; padding-top: 15px; 
+    border-top: 1px dashed #e2e8f0;
+}
+
+.btn-status-step {
+    flex: 1; padding: 10px 5px; border-radius: 12px; border: 1px solid #f1f5f9;
+    font-size: 11px; font-weight: 700; cursor: pointer; background: white; transition: 0.2s;
+}
+.btn-status-step.active { background: var(--primary); color: white; border-color: var(--primary); }
 
 /* =========================================
-   4. Floating POS System (Animation & Layout)
+   4. Menu & POS UI (Phase 2)
    ========================================= */
-.btn-open-pos {
-    background: linear-gradient(135deg, #ff7043, #ff8a65); color: white;
-    border: none; padding: 12px 25px; border-radius: 15px; font-weight: 800;
-    font-size: 15px; cursor: pointer; box-shadow: 0 8px 15px rgba(255, 112, 67, 0.3);
-    transition: 0.3s; display: flex; align-items: center; gap: 8px;
+.menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.pos-menu-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    padding: 15px; overflow-y: auto;
 }
-.btn-open-pos:active { transform: scale(0.95); }
 
+.menu-card {
+    background: white; border-radius: 18px; overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;
+    cursor: pointer; transition: 0.2s;
+}
+.menu-card:active { transform: scale(0.95); }
+.menu-card img { width: 100%; height: 100px; object-fit: cover; }
+
+/* Search & Tags */
+.search-input-pearl {
+    width: 100%; padding: 14px 14px 14px 45px; background: #f3f4f6;
+    border: 1.5px solid transparent; border-radius: 18px; font-size: 15px;
+    transition: 0.3s;
+}
+.search-input-pearl:focus { background: white; border-color: var(--primary-light); outline: none; }
+
+.category-tags { display: flex; gap: 10px; overflow-x: auto; padding: 10px 5px; }
+.tag { 
+    padding: 8px 18px; background: #f3f4f6; border-radius: 50px; 
+    font-size: 13px; white-space: nowrap; cursor: pointer; 
+}
+.tag.active { background: var(--primary); color: white; }
+
+/* =========================================
+   5. Modals & Animation
+   ========================================= */
 .modal-overlay { 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
     background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);
     display: none; justify-content: center; align-items: center; z-index: 3000; 
 }
 
-/* Floating Window Design */
 .floating-window {
     background: #fdfdfd; width: 95vw; height: 92vh; border-radius: 30px;
-    overflow: hidden; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-    animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    overflow: hidden; animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
-
-.floating-window.closing { animation: slideOutDown 0.4s ease-in forwards; }
 
 @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes slideOutDown { from { transform: translateY(0); opacity: 1; } to { transform: translateY(100%); opacity: 0; } }
-
-.pos-main-content { display: flex; flex: 1; height: calc(100% - 60px); overflow: hidden; }
-
-/* POS Menu Grid Fix */
-.menu-container { flex: 1.6; padding: 15px; overflow-y: auto; }
-.pos-menu-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* ၂ ခုတွဲပြရန် */
-    gap: 12px;
-    padding: 15px;
-    overflow-y: auto;
-    flex: 1;
-}
-
-/* Menu Card ကို POS အတွက် သီးသန့်လှအောင်လုပ်ခြင်း */
-.menu-card {
-    background: white;
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    border: 1px solid #f0f0f0;
-    cursor: pointer;
-    transition: 0.2s;
-}
-.menu-card:active { transform: scale(0.95); }
-.menu-card img { width: 100%; height: 100px; object-fit: cover; }
-.menu-card h4 { margin: 0; font-size: 14px; }
-
-/* POS Cart Section */
-.cart-container { flex: 1; background: rgba(255,255,255,0.5); border-left: 1px solid #eee; padding: 20px; display: flex; flex-direction: column; }
-.premium-cart-item { background: white; border-radius: 18px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-
-.pos-input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eee; margin-bottom: 10px; background: #fdfdfd; font-family: inherit; box-sizing: border-box; }
+@keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
 /* =========================================
-   5. Utility & Buttons
+   6. Checkout & Cart
    ========================================= */
-.view { display: none; }
-.view.active { display: block; animation: fadeInUp 0.4s ease; }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-.confirm-btn {
-    width: 100%; background: #111827; color: white; border: none; padding: 18px;
-    border-radius: 20px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s;
+.checkout-bar {
+    position: absolute; bottom: 0; width: 100%; box-sizing: border-box;
+    padding: 20px; background: white; border-top: 1px solid #eee;
+    display: flex; justify-content: space-between; align-items: center;
 }
-.confirm-btn:active { transform: scale(0.98); }
 
-.back-btn { font-size: 24px; cursor: pointer; padding: 5px 10px; color: var(--text-dark); }
+.premium-cart-item {
+    background: #ffffff; padding: 15px; border-radius: 20px;
+    margin-bottom: 12px; display: flex; align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.qty-control-premium {
+    display: flex; align-items: center; background: #f3f4f6;
+    border-radius: 50px; padding: 5px; gap: 5px;
+}
+
+.qty-btn-new {
+    width: 32px; height: 32px; border-radius: 50%; border: none;
+    background: white; color: var(--primary); font-weight: 900;
+}
+
+/* =========================================
+   7. Customer & Photo Upload
+   ========================================= */
+.photo-upload-container {
+    width: 100%; height: 150px; border: 2px dashed #e5e7eb;
+    border-radius: 20px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; background: #f9fafb;
+}
 
 .fab-add { 
     position: fixed; bottom: 95px; right: 20px; width: 60px; height: 60px; 
@@ -161,297 +167,3 @@ body {
     box-shadow: 0 10px 20px rgba(255, 112, 67, 0.3); z-index: 1500; 
 }
 
-/* =========================================
-   6. Responsive Layout
-   ========================================= */
-@media (max-width: 768px) {
-    .pos-main-content { flex-direction: column; overflow-y: auto; }
-    .menu-container { height: auto; flex: none; }
-    .cart-container { height: auto; border-left: none; border-top: 1px solid #eee; flex: none; }
-    .stat-grid, .menu-grid { grid-template-columns: 1fr 1fr; }
-}
-/* === Add/Edit Modal Spacing & Design === */
-.menu-modal-content {
-    background: #ffffff;
-    width: 90%;
-    max-width: 450px;
-    padding: 35px; /* Padding တိုးလိုက်သည် */
-    border-radius: 35px;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
-    position: relative;
-}
-
-.modal-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 25px; /* ခေါင်းစဉ်နှင့် အောက်က input ကြား ခြားလိုက်သည် */
-}
-
-.modal-input-group {
-    margin-bottom: 20px; /* Input တစ်ခုနှင့်တစ်ခုကြား ခြားလိုက်သည် */
-}
-
-.modal-input-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    color: #4B5563;
-}
-
-.modal-input-group input, .modal-input-group select {
-    width: 100%;
-    padding: 14px 18px;
-    border-radius: 15px;
-    border: 1.5px solid #f0f0f0;
-    background: #f9fafb;
-    font-size: 15px;
-    transition: 0.3s;
-}
-/* === Premium Photo Upload Area === */
-.photo-upload-container {
-    width: 100%;
-    height: 150px;
-    border: 2px dashed #e5e7eb;
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #f9fafb;
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-    transition: 0.3s;
-}
-
-.photo-upload-container:hover {
-    border-color: var(--primary);
-    background: #fffafa;
-}
-
-#imagePreview {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: none; /* ပုံမရှိခင် ဖျောက်ထားမည် */
-    position: absolute;
-    top: 0; left: 0;
-}
-
-.upload-placeholder {
-    text-align: center;
-    color: #9ca3af;
-}
-
-.upload-placeholder i { font-size: 30px; margin-bottom: 8px; }
-
-/* === အစ်ကို့ Style Search Bar (Glassmorphism + Pearl White) === */
-.pos-header-actions {
-    padding: 20px;
-    background: white;
-}
-
-.search-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.search-wrapper .search-icon {
-    position: absolute;
-    left: 15px;
-    font-size: 18px;
-    color: #9ca3af;
-}
-
-.search-input-pearl {
-    width: 100%;
-    padding: 14px 14px 14px 45px;
-    background: #f3f4f6;
-    border: 1.5px solid transparent;
-    border-radius: 18px;
-    font-size: 15px;
-    font-family: inherit;
-    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-}
-
-.search-input-pearl:focus {
-    background: white;
-    border-color: var(--primary-light);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-    outline: none;
-}
-
-/* === အော်ဒါအသစ်ဖွင့်ရန် ခလုတ် (Premium Style) === */
-.btn-new-order-main {
-    background: linear-gradient(135deg, #ff7043, #ff8a65);
-    color: white; border: none; width: 100%; padding: 18px;
-    border-radius: 20px; font-size: 17px; font-weight: 800;
-    cursor: pointer; box-shadow: 0 10px 20px rgba(255,112,67,0.3);
-    margin: 20px 0; display: flex; align-items: center; justify-content: center; gap: 10px;
-}
-
-/* === Floating POS Header & Search === */
-.pos-header {
-    background: white; padding: 15px 20px; display: flex; 
-    align-items: center; gap: 15px; border-bottom: 1px solid #f1f1f1;
-}
-/* === Search Bar Design === */
-.search-bar-container {
-    padding: 10px 20px;
-    background: white;
-}
-
-/* === Go to Checkout Button (Sticky Bottom) === */
-.checkout-bar {
-    padding: 20px;
-    background: white;
-    border-top: 1px solid #eee;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 -10px 20px rgba(0,0,0,0.03);
-}
-
-.btn-checkout {
-    background: linear-gradient(135deg, #111827, #374151);
-    color: white;
-    padding: 15px 30px;
-    border-radius: 18px;
-    font-weight: 800;
-    border: none;
-    cursor: pointer;
-    transition: 0.3s;
-}
-.btn-checkout:active { transform: scale(0.95); }
-
-/* === Checkout Quantity Control (Premium) === */
-.premium-cart-item {
-    background: #ffffff;
-    padding: 18px;
-    border-radius: 20px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-}
-
-.qty-control-premium {
-    display: flex;
-    align-items: center;
-    background: #f3f4f6;
-    border-radius: 50px;
-    padding: 5px;
-    gap: 5px;
-}
-
-.qty-btn-new {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    border: none;
-    background: white;
-    color: var(--primary);
-    font-weight: 900;
-    font-size: 18px;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: 0.2s;
-}
-
-.qty-btn-new:active { transform: scale(0.85); background: var(--primary); color: white; }
-
-.qty-input-new {
-    width: 45px;
-    text-align: center;
-    border: none;
-    background: transparent;
-    font-weight: 800;
-    font-size: 16px;
-    color: #1F2937;
-}
-
-.delete-bin-btn {
-    color: #FF4B4B;
-    background: #FFF0F0;
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: 0.3s;
-    border: none;
-    margin-left: 10px;
-}
-
-.delete-bin-btn:hover { background: #FF4B4B; color: white; transform: rotate(10deg); }
-/* Category Filter Tabs */
-.category-scroll {
-    display: flex; gap: 10px; overflow-x: auto; padding: 10px 20px;
-    background: white; border-bottom: 1px solid #eee;
-}
-.cat-tab {
-    padding: 8px 18px; background: #f3f4f6; border-radius: 50px;
-    font-size: 13px; white-space: nowrap; cursor: pointer;
-}
-.cat-tab.active { background: var(--primary); color: white; }
-
-@keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-
-.order-card-premium {
-    background: white;
-    border-radius: 25px;
-    padding: 20px;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-    border: 1px solid #f8f9fa;
-}
-
-.order-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #f9fafb;
-    padding-bottom: 12px;
-}
-
-.status-badge {
-    padding: 6px 12px;
-    border-radius: 50px;
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-}
-
-.order-card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px dashed #eee;
-}
-
-.total-price-box small {
-    display: block;
-    font-size: 11px;
-    color: #9ca3af;
-    margin-bottom: 2px;
-}
-
-.btn-detail-view {
-    background: #f3f4f6;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 700;
-    color: #4B5563;
-    cursor: pointer;
-}
