@@ -77,8 +77,92 @@ body {
 .filter-btn.active { background: var(--primary-accent); color: white; }
 
 /* --- 6. MENU GRID --- */
-.grid-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 20px 100px 20px; }
-.menu-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: var(--soft-shadow); position: relative; }
+/* --- Menu Grid System (၂ ခုတွဲပြရန် အဓိကအပိုင်း) --- */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* အကွက် ၂ ကွက် ပိုင်းလိုက်ခြင်း */
+    gap: 12px; /* ဘေးချင်းကပ် အကွာအဝေး */
+    padding: 15px;
+    padding-bottom: 100px; /* Navigation မကွယ်အောင် */
+}
+
+/* --- Menu Card ဒီဇိုင်း --- */
+.menu-card {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- ပုံပြမည့်နေရာ --- */
+.image-container {
+    width: 100%;
+    height: 110px; /* ဖုန်း screen နှင့် ညီအောင် အမြင့်ကို လျှော့ထားသည် */
+    background: #f0f0f0;
+    position: relative;
+}
+
+.image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* --- စာသားပြမည့်နေရာ --- */
+.item-info {
+    padding: 10px;
+    text-align: left;
+}
+
+.item-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #2d3436;
+    display: -webkit-box;
+    -webkit-line-clamp: 1; /* စာတိုအောင် ဖြတ်ထားခြင်း */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.item-price {
+    font-size: 13px;
+    font-weight: 700;
+    color: #FF4500;
+}
+
+/* Sold Out ဖြစ်လျှင် ပြမည့်ပုံစံ */
+.sold-out-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Edit Mode ဖြစ်နေလျှင် ပြမည့်အမှတ်အသား */
+.edit-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #FF4500;
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
 
 /* --- 7. BOTTOM NAV --- */
 .bottom-nav {
