@@ -7,77 +7,67 @@ const orderSubscription = supabase
   })
   .subscribe();
 
-// ၂။ အော်ဒါစာရင်းကို ဆွဲထုတ်ခြင်း (Error ကင်းအောင် ပြင်ထားသည်)
-async function fetchOrders() {
-    const orderContainer = document.getElementById('order-list');
-    if (!orderContainer) return;
-
-    // Error တက်စေတဲ့ customers(name) ကို ဖြုတ်လိုက်ပြီး select('*') ပဲ သုံးထားပါတယ်
-    const { data, error } = await supabase
-        .from('orders')
-        .select('*') 
-        .order('created_at', { ascending: false });
-
-    if (error) {
-        console.error(error);
-        orderContainer.innerHTML = `<p style="color:red; padding:20px;">Error: ${error.message}</p>`;
-        return;
-    }
-
-    if (data.length === 0) {
-        orderContainer.innerHTML = `<div class="loading-state"><p>အော်ဒါစာရင်း မရှိသေးပါ။</p></div>`;
-        return;
-    }
-
-    orderContainer.innerHTML = data.map(order => {
-        let items = [];
-        try {
-            items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
-        } catch (e) { items = []; }
-
-        return `
-        <div class="order-card ${order.order_status === 'Collected' ? 'status-collected' : ''}" id="order-${order.id}">
-            <div class="order-header">
-                <span class="order-type">${order.order_type || 'BBQ Order'}</span>
-                <span class="pickup-time">${new Date(order.created_at).toLocaleTimeString()}</span>
-            </div>
-            
-            <div class="customer-link">
-                <i class="fas fa-user-circle"></i>
-                <strong>ID: ${order.customer_id || 'Guest Customer'}</strong>
-            </div>
-
-            <div class="order-items">
-                ${items.map(item => `<p>${item.qty} x ${item.name}</p>`).join('')}
-            </div>
-
-            <div class="order-footer">
-                <p>Total: <strong>${order.total_amount?.toLocaleString()} MMK</strong></p>
-                <div class="status-buttons">
-                    <button class="status-btn preparing ${order.order_status === 'Preparing' ? 'active' : ''}" onclick="updateStatus('${order.id}', 'Preparing')">Prep</button>
-                    <button class="status-btn ready ${order.order_status === 'Ready' ? 'active' : ''}" onclick="updateStatus('${order.id}', 'Ready')">Ready</button>
-                    <button class="status-btn collected" onclick="finalizeOrder('${order.id}')">Collect</button>
-                </div>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-// ၃။ Status Update
+// အော်ဒါအဆင့်ပြောင်းလဲခြင်း (Prep, Ready, Done အတွက်)
 async function updateStatus(orderId, status) {
+    console.log("Updating Status:", orderId, status); // အလုပ်လုပ်၊ မလုပ် စစ်ရန်
     const { error } = await supabase
         .from('orders')
         .update({ order_status: status })
         .eq('id', orderId);
 
     if (error) {
-        alert("Status update လုပ်လို့မရပါ: " + error.message);
+        alert("Error: " + error.message);
     } else {
-        // အောင်မြင်ရင် စာရင်းကို ပြန်ဆွဲထုတ်မယ်
-        fetchOrders();
+        fetchOrders(); // အောင်မြင်ရင် စာရင်းပြန်ပြောင်း
     }
 }
 
+// Order တွေကို နေရာတကျ ပြသခြင်း
+async function fetchOrders() {
+    const orderContainer = document.getElementById('order-list');
+    if (!orderContainer) return;
+
+    const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+
+    if (error) return console.error(error);
+
+    orderContainer.innerHTML = data.map(order => {
+        let items = [];
+        try { items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items; } catch (e) { items = []; }
+
+        return `
+        <div class="order-card">
+            <div class="order-header">
+                <strong>Pickup: ${new Date(order.created_at).toLocaleTimeString()}</strong>
+                <span style="color:orange">${order.order_status}</span>
+            </div>
+            <div class="order-items" style="margin: 10px 0;">
+                ${items.map(i => `<p>${i.qty} x ${i.name}</p>`).join('')}
+            </div>
+            <div class="status-buttons" style="display:flex; gap:5px;">
+                <button class="status-btn" style="background:#ffeaa7" onclick="updateStatus('${order.id}', 'Preparing')">Prep</button>
+                <button class="status-btn" style="background:#55e6c1" onclick="updateStatus('${order.id}', 'Ready')">Ready</button>
+                <button class="status-btn" style="background:#ff7675; color:white;" onclick="updateStatus('${order.id}', 'Collected')">Done</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ၃။ Status Update
+// အော်ဒါအဆင့်ပြောင်းလဲခြင်း (Prep, Ready, Done အတွက်)
+async function updateStatus(orderId, status) {
+    console.log("Updating Status:", orderId, status); // အလုပ်လုပ်၊ မလုပ် စစ်ရန်
+    const { error } = await supabase
+        .from('orders')
+        .update({ order_status: status })
+        .eq('id', orderId);
+
+    if (error) {
+        alert("Error: " + error.message);
+    } else {
+        fetchOrders(); // အောင်မြင်ရင် စာရင်းပြန်ပြောင်း
+    }
+}
 // ၄။ အော်ဒါပိတ်သိမ်းခြင်း
 async function finalizeOrder(orderId) {
     if (confirm("ဒီအော်ဒါကို ငွေချေပြီးကြောင်း မှတ်တမ်းတင်မလား?")) {
