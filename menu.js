@@ -73,6 +73,29 @@ async function openEditModal(id) {
     }
 }
 
+// ၁။ ပုံတင်သည့် function ကို သီးသန့် အရင်ရေးပါ (နာမည်ကို သေချာစစ်ပါ)
+async function uploadImage(file) {
+    try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `menu-images/${fileName}`;
+
+        // Supabase storage သို့ တင်ခြင်း
+        let { error: uploadError } = await supabase.storage
+            .from('images') // အစ်ကို့ bucket နာမည် 'images' ဖြစ်ရပါမယ်
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        // တင်ပြီးသားပုံရဲ့ Public URL ကို ပြန်ယူခြင်း
+        const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+        return data.publicUrl;
+    } catch (err) {
+        console.error('Upload error:', err);
+        throw new Error('ပုံတင်လို့မရပါသဖြင့် နောက်မှပြန်ကြိုးစားပါ');
+    }
+}
+
 // ၅။ Save Item Logic
 async function saveItem() {
     const name = document.getElementById('edit-name').value;
