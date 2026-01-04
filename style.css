@@ -16,6 +16,35 @@ body {
     margin: 0; background-color: var(--bg); color: var(--text-dark); 
     overflow-x: hidden; -webkit-tap-highlight-color: transparent; 
 }
+/* --- Page View Control (ရောမနေစေရန်) --- */
+.view { 
+    display: none; /* အစမှာ အကုန်ဖျောက်ထားမယ် */
+}
+
+.view.active { 
+    display: block; /* active class ရှိတဲ့ view တစ်ခုပဲ ပြမယ် */
+    animation: fadeIn 0.3s ease-in-out; 
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dashboard Stat Cards အလှဆင်ရန် */
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-align: left !important; /* စာသားတွေကို ဘယ်ဘက်ကပ်မယ် */
+}
+
+.card-icon {
+    font-size: 32px;
+    background: #fdf2f0;
+    padding: 10px;
+    border-radius: 15px;
+}
 
 /* =========================================
    2. Layout & Components
