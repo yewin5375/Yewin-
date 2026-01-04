@@ -217,6 +217,80 @@ async function loadOrders() {
     }
 }
 
+// ၂။ အော်ဒါများကို UI မှာပြသခြင်း
+function renderOrders(orders) {
+    const listDiv = document.getElementById('order-list');
+    if (!listDiv) return;
+
+    listDiv.innerHTML = orders.map(order => {
+        const itemsList = order.items.map(i => `${i.name} x${i.qty}`).join(', ');
+        
+        // Status အလိုက် CSS Class သတ်မှတ်ခြင်း
+        const statusClass = `status-${order.order_status.toLowerCase()}`;
+        
+        return `
+            <div class="order-card-new">
+                <div style="display:flex; justify-content:space-between; align-items:start;">
+                    <div>
+                        <h4 style="margin:0; font-size:17px;">${order.customer_name}</h4>
+                        <div class="info-row">📞 ${order.customer_phone}</div>
+                        <div class="info-row">⏰ Pick-up: <b>${order.pickup_time || 'Soon'}</b></div>
+                    </div>
+                    <span class="badge-status ${statusClass}">${order.order_status}</span>
+                </div>
+
+                <div style="margin: 15px 0; background: #f8fafc; padding: 12px; border-radius: 15px;">
+                    <small style="color:#94a3b8; display:block; margin-bottom:5px;">ORDER ITEMS</small>
+                    <div style="font-size:14px; font-weight:600; color:#334155;">${itemsList}</div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <small style="color:#94a3b8;">Total Amount</small>
+                        <div style="font-weight:900; color:var(--primary); font-size:18px;">
+                            ${Number(order.total_amount).toLocaleString()} Ks
+                        </div>
+                        <small style="color:${order.payment_status === 'Paid' ? '#16a34a' : '#ef4444'}; font-weight:700;">
+                            ● ${order.payment_status}
+                        </small>
+                    </div>
+                </div>
+
+                <div class="status-toggle-box">
+                    <button class="btn-status-step ${order.order_status === 'Preparing' ? 'active' : ''}" 
+                        onclick="updateOrderStatus(${order.id}, 'Preparing')">ကင်နေဆဲ</button>
+                    <button class="btn-status-step ${order.order_status === 'Ready' ? 'active' : ''}" 
+                        onclick="updateOrderStatus(${order.id}, 'Ready')">အဆင်သင့်</button>
+                    <button class="btn-status-step ${order.order_status === 'Collected' ? 'active' : ''}" 
+                        onclick="updateOrderStatus(${order.id}, 'Collected')">ယူသွားပြီ</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ၃။ Status Update လုပ်ခြင်း (Database ထဲထိ ပြောင်းသွားမည်)
+async function updateOrderStatus(orderId, newStatus) {
+    try {
+        const { error } = await window.sb
+            .from('orders')
+            .update({ order_status: newStatus })
+            .eq('id', orderId);
+
+        if (error) throw error;
+        
+        // Blueprint Phase 4: Ready ဖြစ်ရင် Noti ပြချင်ရင် ဒီမှာ logic ထည့်လို့ရပါတယ်
+        if(newStatus === 'Ready') {
+            console.log("Notifying Customer: Order is Ready!");
+        }
+
+        loadOrders(); // UI ကို refresh ပြန်လုပ်
+    } catch (e) {
+        alert("Status Update Error: " + e.message);
+    }
+}
+
+
 function renderOrders(orders) {
     const orderListDiv = document.getElementById('order-list');
     orderListDiv.innerHTML = orders.map(order => {
