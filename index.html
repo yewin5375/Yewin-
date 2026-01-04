@@ -135,7 +135,32 @@
         </div>
         </section>
         
-        <section id="report-page" class="page-content hidden"><h2>Sales Reports</h2></section>
+        <section id="report-page" class="page-content hidden">
+    <div class="header-section">
+        <h2 class="title">Sales Report</h2>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card glass-card">
+            <span class="label">Today's Revenue</span>
+            <h3 id="today-revenue">0 MMK</h3>
+        </div>
+        <div class="stat-card glass-card">
+            <span class="label">Net Profit</span>
+            <h3 id="net-profit" style="color: #2ecc71;">0 MMK</h3>
+        </div>
+    </div>
+
+    <div class="expense-section glass-card">
+        <h4>Add Daily Expense</h4>
+        <div class="input-row">
+            <input type="text" id="exp-desc" placeholder="ဘာဖိုးလဲ (ဥပမာ-မီးသွေး)">
+            <input type="number" id="exp-amount" placeholder="Amount">
+            <button onclick="addExpense()" class="btn-save small">Add</button>
+        </div>
+    </div>
+        </section>
+        
 
     </main>
 
