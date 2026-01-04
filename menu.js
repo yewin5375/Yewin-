@@ -74,13 +74,17 @@ async function saveItem() {
                 imageUrl = await uploadImage(fileInput.files[0]);
             }
 
-            const itemData = {
-                name: name,
-                price: parseFloat(price),
-                stock_count: parseInt(stock),
-                is_available: available,
-                image_url: imageUrl
-            };
+               // menu.js ထဲက saveItem function အပိုင်း
+const itemData = {
+    name: name,
+    price: parseFloat(price),
+    stock: parseInt(stock), // အစ်ကို့ table ထဲက 'stock' column အတွက်
+    stock_count: parseInt(stock), // 'stock_count' အတွက်ပါ တစ်ခါတည်းထည့်ပေးထားပါတယ်
+    is_available: available,
+    image_url: imageUrl
+};
+
+             ;
 
             const { error } = currentEditingId 
                 ? await supabase.from('menu').update(itemData).eq('id', currentEditingId)
@@ -108,8 +112,8 @@ function previewImage(event) {
 
 function enterAddMode() {
     currentEditingId = null; 
-    toggleMenuOptions();
-    document.getElementById('modal-title').innerText = "Add New Item";
+; 
+ toggleMenuOptions()s(    document.getElementById('modal-title').innerText = "Add New Item";
     document.getElementById('edit-name').value = "";
     document.getElementById('edit-price').value = "";
     document.getElementById('preview-img').src = 'placeholder.jpg';
