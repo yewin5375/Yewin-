@@ -149,3 +149,10 @@ function closeModal() {
     document.getElementById('edit-modal').classList.add('hidden');
 }
 
+// menu.js ထဲက uploadImage အပိုင်း
+let { error: uploadError } = await supabase.storage
+    .from('images') 
+    .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true // ဒါလေး ထည့်လိုက်ပါ (ရှိပြီးသားပုံဆိုရင် အစားထိုးဖို့)
+    });
