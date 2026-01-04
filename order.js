@@ -68,3 +68,60 @@ function playNotificationSound() {
     audio.play();
 }
 
+// အော်ဒါကို အပြီးသတ်ခြင်း (Collect & Pay)
+async function finalizeOrder(orderId) {
+    const check = confirm("ငွေလက်ခံရရှိပြီး အော်ဒါလွှဲပြောင်းပေးလိုက်ပြီလား?");
+    
+    if (check) {
+        // ၁။ အော်ဒါဒေတာကို အရင်ယူမယ် (Customer ID နဲ့ Total Amount သိဖို့)
+        const { data: order } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('id', orderId)
+            .single();
+
+        if (!order) return;
+
+        // ၂။ Order Status ကို Collected ပြောင်းမယ်၊ Payment ကို Paid ပြောင်းမယ်
+        const { error: orderError } = await supabase
+            .from('orders')
+            .update({ 
+                order_status: 'Collected', 
+                payment_status: 'Paid',
+                is_locked: false 
+            })
+            .eq('id', orderId);
+
+        if (!orderError) {
+            // ၃။ Customer ရဲ့ Points နဲ့ Lifetime Value ကို Update လုပ်မယ်
+            await updateCustomerLoyalty(order.customer_id, order.total_amount);
+            
+            alert("အော်ဒါပိတ်သိမ်းပြီး ငွေစာရင်းသွင်းပြီးပါပြီ။");
+            fetchOrders(); // List ကို Refresh လုပ်မယ်
+        }
+    }
+}
+
+// Customer Points Update လုပ်တဲ့ Logic
+async function updateCustomerLoyalty(customerId, amount) {
+    if (!customerId) return;
+
+    // အစ်ကို့သတ်မှတ်ချက် - ၁၀၀၀ ဖိုးဝယ်ရင် ၁ Point ရမယ်ဆိုပါစို့
+    const earnedPoints = Math.floor(amount / 1000); 
+
+    const { data: customer } = await supabase
+        .from('customers')
+        .select('total_points, lifetime_value')
+        .eq('id', customerId)
+        .single();
+
+    if (customer) {
+        const newPoints = (customer.total_points || 0) + earnedPoints;
+        const newLifetimeValue = (customer.lifetime_value || 0) + amount;
+
+        await supabase.from('customers').update({
+            total_points: newPoints,
+            lifetime_value: newLifetimeValue
+        }).eq('id', customerId);
+    }
+}
