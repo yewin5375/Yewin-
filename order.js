@@ -5,7 +5,8 @@ let allMenuItems = [];
 async function openOrderModal() {
     const modal = document.getElementById('orderModal');
     const container = document.getElementById('posContainer');
-    modal.style.display = 'flex';
+    
+    if (modal) modal.style.display = 'flex';
     if (container) container.classList.remove('closing');
     
     currentCart = []; 
@@ -31,7 +32,7 @@ function renderPOSMenu(items) {
         <div class="menu-card" onclick='addToCart(${JSON.stringify(item)})'>
             <img src="${item.image_url || 'https://via.placeholder.com/150'}">
             <div style="padding: 10px;">
-                <h4>${item.name}</h4>
+                <h4 style="margin:0 0 5px 0;">${item.name}</h4>
                 <span style="color: var(--primary); font-weight: 800;">${Number(item.price).toLocaleString()} Ks</span>
                 <div style="font-size: 10px; color: #666; margin-top: 5px;">📦 Stock: ${item.stock || 0}</div>
                 ${(item.stock || 0) < 1 ? '<div style="color:red; font-size:10px; font-weight:bold;">Out of Stock</div>' : ''}
@@ -46,7 +47,7 @@ function renderCategories(items) {
     const catDiv = document.getElementById('posCategories');
     if (!catDiv) return;
     catDiv.innerHTML = cats.map(c => `
-        <div class="tag ${c==='All'?'active':''}" onclick="filterByCategory('${c}', this)">${c}</div>
+        <div class="tag ${c === 'All' ? 'active' : ''}" onclick="filterByCategory('${c}', this)">${c}</div>
     `).join('');
 }
 
@@ -59,12 +60,14 @@ function filterByCategory(cat, el) {
 
 // ၄။ Search လုပ်ခြင်း
 function filterPOSMenu() {
-    const term = document.getElementById('posSearch').value.toLowerCase();
+    const searchInput = document.getElementById('posSearch');
+    if (!searchInput) return;
+    const term = searchInput.value.toLowerCase();
     const filtered = allMenuItems.filter(i => i.name.toLowerCase().includes(term));
     renderPOSMenu(filtered);
 }
 
-// ၅။ Cart ထဲထည့်ခြင်း
+// ၅။ Cart Logic
 function addToCart(item) {
     if ((item.stock || 0) < 1) return alert("လက်ကျန်မရှိတော့ပါ!");
     
@@ -89,7 +92,7 @@ function updateCartUI() {
     if (totalEl) totalEl.innerText = total.toLocaleString() + " Ks";
 }
 
-// ၆။ Checkout သွားရန် Modal ဖွင့်ခြင်း
+// ၆။ Checkout & Quantity Management
 function openCheckoutDetails() {
     if (currentCart.length === 0) return alert("ပစ္စည်း အရင်ရွေးပါ!");
     const modal = document.getElementById('checkoutModal');
@@ -99,7 +102,6 @@ function openCheckoutDetails() {
     }
 }
 
-// ၇။ Checkout ထဲမှာ Cart List ကို ပြသခြင်း
 function renderCartList() {
     const list = document.getElementById('selectedItemsList');
     if (!list) return;
@@ -123,12 +125,9 @@ function renderCartList() {
     `).join('');
 }
 
-// လက်နဲ့ Quantity ရိုက်ထည့်ရင် စစ်ဆေးခြင်း
 function directQtyInput(index, val) {
     let newQty = parseInt(val);
-    if (isNaN(newQty) || newQty < 1) {
-        newQty = 1;
-    }
+    if (isNaN(newQty) || newQty < 1) newQty = 1;
     currentCart[index].qty = newQty;
     updateCartUI();
     renderCartList();
@@ -142,18 +141,19 @@ function updateQty(index, change) {
 }
 
 function removeFromCart(index) {
-    if(confirm("ဒီပစ္စည်းကို ဖျက်မှာ သေချာပါသလား?")) {
+    if (confirm("ဒီပစ္စည်းကို ဖျက်မှာ သေချာပါသလား?")) {
         currentCart.splice(index, 1);
         updateCartUI();
         renderCartList();
     }
 }
 
-// ၈။ Final Order တင်ခြင်း
+// ၇။ Final Order Submission (Blueprint Phase 4)
 async function submitFinalOrder() {
     const name = document.getElementById('cName').value || 'ဧည့်သည်';
     const phone = document.getElementById('cPhone').value;
     const status = document.getElementById('payStatus').value;
+    const pickup = document.getElementById('pickupTime')?.value || 'As soon as possible';
 
     if (!phone) return alert("ဖုန်းနံပါတ် ထည့်ပေးပါ!");
 
@@ -166,12 +166,13 @@ async function submitFinalOrder() {
             items: currentCart,
             total_amount: total,
             payment_status: status,
-            order_status: 'Preparing'
+            order_status: 'Preparing',
+            pickup_time: pickup
         }]);
 
         if (orderError) throw orderError;
 
-        // Stock Update
+        // Stock Update Logic
         for (const item of currentCart) {
             const { data: menuData } = await window.sb.from('menu').select('stock').eq('id', item.id).single();
             const newStock = (menuData.stock || 0) - item.qty;
@@ -186,16 +187,7 @@ async function submitFinalOrder() {
     }
 }
 
-function closeOrderModal() {
-    const container = document.getElementById('posContainer');
-    if (container) container.classList.add('closing');
-    setTimeout(() => {
-        document.getElementById('orderModal').style.display = 'none';
-        if (container) container.classList.remove('closing');
-    }, 400);
-}
-
-// ၉။ အော်ဒါစာရင်း Load လုပ်ခြင်း
+// ၈။ Order List Rendering (Blueprint Phase 2 & 3 UI)
 async function loadOrders() {
     try {
         const { data, error } = await window.sb
@@ -204,28 +196,23 @@ async function loadOrders() {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        const orderListDiv = document.getElementById('order-list');
-        if (!orderListDiv) return;
-
-        if (data.length === 0) {
-            orderListDiv.innerHTML = `<p style="text-align:center; padding:50px;">အော်ဒါစာရင်း မရှိသေးပါ။</p>`;
-            return;
-        }
         renderOrders(data);
     } catch (e) {
         console.error("Order Load Error:", e.message);
     }
 }
 
-// ၂။ အော်ဒါများကို UI မှာပြသခြင်း
 function renderOrders(orders) {
     const listDiv = document.getElementById('order-list');
     if (!listDiv) return;
 
+    if (orders.length === 0) {
+        listDiv.innerHTML = `<p style="text-align:center; padding:50px; color:#94a3b8;">အော်ဒါစာရင်း မရှိသေးပါ။</p>`;
+        return;
+    }
+
     listDiv.innerHTML = orders.map(order => {
         const itemsList = order.items.map(i => `${i.name} x${i.qty}`).join(', ');
-        
-        // Status အလိုက် CSS Class သတ်မှတ်ခြင်း
         const statusClass = `status-${order.order_status.toLowerCase()}`;
         
         return `
@@ -233,14 +220,14 @@ function renderOrders(orders) {
                 <div style="display:flex; justify-content:space-between; align-items:start;">
                     <div>
                         <h4 style="margin:0; font-size:17px;">${order.customer_name}</h4>
-                        <div class="info-row">📞 ${order.customer_phone}</div>
-                        <div class="info-row">⏰ Pick-up: <b>${order.pickup_time || 'Soon'}</b></div>
+                        <div class="info-row" style="font-size:13px; color:#64748b; margin-top:4px;">📞 ${order.customer_phone}</div>
+                        <div class="info-row" style="font-size:13px; color:#64748b;">⏰ Pick-up: <b>${order.pickup_time || 'Soon'}</b></div>
                     </div>
                     <span class="badge-status ${statusClass}">${order.order_status}</span>
                 </div>
 
                 <div style="margin: 15px 0; background: #f8fafc; padding: 12px; border-radius: 15px;">
-                    <small style="color:#94a3b8; display:block; margin-bottom:5px;">ORDER ITEMS</small>
+                    <small style="color:#94a3b8; display:block; margin-bottom:5px; font-weight:700;">ORDER ITEMS</small>
                     <div style="font-size:14px; font-weight:600; color:#334155;">${itemsList}</div>
                 </div>
 
@@ -250,13 +237,14 @@ function renderOrders(orders) {
                         <div style="font-weight:900; color:var(--primary); font-size:18px;">
                             ${Number(order.total_amount).toLocaleString()} Ks
                         </div>
-                        <small style="color:${order.payment_status === 'Paid' ? '#16a34a' : '#ef4444'}; font-weight:700;">
+                        <small style="color:${order.payment_status === 'Paid' ? '#16a34a' : '#ef4444'}; font-weight:800;">
                             ● ${order.payment_status}
                         </small>
                     </div>
+                    <button class="btn-detail-view" style="padding:8px 15px; border-radius:10px; border:none; background:#f1f5f9; font-weight:700; cursor:pointer;" onclick="alert('Order ID: ${order.id}')">View</button>
                 </div>
 
-                <div class="status-toggle-box">
+                <div class="status-toggle-box" style="display:flex; gap:8px; margin-top:15px; padding-top:15px; border-top:1px dashed #e2e8f0;">
                     <button class="btn-status-step ${order.order_status === 'Preparing' ? 'active' : ''}" 
                         onclick="updateOrderStatus(${order.id}, 'Preparing')">ကင်နေဆဲ</button>
                     <button class="btn-status-step ${order.order_status === 'Ready' ? 'active' : ''}" 
@@ -269,7 +257,7 @@ function renderOrders(orders) {
     }).join('');
 }
 
-// ၃။ Status Update လုပ်ခြင်း (Database ထဲထိ ပြောင်းသွားမည်)
+// ၉။ Quick Status Update
 async function updateOrderStatus(orderId, newStatus) {
     try {
         const { error } = await window.sb
@@ -279,47 +267,26 @@ async function updateOrderStatus(orderId, newStatus) {
 
         if (error) throw error;
         
-        // Blueprint Phase 4: Ready ဖြစ်ရင် Noti ပြချင်ရင် ဒီမှာ logic ထည့်လို့ရပါတယ်
-        if(newStatus === 'Ready') {
-            console.log("Notifying Customer: Order is Ready!");
+        if (newStatus === 'Ready') {
+            console.log("Notifying Customer: Your order is ready!");
+            // ဤနေရာတွင် Firebase Notification ပို့သည့် function ထည့်နိုင်သည်
         }
 
-        loadOrders(); // UI ကို refresh ပြန်လုပ်
+        loadOrders(); 
     } catch (e) {
-        alert("Status Update Error: " + e.message);
+        alert("Error updating status: " + e.message);
     }
 }
 
-
-function renderOrders(orders) {
-    const orderListDiv = document.getElementById('order-list');
-    orderListDiv.innerHTML = orders.map(order => {
-        const itemsSummary = order.items.map(i => `${i.name} x ${i.qty}`).join(', ');
-        const statusColor = order.payment_status === 'Paid' ? '#2ecc71' : '#e74c3c';
-
-        return `
-            <div class="order-card-premium">
-                <div class="order-card-header">
-                    <div>
-                        <h4 style="margin:0;">${order.customer_name}</h4>
-                        <small>📞 ${order.customer_phone}</small>
-                    </div>
-                    <div class="status-badge" style="background:${statusColor}15; color:${statusColor};">
-                        ${order.payment_status}
-                    </div>
-                </div>
-                <p style="font-size:13px; margin:10px 0;">📦 ${itemsSummary}</p>
-                <div class="order-card-footer">
-                    <div>
-                        <small>Total</small>
-                        <div style="font-weight:800; color:var(--primary);">${Number(order.total_amount).toLocaleString()} Ks</div>
-                    </div>
-                    <button class="btn-detail-view" onclick="alert('Order ID: ${order.id}')">ကြည့်ရန်</button>
-                </div>
-            </div>
-        `;
-    }).join('');
+function closeOrderModal() {
+    const container = document.getElementById('posContainer');
+    if (container) container.classList.add('closing');
+    setTimeout(() => {
+        document.getElementById('orderModal').style.display = 'none';
+        if (container) container.classList.remove('closing');
+    }, 400);
 }
 
+// Page စတင်ခြင်း
 document.addEventListener('DOMContentLoaded', loadOrders);
 
