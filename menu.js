@@ -131,19 +131,52 @@ function enterAddMode() {
     toggleMenuOptions();
 }
 
-async function openEditModal(item) {
-    currentEditingId = id;
-    const { data, error } = await supabase.from('menu').select('*').eq('id', id).single();
-    if (data) {
-        document.getElementById('modal-title').innerText = "Edit Menu Item";
-        document.getElementById('edit-name').value = item.name;
-        document.getElementById('edit-price').value = item.price;
-        // အစ်ကို့ table မှာ stock လို့ ပေးထားရင် data.stock လို့ ပြင်သုံးပါ
-        document.getElementById('edit-stock').value = item.stock || item.stock_count || 0;
-        document.getElementById('edit-available').checked = item.is_available;
-        document.getElementById('preview-img').src = item.image_url || 'placeholder.jpg';
-        document.getElementById('edit-modal').classList.remove('hidden');
-    }
+async function renderMenuWithControls() {
+    const { data, error } = await supabase.from('menu').select('*');
+    if (error) return console.error(error);
+
+    const grid = document.getElementById('menu-grid');
+    grid.innerHTML = ''; // အရင်ဟောင်းတာတွေကို ဖျက်ထုတ်
+
+    data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'menu-card edit-shake';
+        
+        // Card တစ်ခုလုံးကို နှိပ်ရင် Modal ပွင့်အောင် လုပ်ခြင်း
+        card.onclick = () => openEditModal(item);
+
+        card.innerHTML = `
+            <div class="image-container">
+                <img src="${item.image_url || 'placeholder.jpg'}">
+                <button class="delete-badge" onclick="event.stopPropagation(); deleteItem('${item.id}', '${item.name}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="item-info">
+                <div class="item-name">${item.name}</div>
+                <div class="item-price">${item.price} MMK</div>
+            </div>
+            <div style="text-align:center; padding-bottom:10px; color:var(--primary-accent); font-size:12px;">
+                <i class="fas fa-pen"></i> Tap to Edit
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+// Modal ဖွင့်ပေးမည့် Function (ဒါလည်း ရှိနေရပါမယ်)
+function openEditModal(item) {
+    console.log("Opening Modal for:", item.name); // စစ်ဆေးရန် console မှာ ကြည့်နိုင်သည်
+    
+    document.getElementById('modal-title').innerText = "Edit Item";
+    document.getElementById('edit-name').value = item.name;
+    document.getElementById('edit-price').value = item.price;
+    document.getElementById('edit-stock').value = item.stock || 0;
+    document.getElementById('edit-available').checked = item.is_available;
+    document.getElementById('preview-img').src = item.image_url || 'placeholder.jpg';
+    
+    window.currentEditingId = item.id;
+    document.getElementById('edit-modal').classList.remove('hidden');
 }
 
 function toggleMenuOptions() {
