@@ -275,3 +275,35 @@ body {
 
 .status-btn.preparing.active { background: #FFEAA7; color: #D6A31E; }
 .status-btn.ready.active { background: #55E6C1; color: #1B8E72; }
+
+/* --- CUSTOMER PROFILE STYLES --- */
+#customer-insight-card {
+    margin: 20px;
+    padding: 20px;
+    background: var(--pure-white);
+    border-radius: 25px;
+    box-shadow: var(--soft-shadow);
+    border: var(--glass-border);
+}
+
+.profile-summary { text-align: center; margin-bottom: 20px; }
+.badge-row { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+.badge { 
+    background: #FFF3E0; color: var(--primary-accent); 
+    padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;
+}
+
+.stats-row { 
+    display: flex; justify-content: space-around; 
+    border-top: 1px solid #f0f0f0; padding-top: 15px; 
+}
+.stat-box { text-align: center; }
+.stat-box .label { font-size: 11px; color: var(--text-muted); display: block; }
+.stat-box .value { font-size: 16px; font-weight: 600; color: var(--text-main); }
+
+.history-item {
+    background: var(--pure-white);
+    margin: 10px 20px; padding: 15px;
+    border-radius: 15px; border-left: 4px solid var(--primary-accent);
+    display: flex; justify-content: space-between; align-items: center;
+}
