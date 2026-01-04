@@ -188,7 +188,7 @@ async function renderMenuWithControls() {
     const grid = document.getElementById('menu-grid');
     
     grid.innerHTML = data.map(item => `
-        <div class="menu-card edit-shake">
+        <div class="menu-card edit-shake" onclick='openEditModal(${JSON.stringify(item)})'>
             <div class="image-container">
                 <img src="${item.image_url || 'placeholder.jpg'}">
                 <button class="delete-badge" onclick="deleteItem('${item.id}', '${item.name}')">
