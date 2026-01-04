@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ၁။ Menu Grid ဆွဲထုတ်ခြင်း
 async function fetchMenuItems() {
     const grid = document.getElementById('menu-grid');
+    if(!grid) return;
     grid.innerHTML = '<div class="loading">Loading Menu...</div>';
 
     const { data, error } = await supabase.from('menu').select('*').order('name', { ascending: true });
@@ -32,71 +33,29 @@ async function fetchMenuItems() {
     `).join('');
 }
 
-// ၂။ Add New Button နှိပ်လျှင် (Alert အစား Modal ဖွင့်ရန် ပြင်ဆင်သည်)
-function enterAddMode() {
-    currentEditingId = null; 
-    toggleMenuOptions();
-    
-    // Form ထဲက Data တွေ အဟောင်းမကျန်အောင် အရင်ရှင်းသည်
-    document.getElementById('modal-title').innerText = "Add New Item";
-    document.getElementById('edit-name').value = "";
-    document.getElementById('edit-price').value = "";
-    document.getElementById('edit-stock').value = "0";
-    document.getElementById('edit-available').checked = true;
-    document.getElementById('preview-img').src = 'placeholder.jpg';
-    
-    document.getElementById('edit-modal').classList.remove('hidden');
-}
-
-// ၃။ Image Preview Function (ဒါက အစ်ကို့ Code မှာ ကျန်နေခဲ့တဲ့ Function ပါ)
-function previewImage(event) {
-    const reader = new FileReader();
-    reader.onload = function() {
-        document.getElementById('preview-img').src = reader.result;
-    };
-    if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
-}
-
-// ၄။ Edit Modal ဖွင့်ခြင်း
-async function openEditModal(id) {
-    currentEditingId = id;
-    const { data, error } = await supabase.from('menu').select('*').eq('id', id).single();
-    
-    if (data) {
-        document.getElementById('modal-title').innerText = "Edit Menu Item";
-        document.getElementById('edit-name').value = data.name;
-        document.getElementById('edit-price').value = data.price;
-        document.getElementById('edit-stock').value = data.stock_count;
-        document.getElementById('edit-available').checked = data.is_available;
-        document.getElementById('preview-img').src = data.image_url || 'placeholder.jpg';
-        document.getElementById('edit-modal').classList.remove('hidden');
-    }
-}
-
-// ၁။ ပုံတင်သည့် function ကို သီးသန့် အရင်ရေးပါ (နာမည်ကို သေချာစစ်ပါ)
+// ၂။ ပုံတင်သည့် function (နာမည်ကို သေချာစစ်ပါ)
 async function uploadImage(file) {
     try {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
         const filePath = `menu-images/${fileName}`;
 
-        // Supabase storage သို့ တင်ခြင်း
+        // Bucket နာမည် 'images' ဖြစ်ကြောင်း သေချာပါစေ
         let { error: uploadError } = await supabase.storage
-            .from('images') // အစ်ကို့ bucket နာမည် 'images' ဖြစ်ရပါမယ်
+            .from('images') 
             .upload(filePath, file);
 
         if (uploadError) throw uploadError;
 
-        // တင်ပြီးသားပုံရဲ့ Public URL ကို ပြန်ယူခြင်း
         const { data } = supabase.storage.from('images').getPublicUrl(filePath);
         return data.publicUrl;
     } catch (err) {
         console.error('Upload error:', err);
-        throw new Error('ပုံတင်လို့မရပါသဖြင့် နောက်မှပြန်ကြိုးစားပါ');
+        throw new Error('Image upload failed');
     }
 }
 
-// ၅။ Save Item Logic
+// ၃။ Save Item Logic
 async function saveItem() {
     const name = document.getElementById('edit-name').value;
     const price = document.getElementById('edit-price').value;
@@ -106,12 +65,12 @@ async function saveItem() {
 
     if (!name || !price) return alert("အမည်နှင့် ဈေးနှုန်း ထည့်ပေးပါ");
 
-    if (confirm("အချက်အလက်များကို သိမ်းဆည်းရန် သေချာပါသလား?") && confirm("အတည်ပြုပါသလား?")) {
+    if (confirm("အချက်အလက်များကို သိမ်းဆည်းရန် သေချာပါသလား?")) {
         try {
             let imageUrl = document.getElementById('preview-img').src;
 
-            // ပုံအသစ်ပါလျှင် အရင် Upload လုပ်သည်
-            if (fileInput.files.length > 0) {
+            // ပုံအသစ်ပါလျှင် uploadImage ကိုခေါ်မည်
+            if (fileInput.files && fileInput.files.length > 0) {
                 imageUrl = await uploadImage(fileInput.files[0]);
             }
 
@@ -129,7 +88,7 @@ async function saveItem() {
 
             if (error) throw error;
 
-            alert("သိမ်းဆည်းအောင်မြင်ပါသည်။");
+            alert("Success!");
             closeModal();
             fetchMenuItems();
         } catch (err) {
@@ -138,7 +97,39 @@ async function saveItem() {
     }
 }
 
-// ၆။ အခြား လိုအပ်သော Function များ (Toggle/Close)
+// ၄။ Helper Functions
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function() {
+        document.getElementById('preview-img').src = reader.result;
+    };
+    if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+}
+
+function enterAddMode() {
+    currentEditingId = null; 
+    toggleMenuOptions();
+    document.getElementById('modal-title').innerText = "Add New Item";
+    document.getElementById('edit-name').value = "";
+    document.getElementById('edit-price').value = "";
+    document.getElementById('preview-img').src = 'placeholder.jpg';
+    document.getElementById('edit-modal').classList.remove('hidden');
+}
+
+async function openEditModal(id) {
+    currentEditingId = id;
+    const { data } = await supabase.from('menu').select('*').eq('id', id).single();
+    if (data) {
+        document.getElementById('modal-title').innerText = "Edit Menu Item";
+        document.getElementById('edit-name').value = data.name;
+        document.getElementById('edit-price').value = data.price;
+        document.getElementById('edit-stock').value = data.stock_count;
+        document.getElementById('edit-available').checked = data.is_available;
+        document.getElementById('preview-img').src = data.image_url || 'placeholder.jpg';
+        document.getElementById('edit-modal').classList.remove('hidden');
+    }
+}
+
 function toggleMenuOptions() {
     document.getElementById('option-overlay').classList.toggle('hidden');
 }
@@ -149,11 +140,9 @@ function enterEditMode() {
     fetchMenuItems(); 
 }
 
-async function handleItemClick(id) {
+function handleItemClick(id) {
     if (!editMode) return;
-    if (confirm("ပြင်ဆင်မှာ သေချာပါသလား?") && confirm("ထပ်မံအတည်ပြုပါ။")) {
-        openEditModal(id); 
-    }
+    openEditModal(id);
 }
 
 function closeModal() {
