@@ -191,21 +191,20 @@ async function renderMenuWithControls() {
         <div class="menu-card edit-shake" onclick='openEditModal(${JSON.stringify(item)})'>
             <div class="image-container">
                 <img src="${item.image_url || 'placeholder.jpg'}">
-                <button class="delete-badge" onclick="deleteItem('${item.id}', '${item.name}')">
+                <button class="delete-badge" onclick="event.stopPropagation(); deleteItem('${item.id}', '${item.name}')">
                     <i class="fas fa-trash"></i>
-                </button>
-                <button class="edit-badge" onclick="openEditModal(${JSON.stringify(item)})">
-                    <i class="fas fa-pen"></i>
                 </button>
             </div>
             <div class="item-info">
                 <div class="item-name">${item.name}</div>
                 <div class="item-price">${item.price} MMK</div>
             </div>
+            <div style="text-align:center; padding-bottom:10px; color:var(--primary-accent); font-size:12px;">
+                <i class="fas fa-pen"></i> Tap to Edit
+            </div>
         </div>
     `).join('');
 }
-
 // --- Item ကို ဖျက်ခြင်း (Delete Function) ---
 async function deleteItem(id, name) {
     if (confirm(`"${name}" ကို မီနူးထဲကနေ ဖျက်ပစ်မှာ သေချာပါသလား?`)) {
