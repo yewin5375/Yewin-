@@ -174,3 +174,70 @@ body {
 .nav-item { text-decoration: none; color: var(--text-muted); text-align: center; font-size: 10px; font-weight: 600; }
 .nav-item.active { color: var(--primary-accent); }
 .nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
+
+/* --- MENU OPTION OVERLAY (Floating Menu) --- */
+.option-card {
+    position: absolute;
+    top: 70px; /* Header ရဲ့ အောက်နားမှာ ပေါ်ရန် */
+    right: 20px;
+    background: var(--pure-white);
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15); /* ပေါ်လွင်စေရန် အရိပ်ထည့်ခြင်း */
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    min-width: 180px;
+    border: 1px solid #eee;
+}
+
+.option-btn {
+    padding: 12px 15px;
+    border: none;
+    background: none;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px;
+    color: var(--text-main);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.option-btn i {
+    width: 20px;
+    color: var(--primary-accent); /* Icon လေးတွေကို အရောင်ပေးခြင်း */
+}
+
+.option-btn:active {
+    background: #f0f0f0; /* နှိပ်လိုက်ရင် အရောင်ပြောင်းရန် */
+}
+
+/* Edit Mode ဖြစ်နေချိန် Card မှာ ပြမည့် ပုံစံ */
+.edit-mode-active .menu-card {
+    border: 2px dashed var(--primary-accent);
+    animation: shake 0.5s infinite alternate;
+}
+
+@keyframes shake {
+    from { transform: rotate(1deg); }
+    to { transform: rotate(-1deg); }
+}
+
+/* Modal အဖွင့်အပိတ် Animation */
+.modal.hidden {
+    display: none;
+}
+
+.modal {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
