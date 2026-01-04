@@ -1,4 +1,4 @@
-// ၁။ Firebase Configuration
+// ၁။ Firebase Configuration (အစ်ကို့ Key များအတိုင်း)
 const firebaseConfig = {
     apiKey: "AIzaSyCW_jACdwWmN2nwlEOxR6tdTBqLXHy",
     authDomain: "myin-thar-chicken-bbq.firebaseapp.com",
@@ -11,7 +11,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
-// ၂။ Notification စနစ်
+// ၂။ Notification စနစ် (Phase 4)
 async function initNotification() {
     try {
         const permission = await Notification.requestPermission();
@@ -23,6 +23,7 @@ async function initNotification() {
             });
 
             if (token) {
+                // Supabase ထဲမှာ Token သိမ်းမည်
                 await window.sb.from('user_tokens').upsert([{ token: token }], { onConflict: 'token' });
                 console.log("Token Saved Successfully");
             }
@@ -32,30 +33,43 @@ async function initNotification() {
     }
 }
 
-// ၃။ Dashboard Stats
+// ၃။ Dashboard Stats (Blueprint Dashboard & Reports အပိုင်း)
 async function loadDashboardStats() {
     try {
-        const today = new Date().toISOString().split('T')[0];
+        // Timezone လွဲမှားမှုမရှိအောင် ယနေ့ရက်စွဲကို ယူသည်
+        const now = new Date();
+        const today = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+
         const { data, error } = await window.sb
             .from('orders')
             .select('total_amount')
             .gte('created_at', today);
 
-        if (!error) {
+        if (error) throw error;
+
+        if (data) {
             const totalRevenue = data.reduce((sum, o) => sum + Number(o.total_amount || 0), 0);
-            document.getElementById('todayOrders').innerText = data.length + " Orders";
-            document.getElementById('todayRevenue').innerText = totalRevenue.toLocaleString() + " Ks";
+            
+            // HTML UI သို့ Data များ ထည့်ခြင်း
+            const orderEl = document.getElementById('todayOrders');
+            const revenueEl = document.getElementById('todayRevenue');
+            
+            if (orderEl) orderEl.innerText = `${data.length} Orders`;
+            if (revenueEl) revenueEl.innerText = `${totalRevenue.toLocaleString()} Ks`;
         }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+        console.error("Dashboard Stats Error:", e.message);
+    }
 }
 
-// ၄။ Navigation Logic (Refresh ပတ်သက်သော logic အပါအဝင်)
+// ၄။ Navigation Logic (Phase 2 UI Overview)
 function changeNav(id, el) {
-    // လက်ရှိ Page ကို Browser မှာ မှတ်ထားမယ် (Refresh လုပ်ရင် ပြန်သုံးဖို့)
+    // လက်ရှိ Page ကို Browser မှာ မှတ်ထားမည် (Refresh လုပ်ရင် ပြန်သုံးဖို့)
     localStorage.setItem('activeView', id);
 
     // Nav Item အရောင်ပြောင်းခြင်း
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    
     if (el) {
         el.classList.add('active');
     } else {
@@ -76,11 +90,13 @@ function changeNav(id, el) {
         'menu-manager': 'Menu Gallery', 
         'customers': 'VIP Customers' 
     };
-    if (document.getElementById('viewTitle')) document.getElementById('viewTitle').innerText = titles[id];
+    const titleEl = document.getElementById('viewTitle');
+    if (titleEl) titleEl.innerText = titles[id];
 
     showView(id);
 }
 
+// View တစ်ခုချင်းစီကို ပြသခြင်း
 function showView(id) {
     document.querySelectorAll('.view').forEach(v => {
         v.classList.remove('active');
@@ -93,36 +109,46 @@ function showView(id) {
         target.style.display = 'block';
     }
 
-    // သက်ဆိုင်ရာ Data Load လုပ်ခြင်း
+    // သက်ဆိုင်ရာ View အလိုက် Data Load လုပ်ပေးခြင်း
     if (id === 'dashboard') loadDashboardStats();
+    if (id === 'orders') typeof loadOrders === 'function' && loadOrders();
     if (id === 'menu-manager') typeof loadMenuItems === 'function' && loadMenuItems();
     if (id === 'customers') typeof loadCustomers === 'function' && loadCustomers();
-    if (id === 'orders') typeof loadOrders === 'function' && loadOrders();
 }
 
-// Back Arrow နှိပ်လျှင် Dashboard ပြန်သွားခြင်း
+// Back Arrow နှိပ်လျှင် Dashboard သို့ ပြန်သွားခြင်း
 function goBack() {
     changeNav('dashboard', null);
 }
 
-// ၅။ Window Load (Refresh လုပ်လျှင် Page မပျောက်စေရန်)
+// ၅။ Window Load (App စတင်ခြင်း)
 window.onload = () => {
-    // သိမ်းထားတဲ့ Page ရှိရင် အဲ့ဒီကိုသွားမယ်၊ မရှိရင် Dashboard သွားမယ်
+    // သိမ်းထားသော Page သို့ ပြန်သွားမည်
     const savedView = localStorage.getItem('activeView') || 'dashboard';
     changeNav(savedView, null);
     
+    // Notification စတင်ခြင်း
     initNotification();
-    setInterval(loadDashboardStats, 30000); // ၃၀ စက္ကန့်တစ်ခါ Dashboard update လုပ်မယ်
+    
+    // ၃၀ စက္ကန့်တစ်ခါ Dashboard ကို Auto Update လုပ်ပေးမည်
+    setInterval(loadDashboardStats, 30000);
 };
 
-// ၆။ Back to Top Button
+// ၆။ Scroll Back to Top UI
 const backToTopBtn = document.createElement('div');
 backToTopBtn.id = "backToTop";
 backToTopBtn.innerHTML = "↑";
+backToTopBtn.style.cssText = `
+    position: fixed; bottom: 85px; right: 20px; 
+    width: 45px; height: 45px; background: var(--primary); 
+    color: white; border-radius: 50%; display: none; 
+    align-items: center; justify-content: center; 
+    cursor: pointer; z-index: 999; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+`;
 document.body.appendChild(backToTopBtn);
 
 window.onscroll = function() {
-    if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+    if (document.body.scrollTop > 150 || document.documentElement.scrollTop > 150) {
         backToTopBtn.style.display = "flex";
     } else {
         backToTopBtn.style.display = "none";
@@ -132,20 +158,4 @@ window.onscroll = function() {
 backToTopBtn.onclick = function() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
-
-async function loadDashboardStats() {
-    const today = new Date().toISOString().split('T')[0];
-    
-    // ယနေ့ အော်ဒါများယူခြင်း
-    const { data, error } = await window.sb
-        .from('orders')
-        .select('total_amount')
-        .gte('created_at', today);
-
-    if (!error) {
-        const totalRevenue = data.reduce((sum, row) => sum + row.total_amount, 0);
-        document.getElementById('todayRevenue').innerText = totalRevenue.toLocaleString() + " Ks";
-        document.getElementById('todayOrders').innerText = data.length + " Orders";
-    }
-}
 
