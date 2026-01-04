@@ -2,7 +2,10 @@
 const orderSubscription = supabase
   .channel('orders-realtime')
   .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, payload => {
-    try { playNotificationSound(); } catch(e) {}
+    try { 
+        // Notification Sound ထည့်လိုလျှင် ဒီမှာ သုံးနိုင်သည်
+        console.log("New order received!", payload.new);
+    } catch(e) {}
     fetchOrders(); 
   })
   .subscribe();
@@ -17,7 +20,15 @@ async function fetchOrders() {
         .select('*, customers(name, total_points)') 
         .order('created_at', { ascending: false });
 
-    if (error) return console.error(error);
+    if (error) {
+        orderContainer.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        return;
+    }
+
+    if (data.length === 0) {
+        orderContainer.innerHTML = '<div class="loading-state"><p>အော်ဒါအသစ် မရှိသေးပါ။</p></div>';
+        return;
+    }
 
     orderContainer.innerHTML = data.map(order => {
         let items = [];
@@ -25,10 +36,13 @@ async function fetchOrders() {
             items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
         } catch (e) { items = []; }
 
+        // Status အလိုက် Card အရောင်ပြောင်းရန် (CSS နှင့် ချိတ်ဆက်သည်)
+        const statusClass = order.order_status === 'Collected' ? 'status-collected' : '';
+        
         return `
-        <div class="order-card ${order.order_status === 'Collected' ? 'status-collected' : ''}" id="order-${order.id}">
+        <div class="order-card ${statusClass}" id="order-${order.id}">
             <div class="order-header">
-                <span class="order-type">${order.order_type || 'BBQ Order'}</span>
+                <span class="order-type">#${order.id.toString().slice(-4)} ${order.order_type || 'Takeaway'}</span>
                 <span class="pickup-time">${new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
             </div>
             
@@ -38,34 +52,31 @@ async function fetchOrders() {
             </div>
 
             <div class="order-items">
-                ${items.map(item => `<p>${item.qty} x ${item.name}</p>`).join('')}
+                ${items.map(item => `<p>• ${item.qty} x ${item.name}</p>`).join('')}
             </div>
 
             <div class="order-footer">
                 <p>Total: <strong>${order.total_amount?.toLocaleString()} MMK</strong></p>
                 <div class="status-buttons">
-                    <button class="status-btn preparing ${order.order_status === 'Preparing' ? 'active' : ''}" onclick="updateStatus('${order.id}', 'Preparing')">Prep</button>
-                    <button class="status-btn ready ${order.order_status === 'Ready' ? 'active' : ''}" onclick="updateStatus('${order.id}', 'Ready')">Ready</button>
-                    <button class="status-btn collected" onclick="finalizeOrder('${order.id}')">Collect</button>
+                    <button class="status-btn preparing ${order.order_status === 'Preparing' ? 'active' : ''}" 
+                        onclick="updateStatus('${order.id}', 'Preparing')">Prep</button>
+                    <button class="status-btn ready ${order.order_status === 'Ready' ? 'active' : ''}" 
+                        onclick="updateStatus('${order.id}', 'Ready')">Ready</button>
+                    <button class="status-btn collected" 
+                        onclick="finalizeOrder('${order.id}')">Collect</button>
                 </div>
             </div>
         </div>`;
     }).join('');
 }
 
-// ၃။ Deep Link - Customer Profile သို့ တိုက်ရိုက်သွားခြင်း
-function viewCustomerProfile(customerId) {
-    if (!customerId || customerId === 'null') return alert("Guest Customer ဖြစ်နေပါသည်");
-    showPage('customer-page'); 
-    viewCustomerDetail(customerId); 
-}
-
-// ၄။ Status Update
+// ၃။ Status Update Function
 async function updateStatus(orderId, status) {
-    await supabase.from('orders').update({ order_status: status }).eq('id', orderId);
-    fetchOrders();
+    const { error } = await supabase.from('orders').update({ order_status: status }).eq('id', orderId);
+    if (!error) fetchOrders();
 }
 
+// ၄။ အော်ဒါအပြီးသတ်ခြင်း (Points တွက်ချက်ခြင်း အပါအဝင်)
 async function finalizeOrder(orderId) {
     if (confirm("ငွေလက်ခံရရှိပြီး အော်ဒါလွှဲပြောင်းပေးလိုက်ပြီလား?")) {
         const { data: order } = await supabase.from('orders').select('*').eq('id', orderId).single();
@@ -77,14 +88,15 @@ async function finalizeOrder(orderId) {
 
         if (!error) {
             await updateCustomerLoyalty(order.customer_id, order.total_amount);
-            alert("အောင်မြင်ပါသည်။");
+            alert("Order Collected!");
             fetchOrders();
         }
     }
 }
 
+// ၅။ Loyalty Points Update လုပ်ခြင်း
 async function updateCustomerLoyalty(customerId, amount) {
-    if (!customerId) return;
+    if (!customerId || customerId === 'null') return;
     const earnedPoints = Math.floor(amount / 1000); 
     const { data: cust } = await supabase.from('customers').select('*').eq('id', customerId).single();
     if (cust) {
@@ -93,6 +105,16 @@ async function updateCustomerLoyalty(customerId, amount) {
             lifetime_value: (cust.lifetime_value || 0) + amount
         }).eq('id', customerId);
     }
+}
+
+// ၆။ Customer Profile သို့သွားခြင်း
+function viewCustomerProfile(customerId) {
+    if (!customerId || customerId === 'null' || customerId === 'undefined') {
+        return alert("Guest Customer ဖြစ်နေပါသည်");
+    }
+    showPage('customer-page'); 
+    // customer.js ထဲရှိ function ကို လှမ်းခေါ်ခြင်း
+    if (typeof viewCustomerDetail === 'function') viewCustomerDetail(customerId); 
 }
 
 document.addEventListener('DOMContentLoaded', fetchOrders);
