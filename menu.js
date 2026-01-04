@@ -47,7 +47,7 @@ async function uploadImage(file) {
 
         // ၂။ Bucket နာမည် 'images' ဟုတ်မဟုတ် Supabase Dashboard မှာ ပြန်စစ်ပေးပါ
         const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('images') 
+            .from('menu_images')
             .upload(filePath, file, {
                 cacheControl: '3600',
                 upsert: true 
