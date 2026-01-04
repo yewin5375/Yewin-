@@ -164,3 +164,57 @@ function handleItemClick(id) {
 function closeModal() {
     document.getElementById('edit-modal').classList.add('hidden');
 }
+
+// --- Edit Mode ထဲသို့ ဝင်ခြင်း ---
+function enterEditMode() {
+    document.getElementById('menu-grid').classList.add('edit-mode-active');
+    document.getElementById('edit-mode-btn').classList.add('hidden'); // Edit ခလုတ်ကို ဖျောက်
+    document.getElementById('cancel-edit-btn').classList.remove('hidden'); // Cancel ခလုတ်ကို ပြ
+    toggleMenuOptions(); // Option menu ကို ပိတ်
+    renderMenuWithControls(); // Delete ခလုတ်တွေ ပါတဲ့ list ကို ပြန်ဆွဲ
+}
+
+// --- Edit Mode မှ ပြန်ထွက်ခြင်း ---
+function exitEditMode() {
+    document.getElementById('menu-grid').classList.remove('edit-mode-active');
+    document.getElementById('edit-mode-btn').classList.remove('hidden');
+    document.getElementById('cancel-edit-btn').classList.add('hidden');
+    fetchMenuItems(); // ရိုးရိုး menu list ကို ပြန်ပြ
+}
+
+// --- Delete ခလုတ်ပါဝင်သော Menu ကို ဆွဲထုတ်ခြင်း ---
+async function renderMenuWithControls() {
+    const { data } = await supabase.from('menu').select('*');
+    const grid = document.getElementById('menu-grid');
+    
+    grid.innerHTML = data.map(item => `
+        <div class="menu-card edit-shake">
+            <div class="image-container">
+                <img src="${item.image_url || 'placeholder.jpg'}">
+                <button class="delete-badge" onclick="deleteItem('${item.id}', '${item.name}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <button class="edit-badge" onclick="openEditModal(${JSON.stringify(item)})">
+                    <i class="fas fa-pen"></i>
+                </button>
+            </div>
+            <div class="item-info">
+                <div class="item-name">${item.name}</div>
+                <div class="item-price">${item.price} MMK</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// --- Item ကို ဖျက်ခြင်း (Delete Function) ---
+async function deleteItem(id, name) {
+    if (confirm(`"${name}" ကို မီနူးထဲကနေ ဖျက်ပစ်မှာ သေချာပါသလား?`)) {
+        const { error } = await supabase.from('menu').delete().eq('id', id);
+        if (!error) {
+            alert("ဖျက်ပြီးပါပြီ။");
+            renderMenuWithControls(); // List ကို ပြန် update လုပ်
+        } else {
+            alert("Error: " + error.message);
+        }
+    }
+}
