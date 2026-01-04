@@ -125,42 +125,47 @@
         
         <section id="customer-page" class="page-content hidden">
     <div class="header-section">
-        <h2 class="title">Customer Profile</h2>
-    </div>
-
-    <div id="customer-insight-card" class="glass-card">
-        <div class="profile-summary">
-            <h3 id="cust-name">Customer Name</h3>
-            <p id="cust-phone">09xxxxxxxxx</p>
-            <div class="badge-row">
-                <span id="cust-points" class="badge">0 Points</span>
-                <span id="cust-level" class="badge">VIP Level</span>
+        <h2 class="title">Customers</h2>
+        <div class="header-actions">
+            <div class="search-box mini">
+                <i class="fas fa-search"></i>
+                <input type="text" id="customer-search" placeholder="Search customer..." onkeyup="filterCustomers()">
             </div>
-        </div>
-
-        <div class="stats-row">
-            <div class="stat-box">
-                <span class="label">Lifetime Value</span>
-                <span id="cust-total-spent" class="value">0 MMK</span>
-            </div>
-            <div class="stat-box">
-                <span class="label">Total Orders</span>
-                <span id="cust-total-orders" class="value">0</span>
-            </div>
-        </div>
-
-        <div class="history-section">
-            <h4>Favorite Items</h4>
-            <div id="cust-favorites" class="fav-list"></div>
         </div>
     </div>
 
-    <div class="history-list-header">
-        <h4>Recent Orders</h4>
+    <div id="customer-list-view">
+        <div id="customer-grid" class="customer-grid-container">
+            </div>
     </div>
-    <div id="customer-order-history" class="history-container">
+
+    <div id="customer-detail-view" class="hidden">
+        <button class="back-btn" onclick="showCustomerList()">
+            <i class="fas fa-arrow-left"></i> Back to List
+        </button>
+        <div id="customer-insight-card" class="glass-card">
+            <div class="profile-summary">
+                <h3 id="cust-name">Name</h3>
+                <p id="cust-phone">Phone</p>
+                <div class="badge-row">
+                    <span id="cust-points" class="badge">0 Points</span>
+                </div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-box">
+                    <span class="label">Lifetime Value</span>
+                    <span id="cust-total-spent" class="value">0 K</span>
+                </div>
+                <div class="stat-box">
+                    <span class="label">Total Orders</span>
+                    <span id="cust-total-orders" class="value">0</span>
+                </div>
+            </div>
         </div>
+        <div id="customer-order-history" class="history-container"></div>
+    </div>
         </section>
+        
         
         <section id="report-page" class="page-content hidden">
     <div class="header-section">
