@@ -156,10 +156,14 @@ async function submitFinalOrder() {
     const pickup = document.getElementById('pickupTime')?.value || 'As soon as possible';
 
     if (!phone) return alert("ဖုန်းနံပါတ် ထည့်ပေးပါ!");
+    if (currentCart.length === 0) return alert("ပစ္စည်း ရွေးချယ်မှု မရှိသေးပါ!");
 
     const total = currentCart.reduce((s, i) => s + (i.qty * i.price), 0);
+    // Loyalty Points တွက်ချက်ခြင်း (ဥပမာ - ၁၀၀၀ ကျပ်လျှင် ၁ မှတ်)
+    const earnedPoints = Math.floor(total / 1000);
 
     try {
+        // ၁။ Orders Table ထဲသို့ အော်ဒါအသစ်ထည့်ခြင်း
         const { error: orderError } = await window.sb.from('orders').insert([{
             customer_name: name,
             customer_phone: phone,
@@ -172,20 +176,49 @@ async function submitFinalOrder() {
 
         if (orderError) throw orderError;
 
-        // Stock Update Logic
+        // ၂။ Menu Stock များကို Update လုပ်ခြင်း
         for (const item of currentCart) {
             const { data: menuData } = await window.sb.from('menu').select('stock').eq('id', item.id).single();
             const newStock = (menuData.stock || 0) - item.qty;
             await window.sb.from('menu').update({ stock: newStock }).eq('id', item.id);
         }
 
-        alert("အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်!");
+        // ၃။ Customer Table ကို Update လုပ်ခြင်း (Blueprint Phase 3 Logic)
+        // ဖုန်းနံပါတ်တူရင် အချက်အလက်ပေါင်းမယ်၊ မရှိရင် အသစ်ဆောက်မယ် (Upsert)
+        const { data: existingCust } = await window.sb
+            .from('customers')
+            .select('*')
+            .eq('phone', phone)
+            .single();
+
+        if (existingCust) {
+            // ရှိပြီးသား Customer ဖြစ်လျှင် အချက်အလက်များ ပေါင်းထည့်မည်
+            await window.sb.from('customers').update({
+                name: name, // နာမည်ပြောင်းသွားရင် update ဖြစ်အောင်
+                total_spent: (existingCust.total_spent || 0) + total,
+                total_orders: (existingCust.total_orders || 0) + 1,
+                points: (existingCust.points || 0) + earnedPoints
+            }).eq('phone', phone);
+        } else {
+            // Customer အသစ်ဖြစ်လျှင် အသစ်စာရင်းသွင်းမည်
+            await window.sb.from('customers').insert([{
+                phone: phone,
+                name: name,
+                total_spent: total,
+                total_orders: 1,
+                points: earnedPoints
+            }]);
+        }
+
+        alert(`အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်!\nရရှိသည့် အမှတ်: ${earnedPoints} pts`);
         location.reload(); 
 
     } catch (e) {
-        alert("Error: " + e.message);
+        alert("System Error: " + e.message);
+        console.error(e);
     }
 }
+
 
 // ၈။ Order List Rendering (Blueprint Phase 2 & 3 UI)
 async function loadOrders() {
