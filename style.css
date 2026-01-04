@@ -233,21 +233,66 @@ body {
     font-weight: bold; color: var(--primary-accent);
 }
 
-/* Order Card Layout ပြန်ညှိခြင်း */
-.order-list-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 15px;
+/* Order Page Layout */
+.order-container {
     padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* အော်ဒါကတ်တစ်ခုချင်းစီကြား အကွာအဝေး */
+    padding-bottom: 100px;
 }
 
 .order-card {
-    background: white;
+    background: #ffffff;
     border-radius: 15px;
-    padding: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    display: block; /* နေရာတကျဖြစ်အောင် */
+    padding: 18px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-left: 5px solid #FF4500;
+    display: block; /* နေရာလွဲမသွားစေရန် */
 }
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #636E72;
+}
+
+.order-items {
+    background: #F8F9FA;
+    padding: 12px;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+.order-items p {
+    margin: 5px 0;
+    font-size: 15px;
+}
+
+/* ခလုတ်များ ညီညာစေရန် */
+.status-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.status-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    background: #EFEFEF;
+}
+
+.status-btn.active-prep { background: #FFEAA7; color: #D6A31E; }
+.status-btn.active-ready { background: #55E6C1; color: #1B8E72; }
+.status-btn.done { background: #FF4500; color: white; }
 /* Delete ခလုတ်ကို Card ရဲ့ ဘယ်ဘက်အပေါ်မှာ ပြရန် */
 .delete-badge {
     position: absolute;
