@@ -95,7 +95,35 @@
             
         </section>
 
-        <section id="order-page" class="page-content hidden"><h2>Order Management</h2></section>
+        <section id="order-page" class="page-content hidden">
+    <div class="header-section">
+        <h2 class="title">Active Orders</h2>
+        <div class="header-actions">
+            <button class="icon-btn"><i class="fas fa-search"></i></button>
+        </div>
+    </div>
+
+    <div class="order-controls glass-card">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="order-search" placeholder="Search by Phone or Name..." onkeyup="filterOrders()">
+        </div>
+        <div class="filter-tabs">
+            <button class="filter-btn active" onclick="setOrderFilter('all')">All</button>
+            <button class="filter-btn" onclick="setOrderFilter('Preparing')">Prep</button>
+            <button class="filter-btn" onclick="setOrderFilter('Ready')">Ready</button>
+            <button class="filter-btn" onclick="setOrderFilter('Collected')">Done</button>
+        </div>
+    </div>
+
+    <div id="order-list" class="order-container">
+        <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Waiting for new orders...</p>
+        </div>
+    </div>
+        </section>
+        
         <section id="customer-page" class="page-content hidden">
     <div class="header-section">
         <h2 class="title">Customer Profile</h2>
