@@ -241,3 +241,33 @@ body {
     to { opacity: 1; }
 }
 
+/* Delete ခလုတ်ကို Card ရဲ့ ဘယ်ဘက်အပေါ်မှာ ပြရန် */
+.delete-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #ff4757;
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 5;
+}
+
+/* Edit လုပ်နေစဉ် တုန်ခါနေသည့် Animation */
+.edit-shake {
+    animation: shake 0.5s infinite alternate;
+    border: 2px dashed var(--primary-accent) !important;
+}
+
+@keyframes shake {
+    from { transform: rotate(1deg); }
+    to { transform: rotate(-1deg); }
+}
+
