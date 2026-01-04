@@ -1,140 +1,157 @@
 <!DOCTYPE html>
-<html lang="my">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chicken BBQ Admin - Full Solution</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chicken BBQ Admin System</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    
+    <div class="app-container">
+        <header class="app-header">
+            <div class="back-btn" id="headerBackBtn" onclick="goBack()" style="visibility: hidden;">←</div>
+            <h2 id="viewTitle">Admin Overview</h2>
+            <div id="online-status" style="font-size: 10px; color: #10b981;">● Online</div>
+        </header>
 
-    <header class="app-header">
-        <div style="font-weight: 800; font-size: 1.2rem; color: #ff7043;">Chicken BBQ Admin</div>
-        <div id="status-dot" style="font-size: 12px; color: #10b981;">● System Online</div>
-    </header>
-
-    <main class="content-area">
-        
-        <section id="dashboard" class="view active">
-            <h2 class="page-header">Daily Summary</h2>
-            <div class="stat-grid">
-                <div class="stat-card">
-                    <small>Today Revenue</small>
-                    <h3 id="stat-revenue">0 Ks</h3>
-                </div>
-                <div class="stat-card">
-                    <small>New Orders</small>
-                    <h3 id="stat-orders">0</h3>
-                </div>
-            </div>
-            <div class="order-card-new">
-                <canvas id="salesChart" height="180"></canvas>
-            </div>
-        </section>
-
-        <section id="orders" class="view">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h2 class="page-header">Orders</h2>
-                <button class="btn-status-step active" onclick="openPOS()">+ New Order</button>
-            </div>
+        <main class="content-area">
             
-            <div class="category-scroll" style="margin-bottom: 15px;">
-                <div class="cat-tab active" onclick="filterOrders('New')">New</div>
-                <div class="cat-tab" onclick="filterOrders('Preparing')">Preparing</div>
-                <div class="cat-tab" onclick="filterOrders('Ready')">Ready</div>
-                <div class="cat-tab" onclick="filterOrders('Finished')">Finished</div>
-            </div>
-
-            <div id="order-list">
+            <div id="dashboard" class="view active">
+                <h1 class="page-header">Daily Summary</h1>
+                <div class="stat-grid"> 
+                    <div class="stat-card" onclick="changeNav('orders', document.querySelectorAll('.nav-item')[1])">
+                        <div class="card-icon">🛍️</div>
+                        <div class="card-info">
+                            <h3>New Orders</h3>
+                            <p id="todayOrders">0 Orders</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="card-icon">💰</div>
+                        <div class="card-info">
+                            <h3>Revenue</h3>
+                            <p id="todayRevenue">0 Ks</p>
+                        </div>
+                    </div>
                 </div>
-        </section>
-
-        <section id="menu-manager" class="view">
-            <h2 class="page-header">Menu Gallery</h2>
-            <div id="menu-list" class="menu-grid">
+                <div class="stat-card" style="margin-top: 20px; padding: 15px;">
+                    <canvas id="salesChart" height="150"></canvas>
                 </div>
-            <button class="fab-add" onclick="openMenuModal()">+</button>
-        </section>
-
-        <section id="customers" class="view">
-            <h2 class="page-header">VIP Customers</h2>
-            <div class="search-wrapper">
-                <input type="text" class="search-input-pearl" placeholder="ရှာရန် (ဖုန်း/နာမည်)..." oninput="searchCRM(this.value)">
             </div>
-            <div id="customer-list" style="margin-top: 20px;">
+
+            <div id="orders" class="view">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 class="page-header">Orders</h2>
+                    <button class="btn-open-pos" onclick="openOrderModal()">➕ New Order</button>
                 </div>
-        </section>
 
-    </main>
+                <div class="category-scroll" style="margin-bottom: 15px; background: transparent; padding: 10px 0;">
+                    <div class="cat-tab active" onclick="filterByStatus('New', this)">New</div>
+                    <div class="cat-tab" onclick="filterByStatus('Preparing', this)">Preparing</div>
+                    <div class="cat-tab" onclick="filterByStatus('Ready', this)">Ready</div>
+                    <div class="cat-tab" onclick="filterByStatus('Finished', this)">Finished</div>
+                </div>
 
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="showView('dashboard', this)">📊</div>
-        <div class="nav-item" onclick="showView('orders', this)">📦</div>
-        <div class="nav-item" onclick="showView('menu-manager', this)">🍴</div>
-        <div class="nav-item" onclick="showView('customers', this)">👥</div>
-    </nav>
+                <div id="order-list" class="order-container">
+                    </div>
+            </div>
 
-    <div id="menuModal" class="modal-overlay">
-        <div class="menu-modal-content">
-            <h3 id="menuModalTitle">Add New Item</h3>
-            <input type="hidden" id="edit-id"> <div class="modal-input-group">
-                <label>Item Name</label>
-                <input type="text" id="m-name" placeholder="ဥပမာ- ကြက်တောင်ပံကင်">
+            <div id="menu-manager" class="view">
+                <h1 class="page-header">Menu Gallery</h1>
+                <div id="menu-list" class="menu-grid"></div>
+                <button class="fab-add" onclick="openMenuModal()">+</button>
             </div>
-            <div class="modal-input-group">
-                <label>Price (Ks)</label>
-                <input type="number" id="m-price" placeholder="0">
-            </div>
-            <div class="modal-input-group">
-                <label>Category</label>
-                <select id="m-cat">
-                    <option value="BBQ">BBQ</option>
-                    <option value="Fried">အကြော်စုံ</option>
-                    <option value="Drink">အအေး</option>
-                </select>
-            </div>
-            <button class="confirm-btn" onclick="saveMenu()">Confirm & Save</button>
-            <button onclick="closeModal('menuModal')" style="width:100%; border:none; background:none; margin-top:15px; color:#94a3b8;">Cancel</button>
-        </div>
-    </div>
 
-    <div id="orderModal" class="modal-overlay">
-        <div class="floating-window">
-            <div class="pos-header">
-                <h3 style="margin:0">Create New Order</h3>
-                <button onclick="closeModal('orderModal')" class="delete-bin-btn">×</button>
+            <div id="customers" class="view">
+                <h1 class="page-header">Top Customers</h1>
+                <div class="search-wrapper" style="margin-bottom: 15px;">
+                    <input type="text" class="search-input-pearl" placeholder="Search customer phone..." oninput="searchCRM(this.value)">
+                </div>
+                <div id="customer-list" class="customer-container"></div>
             </div>
-            <div class="pos-main-content">
-                <div class="menu-container">
-                    <input type="text" class="pos-input" placeholder="Search menu..." oninput="searchPOSMenu(this.value)">
-                    <div id="pos-menu-grid" class="pos-menu-grid"></div>
+
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="changeNav('dashboard', this)">🏠</div>
+            <div class="nav-item" onclick="changeNav('orders', this)">📦</div>
+            <div class="nav-item" onclick="changeNav('menu-manager', this)">🍴</div>
+            <div class="nav-item" onclick="changeNav('customers', this)">👥</div>
+        </nav>
+
+        <div id="menuModal" class="modal-overlay">
+            <div class="menu-modal-content">
+                <div class="modal-header">
+                    <div class="back-btn" onclick="closeMenuModal()" style="font-size: 24px;">←</div>
+                    <h3 id="modalTitle">Add Menu</h3>
                 </div>
                 
-                <div class="cart-container">
-                    <input type="text" id="cust-phone" class="pos-input" placeholder="Phone Number">
-                    <input type="text" id="cust-name" class="pos-input" placeholder="Customer Name">
-                    
-                    <div style="display:flex; gap:10px;">
-                        <select id="pay-method" class="pos-input">
-                            <option value="Cash">Cash on Pick-up</option>
-                            <option value="Prepaid">Pre-paid (Paid)</option>
-                        </select>
-                        <input type="time" id="pick-time" class="pos-input" title="Pick-up Time">
+                <input type="hidden" id="editItemId">
+                
+                <div class="modal-input-group">
+                    <label>Menu Name</label>
+                    <input type="text" id="itemName" placeholder="ဥပမာ - ကြက်တောင်ပံကင်">
+                </div>
+                
+                <div class="modal-input-group" style="display: flex; gap: 10px;">
+                    <div style="flex: 1;">
+                        <label>Price</label>
+                        <input type="number" id="itemPrice" placeholder="5000">
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Stock</label>
+                        <input type="number" id="itemStock" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="modal-input-group">
+                    <label>Category</label>
+                    <select id="itemCategory">
+                        <option value="BBQ">BBQ</option>
+                        <option value="Drinks">Drinks</option>
+                        <option value="Sides">Sides</option>
+                    </select>
+                </div>
+
+                <button class="confirm-btn" onclick="handleMenuSave()">Save & Update</button>
+            </div>
+        </div>
+
+        <div id="orderModal" class="modal-overlay">
+            <div id="posContainer" class="floating-window">
+                <div class="pos-header">
+                    <div class="back-btn" onclick="closeOrderModal()">← Back</div>
+                    <h3 style="margin:0;">New Order</h3>
+                    <div style="width:40px;"></div>
+                </div>
+
+                <div class="pos-main-content">
+                    <div class="menu-container">
+                        <div class="search-wrapper" style="padding: 10px;">
+                            <input type="text" class="search-input-pearl" id="posSearch" placeholder="Search menu..." oninput="filterPOSMenu()">
+                        </div>
+                        <div id="posMenuGrid" class="pos-menu-grid"></div>
                     </div>
 
-                    <div id="cart-items-list" style="flex:1; overflow-y:auto; margin-top:10px;">
+                    <div class="cart-container">
+                        <div class="modal-input-group">
+                            <input type="text" id="cName" class="pos-input" placeholder="Customer Name">
+                            <input type="number" id="cPhone" class="pos-input" placeholder="Phone (09...)">
+                            <input type="time" id="pickupTime" class="pos-input" title="Pick-up Time">
                         </div>
-
-                    <div class="checkout-bar">
-                        <div id="total-amount-display" style="font-weight:800; font-size:1.1rem;">Total: 0 Ks</div>
-                        <button class="btn-checkout" onclick="submitOrder()">Place Order</button>
+                        <div id="selectedItemsList" style="flex: 1; overflow-y: auto;"></div>
+                        <div class="checkout-bar">
+                            <div>Total: <b id="cartTotal">0 Ks</b></div>
+                            <button class="btn-checkout" onclick="submitFinalOrder()">Confirm</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -143,30 +160,6 @@
     <script src="menu.js"></script>
     <script src="order.js"></script>
     <script src="customer.js"></script>
-
-    <script>
-        // View Navigation Logic
-        function showView(viewId, element) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            element.classList.add('active');
-            
-            // Reload data
-            if(viewId === 'orders') loadOrders('New');
-            if(viewId === 'menu-manager') loadMenu();
-            if(viewId === 'customers') loadCustomers();
-            if(viewId === 'dashboard') updateDashboard();
-        }
-
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function openPOS() { document.getElementById('orderModal').style.display = 'flex'; loadPOSMenu(); }
-        function openMenuModal() { 
-            document.getElementById('edit-id').value = ''; 
-            document.getElementById('menuModalTitle').innerText = 'Add New Item';
-            document.getElementById('menuModal').style.display = 'flex'; 
-        }
-    </script>
 </body>
 </html>
 
