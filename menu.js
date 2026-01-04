@@ -131,18 +131,18 @@ function enterAddMode() {
     toggleMenuOptions();
 }
 
-async function renderMenuWithControls() {
-    const { data, error } = await supabase.from('menu').select('*');
-    if (error) return console.error(error);
 
+
+async function renderMenuWithControls() {
+    const { data } = await supabase.from('menu').select('*');
     const grid = document.getElementById('menu-grid');
-    grid.innerHTML = ''; // အရင်ဟောင်းတာတွေကို ဖျက်ထုတ်
+    grid.innerHTML = '';
 
     data.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'menu-card edit-shake';
+        card.className = 'menu-card edit-active'; // Animation မပါတော့ပါ
         
-        // Card တစ်ခုလုံးကို နှိပ်ရင် Modal ပွင့်အောင် လုပ်ခြင်း
+        // ကတ်ကို နှိပ်လိုက်တာနဲ့ Modal ပွင့်လာပါမယ်
         card.onclick = () => openEditModal(item);
 
         card.innerHTML = `
@@ -155,9 +155,6 @@ async function renderMenuWithControls() {
             <div class="item-info">
                 <div class="item-name">${item.name}</div>
                 <div class="item-price">${item.price} MMK</div>
-            </div>
-            <div style="text-align:center; padding-bottom:10px; color:var(--primary-accent); font-size:12px;">
-                <i class="fas fa-pen"></i> Tap to Edit
             </div>
         `;
         grid.appendChild(card);
@@ -198,13 +195,12 @@ function closeModal() {
     document.getElementById('edit-modal').classList.add('hidden');
 }
 
-// --- Edit Mode ထဲသို့ ဝင်ခြင်း ---
+// Edit Mode ဝင်သည့် Function
 function enterEditMode() {
-    document.getElementById('menu-grid').classList.add('edit-mode-active');
-    document.getElementById('edit-mode-btn').classList.add('hidden'); // Edit ခလုတ်ကို ဖျောက်
-    document.getElementById('cancel-edit-btn').classList.remove('hidden'); // Cancel ခလုတ်ကို ပြ
-    toggleMenuOptions(); // Option menu ကို ပိတ်
-    renderMenuWithControls(); // Delete ခလုတ်တွေ ပါတဲ့ list ကို ပြန်ဆွဲ
+    document.getElementById('edit-mode-btn').classList.add('hidden');
+    document.getElementById('cancel-edit-btn').classList.remove('hidden');
+    toggleMenuOptions();
+    renderMenuWithControls(); 
 }
 
 // --- Edit Mode မှ ပြန်ထွက်ခြင်း ---
@@ -215,41 +211,6 @@ function exitEditMode() {
     fetchMenuItems(); // ရိုးရိုး menu list ကို ပြန်ပြ
 }
 
-// --- Delete ခလုတ်ပါဝင်သော Menu ကို ဆွဲထုတ်ခြင်း ---
-// Edit Mode မှာ Menu တွေကို ပြန်ဆွဲတဲ့ function
-async function renderMenuWithControls() {
-    const { data, error } = await supabase.from('menu').select('*');
-    if (error) return console.error(error);
-
-    const grid = document.getElementById('menu-grid');
-    grid.innerHTML = ''; 
-
-    data.forEach(item => {
-        const card = document.createElement('div');
-        // Animation အတွက် edit-shake class ထည့်ထားသည်
-        card.className = 'menu-card edit-shake'; 
-        
-        // ဒီအပိုင်းက Card ကို နှိပ်ရင် Modal ပွင့်စေမှာပါ
-        card.onclick = () => openEditModal(item);
-
-        card.innerHTML = `
-            <div class="image-container">
-                <img src="${item.image_url || 'placeholder.jpg'}">
-                <button class="delete-badge" onclick="event.stopPropagation(); deleteItem('${item.id}', '${item.name}')">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-            <div class="item-info">
-                <div class="item-name">${item.name}</div>
-                <div class="item-price">${item.price} MMK</div>
-                <div style="color:var(--primary-accent); font-size:12px; margin-top:5px; text-align:center;">
-                    <i class="fas fa-pen"></i> Tap to Edit
-                </div>
-            </div>
-        `;
-        grid.appendChild(card);
-    });
-}
 // --- Item ကို ဖျက်ခြင်း (Delete Function) ---
 async function deleteItem(id, name) {
     if (confirm(`"${name}" ကို မီနူးထဲကနေ ဖျက်ပစ်မှာ သေချာပါသလား?`)) {
