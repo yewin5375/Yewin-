@@ -217,17 +217,15 @@
     <script>
         // Simple Page Switcher Logic
      function showPage(pageId, event) {
-    // စာမျက်နှာအားလုံး ပိတ်
-    document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+    if (event) event.preventDefault(); // ဒါလေး ထည့်လိုက်ရင် URL မှာ # မပေါ်တော့ပါဘူး
     
-    // ရွေးချယ်ထားသော စာမျက်နှာကို ဖွင့်
+    document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
     const targetPage = document.getElementById(pageId);
     if (targetPage) targetPage.classList.remove('hidden');
     
-    // Navigation Active ပြောင်း
     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-    if (event) event.currentTarget.classList.add('active');
-     }
+    // active class ပြောင်းတဲ့ logic
+}
         
     </script>
 </body>
