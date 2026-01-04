@@ -9,7 +9,40 @@ const orderSubscription = supabase
     fetchOrders(); 
   })
   .subscribe();
+// အော်ဒါတင်သည့် နမူနာ Function
+async function placeOrder(customerId, cartItems, totalAmount) {
+    try {
+        // ၁။ Customer ID '1' သည် တကယ်ရှိမရှိ အရင်စစ်ဆေးပါ
+        const { data: customer, error: custError } = await supabase
+            .from('customers')
+            .select('id')
+            .eq('id', customerId)
+            .single();
 
+        if (custError || !customer) {
+            alert("Error: ဤ Customer ID မရှိသေးပါ။ အရင်စာရင်းသွင်းပါ သို့မဟုတ် Guest အနေဖြင့် တင်ပါ။");
+            return;
+        }
+
+        // ၂။ Customer ရှိမှသာ အော်ဒါသွင်းပါ
+        const orderData = {
+            customer_id: customerId, // customers table ထဲမှာ အရင်ရှိနေရမည်
+            items: JSON.stringify(cartItems),
+            total_amount: totalAmount,
+            order_status: 'Preparing',
+            created_at: new Date().toISOString()
+        };
+
+        const { error: orderError } = await supabase.from('orders').insert([orderData]);
+
+        if (orderError) throw orderError;
+        alert("အော်ဒါ အောင်မြင်စွာ တင်ပြီးပါပြီ!");
+
+    } catch (err) {
+        console.error("Order Error:", err.message);
+        alert("အော်ဒါတင်၍ မရပါ- " + err.message);
+    }
+}
 // ၂။ အော်ဒါစာရင်းကို ဆွဲထုတ်ခြင်း
 async function fetchOrders() {
     const orderContainer = document.getElementById('order-list');
