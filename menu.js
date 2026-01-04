@@ -102,19 +102,70 @@ async function openEditModal(id) {
     }
 }
 
-// ဒေတာသိမ်းဆည်းခြင်း (Confirm ၂ ဆင့်ပါဝင်သည်)
+// ဓာတ်ပုံတင်ခြင်း (Supabase Storage သို့)
+async function uploadImage(file) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `menu-images/${fileName}`;
+
+    let { error: uploadError } = await supabase.storage
+        .from('images') // Supabase မှာ 'images' ဆိုတဲ့ Bucket ရှိရပါမယ်
+        .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+    return data.publicUrl;
+}
+
+// ဒေတာသိမ်းဆည်းခြင်း (Add/Edit နှစ်မျိုးလုံးအတွက်)
 async function saveItem() {
+    const name = document.getElementById('edit-name').value;
+    const price = document.getElementById('edit-price').value;
+    const stock = document.getElementById('edit-stock').value;
+    const available = document.getElementById('edit-available').checked;
+    const fileInput = document.getElementById('file-input');
+
+    if (!name || !price) return alert("အမည်နှင့် ဈေးနှုန်း ထည့်ပေးပါ");
+
     const firstCheck = confirm("အချက်အလက်များကို သိမ်းဆည်းရန် သေချာပါသလား?");
-    if (firstCheck) {
-        const secondCheck = confirm("ဒေတာများ မှန်ကန်ကြောင်း ထပ်မံအတည်ပြုပါ။");
-        if (secondCheck) {
-            // Supabase Update Logic ဤနေရာတွင် လာမည်
-            alert("သိမ်းဆည်းပြီးပါပြီ။");
+    if (firstCheck && confirm("ဒေတာများ မှန်ကန်ကြောင်း ထပ်မံအတည်ပြုပါ။")) {
+        
+        try {
+            let imageUrl = document.getElementById('preview-img').src;
+
+            // ပုံအသစ်ရွေးထားရင် အရင်တင်မယ်
+            if (fileInput.files.length > 0) {
+                imageUrl = await uploadImage(fileInput.files[0]);
+            }
+
+            const itemData = {
+                name: name,
+                price: parseFloat(price),
+                stock_count: parseInt(stock),
+                is_available: available,
+                image_url: imageUrl
+            };
+
+            if (currentEditingId) {
+                // Edit လုပ်ခြင်း
+                const { error } = await supabase.from('menu').update(itemData).eq('id', currentEditingId);
+                if (error) throw error;
+            } else {
+                // Add New လုပ်ခြင်း
+                const { error } = await supabase.from('menu').insert([itemData]);
+                if (error) throw error;
+            }
+
+            alert("သိမ်းဆည်းအောင်မြင်ပါသည်။");
             closeModal();
-            fetchMenuItems(); // Refresh List
+            fetchMenuItems(); // Grid ကို refresh လုပ်မယ်
+        } catch (err) {
+            alert("Error: " + err.message);
         }
     }
 }
+
 
 function closeModal() {
     document.getElementById('edit-modal').classList.add('hidden');
