@@ -3,163 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken BBQ Admin System</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
+    <title>Chicken BBQ - Admin System</title>
     
-    <div class="app-container">
-        <header class="app-header">
-            <div class="back-btn" id="headerBackBtn" onclick="goBack()" style="visibility: hidden;">←</div>
-            <h2 id="viewTitle">Admin Overview</h2>
-            <div id="online-status" style="font-size: 10px; color: #10b981;">● Online</div>
-        </header>
-
-        <main class="content-area">
-            
-            <div id="dashboard" class="view active">
-                <h1 class="page-header">Daily Summary</h1>
-                <div class="stat-grid"> 
-                    <div class="stat-card" onclick="changeNav('orders', document.querySelectorAll('.nav-item')[1])">
-                        <div class="card-icon">🛍️</div>
-                        <div class="card-info">
-                            <h3>New Orders</h3>
-                            <p id="todayOrders">0 Orders</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="card-icon">💰</div>
-                        <div class="card-info">
-                            <h3>Revenue</h3>
-                            <p id="todayRevenue">0 Ks</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="stat-card" style="margin-top: 20px; padding: 15px;">
-                    <canvas id="salesChart" height="150"></canvas>
-                </div>
-            </div>
-
-            <div id="orders" class="view">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2 class="page-header">Orders</h2>
-                    <button class="btn-open-pos" onclick="openOrderModal()">➕ New Order</button>
-                </div>
-
-                <div class="category-scroll" style="margin-bottom: 15px; background: transparent; padding: 10px 0;">
-                    <div class="cat-tab active" onclick="filterByStatus('New', this)">New</div>
-                    <div class="cat-tab" onclick="filterByStatus('Preparing', this)">Preparing</div>
-                    <div class="cat-tab" onclick="filterByStatus('Ready', this)">Ready</div>
-                    <div class="cat-tab" onclick="filterByStatus('Finished', this)">Finished</div>
-                </div>
-
-                <div id="order-list" class="order-container">
-                    </div>
-            </div>
-
-            <div id="menu-manager" class="view">
-                <h1 class="page-header">Menu Gallery</h1>
-                <div id="menu-list" class="menu-grid"></div>
-                <button class="fab-add" onclick="openMenuModal()">+</button>
-            </div>
-
-            <div id="customers" class="view">
-                <h1 class="page-header">Top Customers</h1>
-                <div class="search-wrapper" style="margin-bottom: 15px;">
-                    <input type="text" class="search-input-pearl" placeholder="Search customer phone..." oninput="searchCRM(this.value)">
-                </div>
-                <div id="customer-list" class="customer-container"></div>
-            </div>
-
-        </main>
-
-        <nav class="bottom-nav">
-            <div class="nav-item active" onclick="changeNav('dashboard', this)">🏠</div>
-            <div class="nav-item" onclick="changeNav('orders', this)">📦</div>
-            <div class="nav-item" onclick="changeNav('menu-manager', this)">🍴</div>
-            <div class="nav-item" onclick="changeNav('customers', this)">👥</div>
-        </nav>
-
-        <div id="menuModal" class="modal-overlay">
-            <div class="menu-modal-content">
-                <div class="modal-header">
-                    <div class="back-btn" onclick="closeMenuModal()" style="font-size: 24px;">←</div>
-                    <h3 id="modalTitle">Add Menu</h3>
-                </div>
-                
-                <input type="hidden" id="editItemId">
-                
-                <div class="modal-input-group">
-                    <label>Menu Name</label>
-                    <input type="text" id="itemName" placeholder="ဥပမာ - ကြက်တောင်ပံကင်">
-                </div>
-                
-                <div class="modal-input-group" style="display: flex; gap: 10px;">
-                    <div style="flex: 1;">
-                        <label>Price</label>
-                        <input type="number" id="itemPrice" placeholder="5000">
-                    </div>
-                    <div style="flex: 1;">
-                        <label>Stock</label>
-                        <input type="number" id="itemStock" placeholder="0">
-                    </div>
-                </div>
-
-                <div class="modal-input-group">
-                    <label>Category</label>
-                    <select id="itemCategory">
-                        <option value="BBQ">BBQ</option>
-                        <option value="Drinks">Drinks</option>
-                        <option value="Sides">Sides</option>
-                    </select>
-                </div>
-
-                <button class="confirm-btn" onclick="handleMenuSave()">Save & Update</button>
-            </div>
-        </div>
-
-        <div id="orderModal" class="modal-overlay">
-            <div id="posContainer" class="floating-window">
-                <div class="pos-header">
-                    <div class="back-btn" onclick="closeOrderModal()">← Back</div>
-                    <h3 style="margin:0;">New Order</h3>
-                    <div style="width:40px;"></div>
-                </div>
-
-                <div class="pos-main-content">
-                    <div class="menu-container">
-                        <div class="search-wrapper" style="padding: 10px;">
-                            <input type="text" class="search-input-pearl" id="posSearch" placeholder="Search menu..." oninput="filterPOSMenu()">
-                        </div>
-                        <div id="posMenuGrid" class="pos-menu-grid"></div>
-                    </div>
-
-                    <div class="cart-container">
-                        <div class="modal-input-group">
-                            <input type="text" id="cName" class="pos-input" placeholder="Customer Name">
-                            <input type="number" id="cPhone" class="pos-input" placeholder="Phone (09...)">
-                            <input type="time" id="pickupTime" class="pos-input" title="Pick-up Time">
-                        </div>
-                        <div id="selectedItemsList" style="flex: 1; overflow-y: auto;"></div>
-                        <div class="checkout-bar">
-                            <div>Total: <b id="cartTotal">0 Ks</b></div>
-                            <button class="btn-checkout" onclick="submitFinalOrder()">Confirm</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="style.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="pearl-theme">
+
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item" onclick="showPage('order-page')">
+            <i class="fas fa-shopping-basket"></i>
+            <span>Orders</span>
+        </a>
+        <a href="#" class="nav-item active" onclick="showPage('menu-page')">
+            <i class="fas fa-utensils"></i>
+            <span>Menu</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('customer-page')">
+            <i class="fas fa-users"></i>
+            <span>Customers</span>
+        </a>
+        <a href="#" class="nav-item" onclick="showPage('report-page')">
+            <i class="fas fa-chart-line"></i>
+            <span>Reports</span>
+        </a>
+    </nav>
+
+    <main id="app-container">
+
+        <section id="menu-page" class="page-content">
+            <div class="header-section">
+                <h2 class="title">BBQ Menu</h2>
+                <button id="menu-option-btn" onclick="toggleMenuOptions()">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+
+            <div id="option-overlay" class="option-card hidden">
+                <button onclick="enterAddMode()" class="option-btn">
+                    <i class="fas fa-plus"></i> Add New Item
+                </button>
+                <button onclick="enterEditMode()" class="option-btn">
+                    <i class="fas fa-edit"></i> Edit Menu List
+                </button>
+            </div>
+
+            <div id="menu-grid" class="grid-container">
+                </div>
+        </section>
+
+        <section id="order-page" class="page-content hidden"><h2>Order Management</h2></section>
+        <section id="customer-page" class="page-content hidden"><h2>Customer CRM</h2></section>
+        <section id="report-page" class="page-content hidden"><h2>Sales Reports</h2></section>
+
+    </main>
+
     <script src="supabase.js"></script>
     <script src="app.js"></script>
     <script src="menu.js"></script>
     <script src="order.js"></script>
     <script src="customer.js"></script>
+
+    <script>
+        // Simple Page Switcher Logic
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            // Update Active Nav
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+    </script>
 </body>
 </html>
 
