@@ -1,53 +1,104 @@
-let myChart;
+let salesChart;
 
+// ၁။ စာမျက်နှာစဖွင့်ချိန်တွင် Report များကို load လုပ်ရန်
+document.addEventListener('DOMContentLoaded', () => {
+    // ယနေ့ရက်စွဲကို default ထည့်ရန်
+    const dateInput = document.getElementById('report-date-picker');
+    if(dateInput) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+        loadReports();
+    }
+});
+
+// ၂။ အရောင်းနှင့် အမြတ်ကို တွက်ချက်ခြင်း
 async function loadReports() {
-    const selectedDate = document.getElementById('report-date-picker').value || new Date().toISOString().split('T')[0];
-
-    // ၁။ ဒီနေ့ရောင်းရငွေ (Revenue) ဆွဲထုတ်ခြင်း
-    const { data: sales } = await supabase
+    const selectedDate = document.getElementById('report-date-picker').value;
+    
+    // အရောင်းဒေတာ ဆွဲထုတ်ခြင်း (Paid ဖြစ်ပြီးသား အော်ဒါများသာ)
+    const { data: orders, error } = await supabase
         .from('orders')
         .select('total_amount')
         .eq('payment_status', 'Paid')
         .gte('created_at', `${selectedDate}T00:00:00`)
         .lte('created_at', `${selectedDate}T23:59:59`);
 
-    const totalRev = sales.reduce((sum, item) => sum + item.total_amount, 0);
-    document.getElementById('today-revenue').innerText = `${totalRev.toLocaleString()} K`;
+    const totalRevenue = orders ? orders.reduce((sum, o) => sum + o.total_amount, 0) : 0;
+    document.getElementById('today-revenue').innerText = `${totalRevenue.toLocaleString()} MMK`;
 
-    // ၂။ အသုံးစရိတ် (Expenses) ဆွဲထုတ်ခြင်း
-    const { data: exps } = await supabase
+    // အသုံးစရိတ် ဆွဲထုတ်ခြင်း
+    const { data: expenses } = await supabase
         .from('expenses')
         .select('amount')
-        .gte('created_at', `${selectedDate}T00:00:00`);
+        .gte('created_at', `${selectedDate}T00:00:00`)
+        .lte('created_at', `${selectedDate}T23:59:59`);
 
-    const totalExp = exps.reduce((sum, item) => sum + item.amount, 0);
+    const totalExpense = expenses ? expenses.reduce((sum, e) => sum + e.amount, 0) : 0;
     
-    // ၃။ အသားတင်အမြတ် (Net Profit)
-    const netProfit = totalRev - totalExp;
-    document.getElementById('net-profit').innerText = `${netProfit.toLocaleString()} K`;
+    // အသားတင်အမြတ် တွက်ချက်ခြင်း
+    const netProfit = totalRevenue - totalExpense;
+    const profitEl = document.getElementById('net-profit');
+    profitEl.innerText = `${netProfit.toLocaleString()} MMK`;
+    profitEl.style.color = netProfit >= 0 ? '#00b894' : '#ff7675';
 
-    updateChart(totalRev, totalExp);
+    // Graph ဆွဲရန် function ခေါ်ခြင်း
+    updateSalesChart(totalRevenue, totalExpense);
+    renderExpenseList(expenses || []);
 }
 
-// Graph ဆွဲသည့် Function
-function updateChart(rev, exp) {
+// ၃။ Chart.js ဖြင့် Graph ဆွဲခြင်း
+function updateSalesChart(revenue, expense) {
     const ctx = document.getElementById('salesChart').getContext('2d');
-    if (myChart) myChart.destroy();
+    
+    if (salesChart) salesChart.destroy(); // အဟောင်းကို ဖျက်ပြီးမှ အသစ်ဆွဲရန်
 
-    myChart = new Chart(ctx, {
+    salesChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: ['Revenue', 'Expenses'],
             datasets: [{
-                data: [rev, exp],
-                backgroundColor: ['#00b894', '#fab1a0'],
-                borderWidth: 0
+                data: [revenue, expense],
+                backgroundColor: ['#FF4500', '#dfe6e9'],
+                borderWidth: 0,
+                hoverOffset: 4
             }]
         },
         options: {
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
+            plugins: {
+                legend: { position: 'bottom' }
+            },
+            cutout: '70%'
         }
     });
 }
+
+// ၄။ အသုံးစရိတ်အသစ် ထည့်သွင်းခြင်း
+async function saveExpense() {
+    const title = document.getElementById('exp-title').value;
+    const amount = document.getElementById('exp-amt').value;
+
+    if (!title || !amount) return alert("Description နှင့် Amount ထည့်ပါ");
+
+    const { error } = await supabase.from('expenses').insert([{
+        title: title,
+        amount: parseFloat(amount)
+    }]);
+
+    if (!error) {
+        document.getElementById('exp-title').value = '';
+        document.getElementById('exp-amt').value = '';
+        loadReports(); // စာရင်းပြန် update လုပ်ရန်
+    }
+}
+
+function renderExpenseList(expenses) {
+    const list = document.getElementById('expense-list');
+    list.innerHTML = expenses.map(e => `
+        <div class="history-item">
+            <span>${e.title}</span>
+            <span style="font-weight:600;">-${e.amount.toLocaleString()} K</span>
+        </div>
+    `).join('');
+}
+
 
