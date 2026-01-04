@@ -84,9 +84,40 @@ function enterAddMode() {
     alert("Add New Item Form ကို ဖွင့်ပါမည်။");
 }
 
-// ၇။ Edit Modal ဖွင့်ခြင်း (နောက်အဆင့်တွင် အသေးစိတ်ရေးမည်)
-function openEditModal(id) {
-    console.log("Editing Item ID:", id);
-    // Modal UI logic ဤနေရာတွင် လာမည်
+let currentEditingId = null;
+
+// Modal ဖွင့်ခြင်း
+async function openEditModal(id) {
+    currentEditingId = id;
+    const { data, error } = await supabase.from('menu').select('*').eq('id', id).single();
+    
+    if (data) {
+        document.getElementById('modal-title').innerText = "Edit Menu Item";
+        document.getElementById('edit-name').value = data.name;
+        document.getElementById('edit-price').value = data.price;
+        document.getElementById('edit-stock').value = data.stock_count;
+        document.getElementById('edit-available').checked = data.is_available;
+        document.getElementById('preview-img').src = data.image_url || 'placeholder.jpg';
+        document.getElementById('edit-modal').classList.remove('hidden');
+    }
 }
+
+// ဒေတာသိမ်းဆည်းခြင်း (Confirm ၂ ဆင့်ပါဝင်သည်)
+async function saveItem() {
+    const firstCheck = confirm("အချက်အလက်များကို သိမ်းဆည်းရန် သေချာပါသလား?");
+    if (firstCheck) {
+        const secondCheck = confirm("ဒေတာများ မှန်ကန်ကြောင်း ထပ်မံအတည်ပြုပါ။");
+        if (secondCheck) {
+            // Supabase Update Logic ဤနေရာတွင် လာမည်
+            alert("သိမ်းဆည်းပြီးပါပြီ။");
+            closeModal();
+            fetchMenuItems(); // Refresh List
+        }
+    }
+}
+
+function closeModal() {
+    document.getElementById('edit-modal').classList.add('hidden');
+}
+
 
