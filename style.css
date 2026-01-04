@@ -109,19 +109,43 @@ body {
 /* =========================================
    4. Menu & POS UI (Phase 2)
    ========================================= */
-.menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-.pos-menu-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    padding: 15px; overflow-y: auto;
+/* Menu Card ပုံဆိုဒ်ကို ထိန်းချုပ်ခြင်း */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* တစ်တန်းကို ၂ ခုပြမည် */
+    gap: 12px;
 }
 
 .menu-card {
-    background: white; border-radius: 18px; overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;
-    cursor: pointer; transition: 0.2s;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
 }
-.menu-card:active { transform: scale(0.95); }
-.menu-card img { width: 100%; height: 100px; object-fit: cover; }
+
+.menu-card img {
+    width: 100%;
+    height: 120px; /* ပုံအမြင့်ကို ကန့်သတ်လိုက်ပါ */
+    object-fit: cover; /* ပုံမပြဲသွားအောင် ထိန်းပေးသည် */
+    background: #eee;
+}
+
+/* Edit/Delete ခလုတ်များအတွက် */
+.card-actions {
+    display: flex;
+    gap: 5px;
+    padding: 10px;
+}
+
+.btn-small {
+    flex: 1;
+    font-size: 11px;
+    padding: 5px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fff;
+}
+
 
 /* Search & Tags */
 .search-input-pearl {
@@ -196,3 +220,74 @@ body {
     box-shadow: 0 10px 20px rgba(255, 112, 67, 0.3); z-index: 1500; 
 }
 
+/* =========================================
+   8. Order Status Colors (အော်ဒါ အခြေအနေများ)
+   ========================================= */
+
+/* New Order - အပြာရောင် (အသစ်ရောက်လာသော အော်ဒါ) */
+.order-status-new {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #dbeafe;
+}
+.badge-new { 
+    background: #2563eb; 
+    color: white; 
+    padding: 4px 10px; 
+    border-radius: 50px; 
+    font-size: 10px; 
+}
+
+/* Pending Order (Preparing/Ready) - အဝါရောင် (လုပ်ဆောင်နေဆဲ) */
+.order-status-pending {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fef3c7;
+}
+.badge-pending { 
+    background: #f59e0b; 
+    color: white; 
+    padding: 4px 10px; 
+    border-radius: 50px; 
+    font-size: 10px; 
+}
+
+/* Finished Order - အစိမ်းရောင် (ပြီးစီးသွားသော အော်ဒါ) */
+.order-status-finished {
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #dcfce7;
+}
+.badge-finished { 
+    background: #22c55e; 
+    color: white; 
+    padding: 4px 10px; 
+    border-radius: 50px; 
+    font-size: 10px; 
+}
+
+/* Order Card Detail Styling (အော်ဒါကတ်အတွင်းပိုင်း) */
+.order-item-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+}
+
+.order-customer-info {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pickup-time-tag {
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    color: #475569;
+}
