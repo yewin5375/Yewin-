@@ -52,61 +52,68 @@ function filterByCategory(cat, el) {
     renderPOSMenu(filtered);
 }
 
-// ၄။ Search လုပ်ခြင်း
-function filterPOSMenu() {
-    const term = document.getElementById('posSearch').value.toLowerCase();
-    const filtered = allMenuItems.filter(i => i.name.toLowerCase().includes(term));
-    renderPOSMenu(filtered);
+// // ၄။ Search လုပ်ခြ်း
+function filterPOSMen (
+       co st t =  = docum.nt.getElementById('posSearc.').va.ue.toLowerCas;
+       co st filte =  = allMenuIt.ms.filte => =. i.n.me.toLowerCas.().includes(ter;
+       renderPOSMenu(filter;
+)
+
 }
 
 // ၅။ Cart ထဲထည့်ခြင်း (+/- Animation နှင့် UI Update)
-function addToCart(item) {
-    if (item.stock < 1) return alert("လက်ကျန်မရှိတော့ပါ!");
-    const found = currentCart.find(i => i.id === item.id);
-    if (found) {
-        found.qty += 1;
-    } else {
-        currentCart.push({ ...item, qty: 1 });
-    }
-    updateCartUI();
-    renderCartList(); // Checkout Modal ထဲမှာ ပြဖို့
+function addToCart(
+       if (i.em.st <  < 1) ret rn alert("လက်ကျန်မရှိတော့ပါ;
+       co st fo =  = currentC.rt.fin => =. i === == i.em.;
+       if (fou d
+           fo.nd. += +;
+       } e s
+           currentC.rt.pus ......i, m, : y  1;
+     
+       updateCartU;
+       renderCartLis; ); // Checkout Modal ထဲမှာ ပြဖု
+
 }
 
-function updateCartUI() {
-    const count = currentCart.reduce((s, i) => s + i.qty, 0);
-    const total = currentCart.reduce((s, i) => s + (i.qty * i.price), 0);
-    document.getElementById('cartCount').innerText = count;
-    document.getElementById('cartTotal').innerText = total.toLocaleString() + " Ks";
+function updateCartU (
+       co st co =  = currentC.rt.reduce, s, => = +  . i., y,;
+       co st to =  = currentC.rt.reduce, s, => = +  +.(i. *  . i.pri, ),;
+       docum.nt.getElementById('cartCoun.').innerT =  = co;
+       docum.nt.getElementById('cartTota.').innerT =  = to.al.toLocaleStrin +  + " ;
+"
+
 }
 
-// ၆။ Checkout သွားရန် Modal ဖွင့်ခြင်း
-function openCheckoutDetails() {
-    if (currentCart.length === 0) return alert("ပစ္စည်း အရင်ရွေးပါ!");
-    document.getElementById('checkoutModal').style.display = 'flex';
-    renderCartList();
+// ၆။ Checkout သွားရန် Modal ဖွင့်ခြ်း
+function openCheckoutDetail (
+       if (currentC.rt.len === == 0) ret rn alert("ပစ္စည်း အရင်ရွေးပါ;
+       docum.nt.getElementById('checkoutModa.').st.le.disp =  = 'fl;
+       renderCartLis;
+)
+
 }
 
-// Checkout ထဲမှာ Cart List ကို ပြသခြင်း
-function renderCartList() {
-    const list = document.getElementById('selectedItemsList');
-    if(!list) return;
+// Checkout ထဲမှာ Cart List ကို ပြသခြ်း
+function renderCartLis (
+       co st l =  = docum.nt.getElementById('selectedItemsLis;
+       !f(!li t) ret;
     
-    list.innerHTML = currentCart.map((item, index) => `
+       l.st.innerH =  = currentC.rt.map((i, m, ind => => `
         <div class="premium-cart-item">
             <div style="flex: 1;">
-                <div style="font-weight: 800; color: #1F2937;">${item.name}</div>
-                <div style="font-size: 13px; color: var(--primary); font-weight: 700;">${(item.price * item.qty).toLocaleString()} Ks</div>
+                <div style="font-weight: 800; color: #1F2937;">${i.em.name}</div>
+                <div style="font-size: 13px; color: var(--primary); font-weight: 700;">${(i.em.pr *  * i.em.q.y).toLocaleString()} Ks</div>
             </div>
             
             <div class="qty-control-premium">
                 <button class="qty-btn-new" onclick="updateQty(${index}, -1)">-</button>
-                <input type="number" class="qty-input-new" value="${item.qty}" 
+                <input type="number" class="qty-input-new" value="${i.em.qty}" 
                        onchange="directQtyInput(${index}, this.value)">
                 <button class="qty-btn-new" onclick="updateQty(${index}, 1)">+</button>
             </div>
             
             <button class="delete-bin-btn" onclick="removeFromCart(${index})">🗑️</button>
-        </div>
+        </d
     `).join('');
 }
 
@@ -185,3 +192,76 @@ function closeOrderModal() {
     }, 400);
 }
 
+// ၁။ အော်ဒါစာရင်းကို Supabase မှ ဆွဲထုတ်ခြင်း
+async function loadOrders() {
+    try {
+        const { data, error } = await window.sb
+            .from('orders')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const orderListDiv = document.getElementById('order-list');
+        if (!orderListDiv) return;
+
+        if (data.length === 0) {
+            orderListDiv.innerHTML = `
+                <div style="text-align:center; padding: 50px; color: #9ca3af;">
+                    <p>အော်ဒါစာရင်း မရှိသေးပါ အစ်ကို။</p>
+                </div>`;
+            return;
+        }
+
+        renderOrders(data);
+    } catch (e) {
+        console.error("Order Load Error:", e.message);
+    }
+}
+
+// ၂။ အော်ဒါကတ်ပြားလေးများကို Pearl White Style ဖြင့် ဆွဲထုတ်ခြင်း
+function renderOrders(orders) {
+    const orderListDiv = document.getElementById('order-list');
+    orderListDiv.innerHTML = orders.map(order => {
+        // Items တွေကို Loop ပတ်ပြီး စာသားထုတ်ခြင်း
+        const itemsSummary = order.items.map(i => `${i.name} x ${i.qty}`).join(', ');
+        
+        // Status အလိုက် အရောင်ခွဲခြင်း
+        const statusColor = order.payment_status === 'Paid' ? '#2ecc71' : '#e74c3c';
+
+        return `
+            <div class="order-card-premium" style="animation: fadeInUp 0.4s ease;">
+                <div class="order-card-header">
+                    <div>
+                        <h4 style="margin:0; font-size:16px;">${order.customer_name}</h4>
+                        <small style="color:#9ca3af;">📞 ${order.customer_phone || 'No Phone'}</small>
+                    </div>
+                    <div class="status-badge" style="background: ${statusColor}15; color: ${statusColor};">
+                        ${order.payment_status}
+                    </div>
+                </div>
+                
+                <div class="order-items-detail">
+                    <p style="margin: 8px 0; font-size: 13px; color: #4B5563;">
+                        <span style="color:#9ca3af;">📦 Items:</span> ${itemsSummary}
+                    </p>
+                </div>
+
+                <div class="order-card-footer">
+                    <div class="total-price-box">
+                        <small>Total Amount</small>
+                        <div style="font-weight: 800; font-size: 18px; color: var(--primary);">
+                            ${Number(order.total_amount).toLocaleString()} Ks
+                        </div>
+                    </div>
+                    <button class="btn-detail-view" onclick="viewOrderDetail(${order.id})">
+                        အသေးစိတ်ကြည့်ရန်
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Page စဖွင့်တာနဲ့ Order တွေကို ခေါ်ခိုင်းထားမယ်
+document.addEventListener('DOMContentLoaded', loadOrders);
