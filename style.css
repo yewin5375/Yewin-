@@ -163,15 +163,7 @@ body {
     font-size: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
-.menu-card.edit-shake {
-    cursor: pointer; /* လက်ညှိုးပုံစံပြောင်းရန် */
-    position: relative;
-    border: 2px dashed var(--primary-accent) !important;
-}
 
-.menu-card.edit-shake:active {
-    transform: scale(0.95); /* နှိပ်လိုက်ရင် ချိုင့်ဝင်သွားသည့်ပုံစံ */
-}
 /* --- 7. BOTTOM NAV --- */
 .bottom-nav {
     position: fixed; bottom: 0; width: 100%; height: 75px;
@@ -248,7 +240,29 @@ body {
     from { opacity: 0; }
     to { opacity: 1; }
 }
+/* Modal တစ်ခုလုံးကို အုပ်ပြီး ပေါ်လာစေရန် */
+#edit-modal:not(.hidden) {
+    display: flex !important; 
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.8); /* နောက်ခံကို ပိုမှောင်ပေးထားသည် */
+    backdrop-filter: blur(8px);
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* အပေါ်ဆုံးမှာ ရှိနေစေရန် */
+}
 
+/* Card တွေ တုန်နေချိန်မှာ နှိပ်လို့ရမှန်း သိသာစေရန် */
+.menu-card.edit-shake {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.menu-card.edit-shake:hover {
+    transform: scale(1.02);
+    background: #fffafa;
+}
 /* Delete ခလုတ်ကို Card ရဲ့ ဘယ်ဘက်အပေါ်မှာ ပြရန် */
 .delete-badge {
     position: absolute;
