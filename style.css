@@ -8,7 +8,6 @@
     --text-dark: #1F2937; 
     --white: #ffffff; 
     --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); 
-    --pearl-gradient: linear-gradient(135deg, #ffffff 0%, #f0f4f8 100%);
 }
 
 body { 
@@ -16,41 +15,18 @@ body {
     margin: 0; background-color: var(--bg); color: var(--text-dark); 
     overflow-x: hidden; -webkit-tap-highlight-color: transparent; 
 }
-/* --- Page View Control (ရောမနေစေရန်) --- */
-.view { 
-    display: none; /* အစမှာ အကုန်ဖျောက်ထားမယ် */
-}
 
-.view.active { 
-    display: block; /* active class ရှိတဲ့ view တစ်ခုပဲ ပြမယ် */
-    animation: fadeIn 0.3s ease-in-out; 
-}
+/* Page View Logic - တစ်ခုချင်းစီ ခွဲပြရန် */
+.view { display: none; }
+.view.active { display: block; animation: fadeIn 0.3s ease-in-out; }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Dashboard Stat Cards အလှဆင်ရန် */
-.stat-card {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    text-align: left !important; /* စာသားတွေကို ဘယ်ဘက်ကပ်မယ် */
-}
-
-.card-icon {
-    font-size: 32px;
-    background: #fdf2f0;
-    padding: 10px;
-    border-radius: 15px;
-}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
 /* =========================================
-   2. Layout & Components
+   2. Layout Components
    ========================================= */
 .app-header { 
-    height: 60px; background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); 
+    height: 60px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); 
     display: flex; align-items: center; justify-content: space-between; padding: 0 20px; 
     position: sticky; top: 0; z-index: 1000; box-shadow: 0 1px 3px rgba(0,0,0,0.03); 
 }
@@ -62,232 +38,196 @@ body {
     border-radius: 25px 25px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); border-top: 1px solid #f1f1f1;
 }
 
-.nav-item { 
-    font-size: 24px; color: #9CA3AF; cursor: pointer; transition: 0.4s;
-    display: flex; flex-direction: column; align-items: center; 
-}
-.nav-item.active { color: var(--primary); transform: translateY(-10px) scale(1.1); }
+.nav-item { font-size: 24px; color: #9CA3AF; cursor: pointer; transition: 0.4s; }
+.nav-item.active { color: var(--primary); transform: translateY(-5px) scale(1.1); }
 
 .content-area { padding: 20px; padding-bottom: 120px; }
-.page-header { font-size: 24px; margin-bottom: 20px; font-weight: 800; letter-spacing: -0.5px; }
+.page-header { font-size: 24px; margin-bottom: 20px; font-weight: 800; }
 
 /* =========================================
-   3. Dashboard & Orders (Phase 5)
+   3. Dashboard & Analytics (Phase 5)
    ========================================= */
-.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px; }
+.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
 .stat-card { 
     background: var(--white); padding: 20px; border-radius: 24px; 
-    box-shadow: var(--shadow); border: 1px solid #f8f9fa; text-align: center; 
+    box-shadow: var(--shadow); border: 1px solid #f8f9fa; display: flex; align-items: center; gap: 15px;
 }
+.card-icon { font-size: 28px; background: #fff7ed; padding: 10px; border-radius: 15px; }
 
-/* Order Card Styling */
+/* =========================================
+   4. Live Orders (New, Pending, Finished)
+   ========================================= */
 .order-card-new {
-    background: white; border-radius: 25px; padding: 20px; 
+    background: white; border-radius: 20px; padding: 18px; 
     margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); 
-    border: 1px solid #f8f9fa; animation: zoomIn 0.3s ease;
+    border-left: 6px solid #ddd; position: relative;
 }
 
-.badge-status {
-    padding: 6px 12px; border-radius: 50px; font-size: 11px; font-weight: 800;
-}
-.status-preparing { background: #fff7ed; color: #ea580c; }
-.status-ready { background: #f0fdf4; color: #16a34a; }
-.status-collected { background: #f1f5f9; color: #64748b; }
+/* Status Colors */
+.status-new { border-left-color: #2563eb; background: #f0f7ff; }      /* Blue */
+.status-pending { border-left-color: #f59e0b; background: #fffbeb; }  /* Orange */
+.status-finished { border-left-color: #16a34a; background: #f0fdf4; } /* Green */
 
-/* Status Toggle Box */
-.status-toggle-box {
-    display: flex; gap: 8px; margin-top: 15px; padding-top: 15px; 
-    border-top: 1px dashed #e2e8f0;
-}
-
-.btn-status-step {
-    flex: 1; padding: 10px 5px; border-radius: 12px; border: 1px solid #f1f5f9;
-    font-size: 11px; font-weight: 700; cursor: pointer; background: white; transition: 0.2s;
-}
-.btn-status-step.active { background: var(--primary); color: white; border-color: var(--primary); }
+.badge { padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: 800; }
+.badge-new { background: #2563eb; color: white; }
+.badge-pending { background: #f59e0b; color: white; }
+.badge-finished { background: #16a34a; color: white; }
 
 /* =========================================
-   4. Menu & POS UI (Phase 2)
+   5. Menu Manager (Add/Edit Menu)
    ========================================= */
-/* Menu Card ပုံဆိုဒ်ကို ထိန်းချုပ်ခြင်း */
-.menu-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* တစ်တန်းကို ၂ ခုပြမည် */
-    gap: 12px;
-}
-
+.menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .menu-card {
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
+    background: white; border-radius: 18px; overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05); border: 1px solid #f0f0f0;
 }
-
-.menu-card img {
-    width: 100%;
-    height: 120px; /* ပုံအမြင့်ကို ကန့်သတ်လိုက်ပါ */
-    object-fit: cover; /* ပုံမပြဲသွားအောင် ထိန်းပေးသည် */
-    background: #eee;
-}
-
-/* Edit/Delete ခလုတ်များအတွက် */
-.card-actions {
-    display: flex;
-    gap: 5px;
-    padding: 10px;
-}
-
-.btn-small {
-    flex: 1;
-    font-size: 11px;
-    padding: 5px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    background: #fff;
-}
-
-
-/* Search & Tags */
-.search-input-pearl {
-    width: 100%; padding: 14px 14px 14px 45px; background: #f3f4f6;
-    border: 1.5px solid transparent; border-radius: 18px; font-size: 15px;
-    transition: 0.3s;
-}
-.search-input-pearl:focus { background: white; border-color: var(--primary-light); outline: none; }
-
-.category-tags { display: flex; gap: 10px; overflow-x: auto; padding: 10px 5px; }
-.tag { 
-    padding: 8px 18px; background: #f3f4f6; border-radius: 50px; 
-    font-size: 13px; white-space: nowrap; cursor: pointer; 
-}
-.tag.active { background: var(--primary); color: white; }
-
-/* =========================================
-   5. Modals & Animation
-   ========================================= */
-.modal-overlay { 
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);
-    display: none; justify-content: center; align-items: center; z-index: 3000; 
-}
-
-.floating-window {
-    background: #fdfdfd; width: 95vw; height: 92vh; border-radius: 30px;
-    overflow: hidden; animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-@keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-/* =========================================
-   6. Checkout & Cart
-   ========================================= */
-.checkout-bar {
-    position: absolute; bottom: 0; width: 100%; box-sizing: border-box;
-    padding: 20px; background: white; border-top: 1px solid #eee;
-    display: flex; justify-content: space-between; align-items: center;
-}
-
-.premium-cart-item {
-    background: #ffffff; padding: 15px; border-radius: 20px;
-    margin-bottom: 12px; display: flex; align-items: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-}
-
-.qty-control-premium {
-    display: flex; align-items: center; background: #f3f4f6;
-    border-radius: 50px; padding: 5px; gap: 5px;
-}
-
-.qty-btn-new {
-    width: 32px; height: 32px; border-radius: 50%; border: none;
-    background: white; color: var(--primary); font-weight: 900;
-}
-
-/* =========================================
-   7. Customer & Photo Upload
-   ========================================= */
-.photo-upload-container {
-    width: 100%; height: 150px; border: 2px dashed #e5e7eb;
-    border-radius: 20px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; background: #f9fafb;
-}
+.menu-card img { width: 100%; height: 110px; object-fit: cover; background: #eee; }
+.menu-info { padding: 12px; }
+.menu-info h4 { margin: 0; font-size: 14px; }
+.menu-info p { margin: 5px 0; color: var(--primary); font-weight: 800; }
 
 .fab-add { 
     position: fixed; bottom: 95px; right: 20px; width: 60px; height: 60px; 
-    background: linear-gradient(135deg, var(--primary), var(--primary-light)); 
-    color: white; border-radius: 20px; border: none; font-size: 28px; 
-    box-shadow: 0 10px 20px rgba(255, 112, 67, 0.3); z-index: 1500; 
+    background: var(--primary); color: white; border-radius: 20px; 
+    border: none; font-size: 28px; box-shadow: 0 10px 20px rgba(255, 112, 67, 0.3); z-index: 1500; 
 }
 
 /* =========================================
-   8. Order Status Colors (အော်ဒါ အခြေအနေများ)
+   6. Modals & Photo Upload
+   ========================================= */
+.modal-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px);
+    display: none; justify-content: center; align-items: center; z-index: 3000; 
+}
+
+.menu-modal-content {
+    background: white; width: 90%; max-height: 85vh; border-radius: 25px;
+    padding: 25px; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.photo-upload-container {
+    width: 100%; height: 140px; border: 2px dashed #ddd;
+    border-radius: 20px; display: flex; align-items: center;
+    justify-content: center; background: #f9fafb; overflow: hidden;
+}
+#imagePreview { width: 100%; height: 100%; object-fit: cover; }
+
+.modal-input-group { margin-bottom: 15px; }
+.modal-input-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; }
+.modal-input-group input, .modal-input-group select {
+    width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eee; background: #f9fafb; outline: none;
+}
+
+.confirm-btn {
+    width: 100%; padding: 15px; background: var(--primary); color: white;
+    border: none; border-radius: 15px; font-weight: 800; font-size: 16px; cursor: pointer;
+}
+
+/* =========================================
+   7. POS & Search UI
+   ========================================= */
+.search-input-pearl {
+    width: 100%; padding: 14px 15px; background: #f3f4f6;
+    border: 1.5px solid transparent; border-radius: 15px; font-size: 15px;
+}
+.search-input-pearl:focus { background: white; border-color: var(--primary); outline: none; }
+
+.category-tags { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; }
+.tag { padding: 8px 15px; background: #fff; border: 1px solid #eee; border-radius: 50px; font-size: 12px; white-space: nowrap; }
+.tag.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+/* =========================================
+   8. Customer CRM & VIP Styling (Phase 3)
    ========================================= */
 
-/* New Order - အပြာရောင် (အသစ်ရောက်လာသော အော်ဒါ) */
-.order-status-new {
-    background: #eff6ff;
-    color: #2563eb;
-    border: 1px solid #dbeafe;
-}
-.badge-new { 
-    background: #2563eb; 
-    color: white; 
-    padding: 4px 10px; 
-    border-radius: 50px; 
-    font-size: 10px; 
-}
-
-/* Pending Order (Preparing/Ready) - အဝါရောင် (လုပ်ဆောင်နေဆဲ) */
-.order-status-pending {
-    background: #fffbeb;
-    color: #d97706;
-    border: 1px solid #fef3c7;
-}
-.badge-pending { 
-    background: #f59e0b; 
-    color: white; 
-    padding: 4px 10px; 
-    border-radius: 50px; 
-    font-size: 10px; 
-}
-
-/* Finished Order - အစိမ်းရောင် (ပြီးစီးသွားသော အော်ဒါ) */
-.order-status-finished {
-    background: #f0fdf4;
-    color: #16a34a;
-    border: 1px solid #dcfce7;
-}
-.badge-finished { 
-    background: #22c55e; 
-    color: white; 
-    padding: 4px 10px; 
-    border-radius: 50px; 
-    font-size: 10px; 
-}
-
-/* Order Card Detail Styling (အော်ဒါကတ်အတွင်းပိုင်း) */
-.order-item-row {
+/* Customer Card Container */
+.customer-container {
     display: flex;
-    justify-content: space-between;
-    padding: 5px 0;
-    border-bottom: 1px solid #f1f5f9;
-    font-size: 13px;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.order-customer-info {
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 10px;
+/* Individual Customer Card */
+.customer-card {
+    background: white;
+    padding: 15px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    border: 1px solid #f8f9fa;
+    transition: 0.3s;
 }
 
-.pickup-time-tag {
-    background: #f1f5f9;
-    padding: 4px 8px;
-    border-radius: 8px;
-    font-size: 11px;
-    color: #475569;
+.customer-card:active {
+    transform: scale(0.98);
 }
+
+/* VIP Rank Icon & Info */
+.cust-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rank-badge {
+    width: 45px;
+    height: 45px;
+    background: #fff7ed;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.cust-details h4 {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text-dark);
+}
+
+.cust-details p {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #6B7280;
+}
+
+/* Points & Ranking Tags */
+.cust-stats {
+    text-align: right;
+}
+
+.points-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #f0fdf4;
+    color: #16a34a;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.order-count {
+    display: block;
+    font-size: 10px;
+    color: #9CA3AF;
+    margin-top: 4px;
+}
+
+/* Search Wrapper in Customer Page */
+.search-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.search-wrapper .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9CA3AF;
+}
+
