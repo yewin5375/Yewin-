@@ -216,52 +216,37 @@ body {
     background: #f0f0f0; /* နှိပ်လိုက်ရင် အရောင်ပြောင်းရန် */
 }
 
-/* Edit Mode ဖြစ်နေချိန် Card မှာ ပြမည့် ပုံစံ */
-.edit-mode-active .menu-card {
-    border: 2px dashed var(--primary-accent);
-    animation: shake 0.5s infinite alternate;
-}
-
-@keyframes shake {
-    from { transform: rotate(1deg); }
-    to { transform: rotate(-1deg); }
-}
-
-/* Modal အဖွင့်အပိတ် Animation */
-.modal.hidden {
-    display: none;
-}
-
-.modal {
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-/* Modal တစ်ခုလုံးကို အုပ်ပြီး ပေါ်လာစေရန် */
-#edit-modal:not(.hidden) {
-    display: flex !important; 
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.8); /* နောက်ခံကို ပိုမှောင်ပေးထားသည် */
-    backdrop-filter: blur(8px);
-    justify-content: center;
-    align-items: center;
-    z-index: 10000; /* အပေါ်ဆုံးမှာ ရှိနေစေရန် */
-}
-
-/* Card တွေ တုန်နေချိန်မှာ နှိပ်လို့ရမှန်း သိသာစေရန် */
-.menu-card.edit-shake {
+/* Animation စတိုင်ဟောင်းကို ဖြုတ်ပြီး ရိုးရိုးရှင်းရှင်းပဲ ပြင်ထားပါတယ် */
+.menu-card.edit-active {
+    border: 2px solid var(--primary-accent) !important;
+    position: relative;
     cursor: pointer;
-    transition: transform 0.2s;
 }
 
-.menu-card.edit-shake:hover {
-    transform: scale(1.02);
-    background: #fffafa;
+/* Edit လုပ်လို့ရမှန်း သိသာအောင် Overlay လေး ထည့်ပေးထားပါတယ် */
+.edit-active::after {
+    content: "TAP TO EDIT";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 111, 0, 0.1);
+    display: flex; justify-content: center; align-items: center;
+    font-weight: bold; color: var(--primary-accent);
+}
+
+/* Order Card Layout ပြန်ညှိခြင်း */
+.order-list-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 15px;
+}
+
+.order-card {
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: block; /* နေရာတကျဖြစ်အောင် */
 }
 /* Delete ခလုတ်ကို Card ရဲ့ ဘယ်ဘက်အပေါ်မှာ ပြရန် */
 .delete-badge {
