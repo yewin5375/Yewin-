@@ -36,11 +36,17 @@ async function fetchMenuItems() {
 // ၂။ ပုံတင်သည့် function (Upsert ပါဝင်ပြီးသား)
 async function uploadImage(file) {
     try {
+        // ၁။ supabase object ရှိမရှိ အရင်စစ်ပါ
+        if (typeof supabase === 'undefined') {
+            throw new Error('Supabase is not initialized. Check your supabase.js file.');
+        }
+
         const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`; // ပိုသေချာအောင် Date.now() သုံးထားပါသည်
+        const fileName = `${Date.now()}.${fileExt}`;
         const filePath = `menu-images/${fileName}`;
 
-        let { error: uploadError } = await supabase.storage
+        // ၂။ Bucket နာမည် 'images' ဟုတ်မဟုတ် Supabase Dashboard မှာ ပြန်စစ်ပေးပါ
+        const { data: uploadData, error: uploadError } = await supabase.storage
             .from('images') 
             .upload(filePath, file, {
                 cacheControl: '3600',
@@ -49,11 +55,17 @@ async function uploadImage(file) {
 
         if (uploadError) throw uploadError;
 
+        // ၃။ Public URL ကို ဆွဲထုတ်ခြင်း
         const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+        
+        if (!data || !data.publicUrl) {
+            throw new Error('Could not get public URL');
+        }
+
         return data.publicUrl;
     } catch (err) {
-        console.error('Upload error:', err);
-        throw new Error('Image upload failed: ' + err.message);
+        console.error('Full Upload Error:', err);
+        throw err;
     }
 }
 
