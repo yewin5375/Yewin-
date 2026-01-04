@@ -165,29 +165,41 @@
         
         <section id="report-page" class="page-content hidden">
     <div class="header-section">
-        <h2 class="title">Sales Report</h2>
+        <h2 class="title">Sales Insights</h2>
+        <div class="date-filter">
+            <input type="date" id="report-date-picker" onchange="loadReports()">
+        </div>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card glass-card">
-            <span class="label">Today's Revenue</span>
-            <h3 id="today-revenue">0 MMK</h3>
+    <div class="report-grid">
+        <div class="report-card glass-card">
+            <span class="label">Total Revenue</span>
+            <h3 id="today-revenue" class="value">0 MMK</h3>
+            <span class="trend up"><i class="fas fa-arrow-up"></i> Sales</span>
         </div>
-        <div class="stat-card glass-card">
+        <div class="report-card glass-card">
             <span class="label">Net Profit</span>
-            <h3 id="net-profit" style="color: #2ecc71;">0 MMK</h3>
+            <h3 id="net-profit" class="value" style="color: #00b894;">0 MMK</h3>
+            <span class="trend"><i class="fas fa-wallet"></i> Profit</span>
         </div>
     </div>
 
-    <div class="expense-section glass-card">
-        <h4>Add Daily Expense</h4>
-        <div class="input-row">
-            <input type="text" id="exp-desc" placeholder="ဘာဖိုးလဲ (ဥပမာ-မီးသွေး)">
-            <input type="number" id="exp-amount" placeholder="Amount">
-            <button onclick="addExpense()" class="btn-save small">Add</button>
+    <div class="chart-container glass-card">
+        <canvas id="salesChart"></canvas>
+    </div>
+
+    <div class="expense-manager glass-card">
+        <h4>Daily Expenses</h4>
+        <div class="expense-form">
+            <input type="text" id="exp-title" placeholder="Description">
+            <input type="number" id="exp-amt" placeholder="Amount">
+            <button onclick="saveExpense()"><i class="fas fa-plus"></i></button>
         </div>
+        <div id="expense-list" class="mini-list">
+            </div>
     </div>
         </section>
+        
         
 
     </main>
