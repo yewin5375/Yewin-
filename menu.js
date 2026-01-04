@@ -5,8 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchMenuItems();
 });
 
-// ၁။ Menu Grid ဆွဲထုတ်ခြင်း
+// ၁။ ရိုးရိုး Menu Grid ပြသခြင်း
 async function fetchMenuItems() {
+    editMode = false; // ရိုးရိုး mode သို့ ပြန်ပြောင်း
     const grid = document.getElementById('menu-grid');
     if(!grid) return;
     grid.innerHTML = '<div class="loading">Loading Menu...</div>';
@@ -14,12 +15,12 @@ async function fetchMenuItems() {
     const { data, error } = await supabase.from('menu').select('*').order('name', { ascending: true });
     
     if (error) {
-        grid.innerHTML = '<p class="error">Error loading data.</p>';
+        grid.innerHTML = `<p class="error">Error: ${error.message}</p>`;
         return;
     }
 
     grid.innerHTML = data.map(item => `
-        <div class="menu-card ${editMode ? 'edit-active' : ''}" onclick="handleItemClick('${item.id}')">
+        <div class="menu-card">
             <div class="image-container">
                 <img src="${item.image_url || 'placeholder.jpg'}" alt="${item.name}">
                 ${!item.is_available ? '<div class="sold-out-overlay">Sold Out</div>' : ''}
@@ -27,98 +28,78 @@ async function fetchMenuItems() {
             <div class="item-info">
                 <h4 class="item-name">${item.name}</h4>
                 <p class="item-price">${item.price.toLocaleString()} MMK</p>
+                <p style="font-size: 11px; color: #888;">Stock: ${item.stock || 0}</p>
             </div>
-            ${editMode ? '<div class="edit-badge"><i class="fas fa-pen"></i></div>' : ''}
         </div>
     `).join('');
 }
 
-// ၂။ ပုံတင်သည့် function (Upsert ပါဝင်ပြီးသား)
-async function uploadImage(file) {
-    try {
-        // ၁။ supabase object ရှိမရှိ အရင်စစ်ပါ
-        if (typeof supabase === 'undefined') {
-            throw new Error('Supabase is not initialized. Check your supabase.js file.');
-        }
+// ၂။ Edit Mode (ပြင်ဆင်သည့်စနစ်) သို့ ဝင်ခြင်း
+function enterEditMode() {
+    editMode = true;
+    document.getElementById('edit-mode-btn').classList.add('hidden');
+    document.getElementById('cancel-edit-btn').classList.remove('hidden');
+    toggleMenuOptions();
+    renderMenuWithControls(); 
+}
 
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        const filePath = `menu-images/${fileName}`;
+// ၃။ Edit/Delete ခလုတ်များပါသော Menu ကို ပြသခြင်း
+async function renderMenuWithControls() {
+    const grid = document.getElementById('menu-grid');
+    grid.innerHTML = '<div class="loading">Loading Edit Mode...</div>';
 
-        // ၂။ Bucket နာမည် 'images' ဟုတ်မဟုတ် Supabase Dashboard မှာ ပြန်စစ်ပေးပါ
-        const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('menu_images')
-            .upload(filePath, file, {
-                cacheControl: '3600',
-                upsert: true 
-            });
+    const { data, error } = await supabase.from('menu').select('*').order('name', { ascending: true });
+    if (error) return console.error(error);
 
-        if (uploadError) throw uploadError;
-
-        // ၃။ Public URL ကို ဆွဲထုတ်ခြင်း
-        const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+    grid.innerHTML = '';
+    data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'menu-card edit-active'; 
         
-        if (!data || !data.publicUrl) {
-            throw new Error('Could not get public URL');
-        }
+        // Card ကို နှိပ်လျှင် Edit Modal ပွင့်မည်
+        card.onclick = () => openEditModal(item);
 
-        return data.publicUrl;
-    } catch (err) {
-        console.error('Full Upload Error:', err);
-        throw err;
-    }
+        card.innerHTML = `
+            <div class="image-container">
+                <img src="${item.image_url || 'placeholder.jpg'}">
+                <button class="delete-badge" onclick="event.stopPropagation(); deleteItem('${item.id}', '${item.name}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="item-info">
+                <div class="item-name">${item.name}</div>
+                <div class="item-price">${item.price.toLocaleString()} MMK</div>
+                <div style="color:var(--primary-accent); font-size:12px; margin-top:5px;">
+                    <i class="fas fa-pen"></i> Tap to Edit
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
 }
 
-// ၃။ Save Item Logic (Database Column နှစ်ခုလုံးအတွက်)
-async function saveItem() {
-    const name = document.getElementById('edit-name').value;
-    const price = document.getElementById('edit-price').value;
-    const stockVal = document.getElementById('edit-stock').value;
-    const available = document.getElementById('edit-available').checked;
-    const fileInput = document.getElementById('file-input');
-
-    if (!name || !price) return alert("အမည်နှင့် ဈေးနှုန်း ထည့်ပေးပါ");
-
-    try {
-        let imageUrl = document.getElementById('preview-img').src;
-
-        // ပုံအသစ်ပါလျှင် upload လုပ်မည်
-        if (fileInput.files && fileInput.files.length > 0) {
-            imageUrl = await uploadImage(fileInput.files[0]);
-        }
-
-        const itemData = {
-            name: name,
-            price: parseFloat(price),
-            stock: parseInt(stockVal) || 0,        // 'stock' column
-            stock_count: parseInt(stockVal) || 0,  // 'stock_count' column
-            is_available: available,
-            image_url: imageUrl
-        };
-
-        const { error } = currentEditingId 
-            ? await supabase.from('menu').update(itemData).eq('id', currentEditingId)
-            : await supabase.from('menu').insert([itemData]);
-
-        if (error) throw error;
-
-        alert("အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
-        closeModal();
-        fetchMenuItems();
-    } catch (err) {
-        alert("Error: " + err.message);
-    }
+// ၄။ Edit Modal ဖွင့်ခြင်း
+function openEditModal(item) {
+    currentEditingId = item.id;
+    document.getElementById('modal-title').innerText = "Edit Item";
+    document.getElementById('edit-name').value = item.name;
+    document.getElementById('edit-price').value = item.price;
+    document.getElementById('edit-stock').value = item.stock || 0;
+    document.getElementById('edit-available').checked = item.is_available;
+    document.getElementById('preview-img').src = item.image_url || 'placeholder.jpg';
+    
+    document.getElementById('edit-modal').classList.remove('hidden');
 }
 
-// ၄။ Helper Functions
-function previewImage(event) {
-    const reader = new FileReader();
-    reader.onload = function() {
-        document.getElementById('preview-img').src = reader.result;
-    };
-    if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+// ၅။ Edit Mode မှ ပြန်ထွက်ခြင်း
+function exitEditMode() {
+    editMode = false;
+    document.getElementById('edit-mode-btn').classList.remove('hidden');
+    document.getElementById('cancel-edit-btn').classList.add('hidden');
+    fetchMenuItems(); 
 }
 
+// ၆။ Item အသစ်ထည့်ရန် Modal ဖွင့်ခြင်း
 function enterAddMode() {
     currentEditingId = null; 
     document.getElementById('modal-title').innerText = "Add New Item";
@@ -131,95 +112,86 @@ function enterAddMode() {
     toggleMenuOptions();
 }
 
+// ၇။ Item သိမ်းဆည်းခြင်း (Insert & Update)
+async function saveItem() {
+    const name = document.getElementById('edit-name').value;
+    const price = document.getElementById('edit-price').value;
+    const stockVal = document.getElementById('edit-stock').value;
+    const available = document.getElementById('edit-available').checked;
+    const fileInput = document.getElementById('file-input');
 
+    if (!name || !price) return alert("အမည်နှင့် ဈေးနှုန်း ထည့်ပေးပါ");
 
-async function renderMenuWithControls() {
-    const { data } = await supabase.from('menu').select('*');
-    const grid = document.getElementById('menu-grid');
-    grid.innerHTML = '';
+    try {
+        let imageUrl = document.getElementById('preview-img').src;
 
-    data.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'menu-card edit-active'; // Animation မပါတော့ပါ
-        
-        // ကတ်ကို နှိပ်လိုက်တာနဲ့ Modal ပွင့်လာပါမယ်
-        card.onclick = () => openEditModal(item);
+        if (fileInput.files && fileInput.files.length > 0) {
+            imageUrl = await uploadImage(fileInput.files[0]);
+        }
 
-        card.innerHTML = `
-            <div class="image-container">
-                <img src="${item.image_url || 'placeholder.jpg'}">
-                <button class="delete-badge" onclick="event.stopPropagation(); deleteItem('${item.id}', '${item.name}')">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-            <div class="item-info">
-                <div class="item-name">${item.name}</div>
-                <div class="item-price">${item.price} MMK</div>
-            </div>
-        `;
-        grid.appendChild(card);
-    });
+        const itemData = {
+            name: name,
+            price: parseFloat(price),
+            stock: parseInt(stockVal) || 0,
+            stock_count: parseInt(stockVal) || 0,
+            is_available: available,
+            image_url: imageUrl
+        };
+
+        const { error } = currentEditingId 
+            ? await supabase.from('menu').update(itemData).eq('id', currentEditingId)
+            : await supabase.from('menu').insert([itemData]);
+
+        if (error) throw error;
+
+        alert("အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+        closeModal();
+        editMode ? renderMenuWithControls() : fetchMenuItems();
+    } catch (err) {
+        alert("Error: " + err.message);
+    }
 }
 
-// Modal ဖွင့်ပေးမည့် Function (ဒါလည်း ရှိနေရပါမယ်)
-function openEditModal(item) {
-    console.log("Opening Modal for:", item.name); // စစ်ဆေးရန် console မှာ ကြည့်နိုင်သည်
-    
-    document.getElementById('modal-title').innerText = "Edit Item";
-    document.getElementById('edit-name').value = item.name;
-    document.getElementById('edit-price').value = item.price;
-    document.getElementById('edit-stock').value = item.stock || 0;
-    document.getElementById('edit-available').checked = item.is_available;
-    document.getElementById('preview-img').src = item.image_url || 'placeholder.jpg';
-    
-    window.currentEditingId = item.id;
-    document.getElementById('edit-modal').classList.remove('hidden');
-}
-
-function toggleMenuOptions() {
-    document.getElementById('option-overlay').classList.toggle('hidden');
-}
-
-function enterEditMode() {
-    editMode = !editMode;
-    toggleMenuOptions();
-    fetchMenuItems(); 
-}
-
-function handleItemClick(id) {
-    if (!editMode) return;
-    openEditModal(id);
-}
-
-function closeModal() {
-    document.getElementById('edit-modal').classList.add('hidden');
-}
-
-// Edit Mode ဝင်သည့် Function
-function enterEditMode() {
-    document.getElementById('edit-mode-btn').classList.add('hidden');
-    document.getElementById('cancel-edit-btn').classList.remove('hidden');
-    toggleMenuOptions();
-    renderMenuWithControls(); 
-}
-
-// --- Edit Mode မှ ပြန်ထွက်ခြင်း ---
-function exitEditMode() {
-    document.getElementById('menu-grid').classList.remove('edit-mode-active');
-    document.getElementById('edit-mode-btn').classList.remove('hidden');
-    document.getElementById('cancel-edit-btn').classList.add('hidden');
-    fetchMenuItems(); // ရိုးရိုး menu list ကို ပြန်ပြ
-}
-
-// --- Item ကို ဖျက်ခြင်း (Delete Function) ---
+// ၈။ Item ဖျက်ခြင်း
 async function deleteItem(id, name) {
-    if (confirm(`"${name}" ကို မီနူးထဲကနေ ဖျက်ပစ်မှာ သေချာပါသလား?`)) {
+    if (confirm(`"${name}" ကို ဖျက်ပစ်မှာ သေချာပါသလား?`)) {
         const { error } = await supabase.from('menu').delete().eq('id', id);
         if (!error) {
-            alert("ဖျက်ပြီးပါပြီ။");
-            renderMenuWithControls(); // List ကို ပြန် update လုပ်
+            renderMenuWithControls();
         } else {
             alert("Error: " + error.message);
         }
     }
+}
+
+// ၉။ Helper Functions
+function toggleMenuOptions() {
+    document.getElementById('option-overlay').classList.toggle('hidden');
+}
+
+function closeModal() {
+    document.getElementById('edit-modal').classList.add('hidden');
+    currentEditingId = null;
+}
+
+function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = () => document.getElementById('preview-img').src = reader.result;
+    if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+}
+
+// Image Upload Logic
+async function uploadImage(file) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `menu-images/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+        .from('menu_images')
+        .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage.from('menu_images').getPublicUrl(filePath);
+    return data.publicUrl;
 }
