@@ -211,14 +211,19 @@
 
     <script>
         // Simple Page Switcher Logic
-        function showPage(pageId) {
-            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-            document.getElementById(pageId).classList.remove('hidden');
-            
-            // Update Active Nav
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-        }
+     function showPage(pageId, event) {
+    // စာမျက်နှာအားလုံး ပိတ်
+    document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+    
+    // ရွေးချယ်ထားသော စာမျက်နှာကို ဖွင့်
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) targetPage.classList.remove('hidden');
+    
+    // Navigation Active ပြောင်း
+    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+    if (event) event.currentTarget.classList.add('active');
+     }
+        
     </script>
 </body>
 </html>
