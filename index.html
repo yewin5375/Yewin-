@@ -96,7 +96,45 @@
         </section>
 
         <section id="order-page" class="page-content hidden"><h2>Order Management</h2></section>
-        <section id="customer-page" class="page-content hidden"><h2>Customer CRM</h2></section>
+        <section id="customer-page" class="page-content hidden">
+    <div class="header-section">
+        <h2 class="title">Customer Profile</h2>
+    </div>
+
+    <div id="customer-insight-card" class="glass-card">
+        <div class="profile-summary">
+            <h3 id="cust-name">Customer Name</h3>
+            <p id="cust-phone">09xxxxxxxxx</p>
+            <div class="badge-row">
+                <span id="cust-points" class="badge">0 Points</span>
+                <span id="cust-level" class="badge">VIP Level</span>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-box">
+                <span class="label">Lifetime Value</span>
+                <span id="cust-total-spent" class="value">0 MMK</span>
+            </div>
+            <div class="stat-box">
+                <span class="label">Total Orders</span>
+                <span id="cust-total-orders" class="value">0</span>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <h4>Favorite Items</h4>
+            <div id="cust-favorites" class="fav-list"></div>
+        </div>
+    </div>
+
+    <div class="history-list-header">
+        <h4>Recent Orders</h4>
+    </div>
+    <div id="customer-order-history" class="history-container">
+        </div>
+        </section>
+        
         <section id="report-page" class="page-content hidden"><h2>Sales Reports</h2></section>
 
     </main>
