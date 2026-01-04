@@ -131,17 +131,17 @@ function enterAddMode() {
     toggleMenuOptions();
 }
 
-async function openEditModal(id) {
+async function openEditModal(item) {
     currentEditingId = id;
     const { data, error } = await supabase.from('menu').select('*').eq('id', id).single();
     if (data) {
         document.getElementById('modal-title').innerText = "Edit Menu Item";
-        document.getElementById('edit-name').value = data.name;
-        document.getElementById('edit-price').value = data.price;
+        document.getElementById('edit-name').value = item.name;
+        document.getElementById('edit-price').value = item.price;
         // အစ်ကို့ table မှာ stock လို့ ပေးထားရင် data.stock လို့ ပြင်သုံးပါ
-        document.getElementById('edit-stock').value = data.stock || data.stock_count || 0;
-        document.getElementById('edit-available').checked = data.is_available;
-        document.getElementById('preview-img').src = data.image_url || 'placeholder.jpg';
+        document.getElementById('edit-stock').value = item.stock || item.stock_count || 0;
+        document.getElementById('edit-available').checked = item.is_available;
+        document.getElementById('preview-img').src = item.image_url || 'placeholder.jpg';
         document.getElementById('edit-modal').classList.remove('hidden');
     }
 }
