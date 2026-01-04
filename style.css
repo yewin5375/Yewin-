@@ -21,22 +21,25 @@ body {
     color: var(--text-main);
     font-family: 'Inter', sans-serif;
     line-height: 1.6;
+    overflow-x: hidden;
 }
 
 .hidden { display: none !important; }
 
-/* --- 3. COMMON LAYOUT --- */
+/* --- 3. COMMON HEADER --- */
 .header-section {
     padding: 25px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: sticky; top: 0;
     background: var(--pearl-white);
+    z-index: 100;
 }
 
 .title { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
 
-/* --- 4. MENU & GRID SYSTEM --- */
+/* --- 4. MENU GRID & CARDS --- */
 .grid-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -45,96 +48,94 @@ body {
 }
 
 .menu-card {
-    background: var(--crystal-clear);
-    backdrop-filter: blur(10px);
+    background: var(--pure-white);
     border-radius: 20px;
-    border: var(--glass-border);
     box-shadow: var(--soft-shadow);
     overflow: hidden;
     position: relative;
-    transition: 0.3s ease;
+    border: var(--glass-border);
 }
 
-.image-container { width: 100%; height: 120px; background: #eee; }
+.image-container { width: 100%; height: 120px; background: #f0f0f0; }
 .image-container img { width: 100%; height: 100%; object-fit: cover; }
 .item-info { padding: 12px; }
-.item-name { font-size: 14px; font-weight: 600; }
+.item-name { font-size: 14px; font-weight: 600; color: var(--text-main); }
 .item-price { color: var(--primary-accent); font-weight: 700; font-size: 13px; }
 
-/* --- 5. MODAL (ADD/EDIT MENU) --- */
+/* --- 5. MODAL STYLES (Add/Edit Menu) --- */
 .modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
     display: flex; justify-content: center; align-items: center; z-index: 9999;
 }
 
-.modal-content.glass-card {
+.modal-content {
     background: #fff; width: 90%; max-width: 400px;
-    border-radius: 25px; padding: 25px; box-shadow: var(--soft-shadow);
+    border-radius: 25px; padding: 25px; 
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
 }
 
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+}
+
+.close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+
 .image-upload-area {
-    width: 100%; height: 150px; background: #f8f9fa;
-    border-radius: 15px; border: 1px dashed #ccc;
+    width: 100%; height: 160px; background: #f8f9fa;
+    border-radius: 15px; border: 2px dashed #ddd;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    margin-bottom: 15px; overflow: hidden;
+    margin-bottom: 20px; overflow: hidden; cursor: pointer;
 }
 
 .image-upload-area img { width: 100%; height: 100%; object-fit: cover; }
+.image-upload-area p { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
 
-.input-row { display: flex; gap: 12px; margin-top: 15px; }
-.input-group { flex: 1; display: flex; flex-direction: column; }
-.input-group label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; }
-.input-group input { padding: 12px; border: 1px solid #eee; border-radius: 10px; font-size: 14px; }
+.input-group { margin-bottom: 15px; display: flex; flex-direction: column; }
+.input-group label { font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
+.input-group input { padding: 12px; border: 1px solid #eee; border-radius: 12px; font-size: 14px; background: #fdfdfd; }
+
+/* Price & Stock Row Alignment */
+.input-row { display: flex; gap: 12px; margin-bottom: 15px; }
+.input-row .input-group { flex: 1; margin-bottom: 0; }
+
+.toggle-group { display: flex; align-items: center; gap: 10px; margin: 10px 0; font-size: 14px; font-weight: 600; }
 
 .modal-footer { display: flex; gap: 10px; margin-top: 25px; }
-.btn-cancel { flex: 1; padding: 12px; border: none; border-radius: 12px; background: #f1f2f6; font-weight: 600; }
-.btn-save { flex: 2; padding: 12px; border: none; border-radius: 12px; background: var(--primary-accent); color: #fff; font-weight: 700; }
+.btn-cancel { flex: 1; padding: 14px; border: none; border-radius: 14px; background: #f1f2f6; font-weight: 600; color: var(--text-muted); }
+.btn-save { flex: 2; padding: 14px; border: none; border-radius: 14px; background: var(--primary-accent); color: #fff; font-weight: 700; }
 
-/* --- 6. ORDER PAGE --- */
+/* --- 6. ORDER PAGE STYLES --- */
 .order-card {
-    background: #fff; border-radius: 20px; padding: 15px;
+    background: #fff; border-radius: 20px; padding: 18px;
     margin: 0 20px 15px 20px; box-shadow: var(--soft-shadow);
-    border-left: 5px solid var(--primary-accent);
+    border-left: 6px solid var(--primary-accent);
 }
-
-.order-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 700; }
-.customer-link { color: var(--primary-accent); font-size: 13px; margin-bottom: 10px; display: block; }
+.order-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 700; }
 .status-buttons { display: flex; gap: 8px; margin-top: 15px; }
-.status-btn { flex: 1; padding: 10px; border: none; border-radius: 10px; font-size: 11px; font-weight: 600; cursor: pointer; }
+.status-btn { flex: 1; padding: 12px; border: none; border-radius: 12px; font-size: 11px; font-weight: 700; }
 .status-btn.preparing.active { background: #fff3cd; color: #856404; }
 .status-btn.ready.active { background: #d4edda; color: #155724; }
 
-/* --- 7. CUSTOMER PAGE --- */
-.customer-grid-container { padding: 0 20px; }
+/* --- 7. CUSTOMER & REPORT PAGE --- */
 .customer-card {
-    background: #fff; padding: 15px; border-radius: 15px;
+    background: #fff; padding: 18px; border-radius: 18px;
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 10px; box-shadow: var(--soft-shadow);
+    margin: 0 20px 12px 20px; box-shadow: var(--soft-shadow);
 }
-.badge { background: #fff3e0; color: var(--primary-accent); padding: 4px 10px; border-radius: 20px; font-size: 11px; }
-
-/* --- 8. REPORT PAGE --- */
 .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-.report-card { background: #fff; padding: 20px; border-radius: 20px; box-shadow: var(--soft-shadow); }
-.report-card .value { font-size: 18px; font-weight: 800; display: block; color: var(--primary-accent); }
-.chart-container { margin: 20px; background: #fff; padding: 20px; border-radius: 20px; height: 250px; }
+.report-card { background: #fff; padding: 20px; border-radius: 22px; box-shadow: var(--soft-shadow); }
+.report-card .value { font-size: 18px; font-weight: 800; color: var(--primary-accent); }
 
-/* --- 9. BOTTOM NAVIGATION --- */
+/* --- 8. BOTTOM NAVIGATION --- */
 .bottom-nav {
-    position: fixed; bottom: 0; width: 100%; height: 75px;
-    background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px);
+    position: fixed; bottom: 0; width: 100%; height: 80px;
+    background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
     display: flex; justify-content: space-around; align-items: center;
-    border-top: 1px solid #eee; z-index: 1000;
+    border-top: 1px solid #eee; z-index: 1000; padding-bottom: 10px;
 }
-.nav-item { text-decoration: none; color: var(--text-muted); text-align: center; font-size: 10px; }
+.nav-item { text-decoration: none; color: var(--text-muted); text-align: center; font-size: 10px; font-weight: 600; }
 .nav-item.active { color: var(--primary-accent); }
-.nav-item i { font-size: 22px; display: block; margin-bottom: 4px; }
-
-/* Sold Out Overlay */
-.sold-out-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); color: #fff; display: flex;
-    justify-content: center; align-items: center; font-weight: 800;
-}
+.nav-item i { font-size: 22px; display: block; margin-bottom: 5px; }
 
