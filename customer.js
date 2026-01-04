@@ -105,3 +105,34 @@ function filterCustomers() {
         card.style.display = text.includes(val) ? 'flex' : 'none';
     });
 }
+
+/* Customer List Styling */
+.customer-grid-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.customer-card {
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 18px;
+    box-shadow: var(--soft-shadow);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #eee;
+}
+
+.customer-info h4 { font-size: 16px; margin-bottom: 4px; }
+.customer-info p { font-size: 13px; color: var(--text-muted); }
+
+.badge {
+    background: #fff3e0;
+    color: var(--primary-accent);
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+}
