@@ -1,25 +1,199 @@
+/* --- 1. CORE VARIABLES (ဒီမှာ အရောင်နဲ့ အရိပ်တွေကို ပြင်နိုင်ပါတယ်) --- */
 :root {
-    --pearl-white: #F8F9FA;
-    --crystal-clear: rgba(255, 255, 255, 0.8);
-    --soft-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-    --primary-accent: #FF4500; /* BBQ Warmth */
-    --text-main: #2D3436;
+    --pearl-white: #F8F9FA;         /* ပုလဲရောင် နောက်ခံ */
+    --pure-white: #FFFFFF;
+    --crystal-clear: rgba(255, 255, 255, 0.7); /* မှန်သားကြည် effect */
+    --primary-accent: #FF4500;      /* BBQ Highlight (လိမ္မော်နီ) */
+    --text-main: #2D3436;           /* စာသားအနက်ရောင် */
+    --text-muted: #636E72;          /* စာသားခပ်ဖျော့ဖျော့ */
+    --soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.04); /* အလွန်ပါးလွှာသောအရိပ် */
+    --glass-border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* --- 2. BASIC SETUP --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* ဖုန်းမှာနှိပ်ရင် အပြာကွက်မပေါ်စေရန် */
 }
 
 body {
     background-color: var(--pearl-white);
     color: var(--text-main);
     font-family: 'Inter', sans-serif;
+    line-height: 1.6;
 }
 
-/* Glassmorphism Card Style */
+.hidden { display: none !important; }
+
+/* --- 3. HEADER SECTION --- */
+.header-section {
+    padding: 25px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--pearl-white);
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+#menu-option-btn {
+    background: var(--pure-white);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    box-shadow: var(--soft-shadow);
+    color: var(--text-main);
+    cursor: pointer;
+}
+
+/* --- 4. MENU GRID (၂ ခုတွဲစနစ်) --- */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* ၂ ခုတွဲ */
+    gap: 15px;
+    padding: 0 20px 100px 20px; /* အောက်ခြေ nav အတွက် နေရာချန်ထားခြင်း */
+}
+
+/* --- 5. MENU CARD (Glassmorphism Style) --- */
 .menu-card {
     background: var(--crystal-clear);
-    backdrop-filter: blur(4px);
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(10px); /* မှန်ကြည် effect */
+    border-radius: 20px;
+    border: var(--glass-border);
     box-shadow: var(--soft-shadow);
-    padding: 15px;
-    transition: 0.3s;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.menu-card:active {
+    transform: scale(0.95); /* နှိပ်လိုက်လျှင် အနည်းငယ်ကျုံ့သွားခြင်း */
+}
+
+.image-container {
+    width: 100%;
+    height: 120px;
+    background: #eee;
+}
+
+.image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-info {
+    padding: 12px;
+}
+
+.item-name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.item-price {
+    font-size: 13px;
+    color: var(--primary-accent);
+    font-weight: 600;
+}
+
+/* --- 6. OPTION OVERLAY (floating menu) --- */
+.option-card {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    background: var(--pure-white);
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    min-width: 180px;
+}
+
+.option-btn {
+    padding: 12px 15px;
+    border: none;
+    background: none;
+    text-align: left;
+    font-size: 14px;
+    border-radius: 10px;
+    color: var(--text-main);
+}
+
+.option-btn:active {
+    background: #f0f0f0;
+}
+
+/* --- 7. BOTTOM NAVIGATION --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 70px;
+    background: var(--crystal-clear);
+    backdrop-filter: blur(15px);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: var(--glass-border);
+    z-index: 1000;
+}
+
+.nav-item {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.nav-item.active {
+    color: var(--primary-accent); /* Active ဖြစ်နေလျှင် BBQ အရောင်ပြောင်းမည် */
+}
+
+.nav-item i {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+/* --- 8. STATUS BADGES --- */
+.sold-out-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.edit-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--primary-accent);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
 }
 
