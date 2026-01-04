@@ -307,3 +307,21 @@ body {
     border-radius: 15px; border-left: 4px solid var(--primary-accent);
     display: flex; justify-content: space-between; align-items: center;
 }
+
+/* အပြီးသတ်ပြီးသား အော်ဒါများအတွက် Style */
+.order-card.status-collected {
+    opacity: 0.6;
+    filter: grayscale(0.5);
+    background: #f1f2f6;
+    pointer-events: none; /* ထပ်ပြင်လို့မရအောင် ပိတ်ထားခြင်း */
+}
+
+.status-btn.collected {
+    background: var(--primary-accent);
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 69, 0, 0.3);
+}
+
+.status-btn.collected:active {
+    transform: scale(0.9);
+}
