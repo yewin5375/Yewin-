@@ -322,7 +322,43 @@ body {
     from { transform: rotate(1deg); }
     to { transform: rotate(-1deg); }
 }
+/* Modal ကို အလယ်မှာ ပေါ်စေရန် */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
 
+.modal.hidden {
+    display: none !important;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 400px;
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.image-upload-area {
+    text-align: center;
+    border: 2px dashed #ccc;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.image-upload-area img {
+    width: 100%;
+    max-height: 150px;
+    object-fit: contain;
+}
 /* --- CUSTOMER VIEW STYLING --- */
 .customer-grid-container {
     padding: 20px;
