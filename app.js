@@ -64,48 +64,61 @@ async function loadDashboardStats() {
 
 // ၄။ Navigation Logic (Page ပြောင်းခြင်း)
 function changeNav(id, el) {
+    // လက်ရှိ Page ID ကို သိမ်းမယ်
     localStorage.setItem('activeView', id);
 
     // Nav Item အရောင်ပြောင်းခြင်း
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
     
-    // Header Title ပြောင်းခြင်း
+    // Header Title ပြောင်းခြင်း (ID နာမည်တွေနဲ့ Titles တွေကို ညှိထားပါတယ်)
     const titles = { 
         'dashboard': 'Admin Overview', 
-        'orders': 'Live Orders', 
-        'menu-manager': 'Menu Gallery', 
-        'customers': 'VIP Customers' 
+        'order-page': 'Live Orders', 
+        'menu-page': 'Menu Gallery', 
+        'customer-page': 'VIP Customers',
+        'report-page': 'Sales Insights'
     };
     
     const titleEl = document.getElementById('viewTitle');
     if (titleEl) titleEl.innerText = titles[id] || 'Admin';
 
+    // ခလုတ်ကို အရောင်တင်ခြင်း
+    if (el) {
+        el.classList.add('active');
+    } else {
+        const activeBtn = document.querySelector(`.nav-item[onclick*="${id}"]`);
+        if (activeBtn) activeBtn.classList.add('active');
+    }
+
     showView(id);
 }
 
 function showView(id) {
-    // အကုန်ဖျောက်ပြီးမှ သက်ဆိုင်ရာ Page ကို ပြခြင်း
+    // အကုန်ဖျောက်
     document.querySelectorAll('.page-content').forEach(v => {
         v.classList.add('hidden');
     });
 
+    // သက်ဆိုင်ရာ Page ကို ပြ (HTML ID နဲ့ ကိုက်အောင် စစ်ပေးပါ)
     const target = document.getElementById(id);
     if (target) {
         target.classList.remove('hidden');
     }
 
-    // Data Load လုပ်ပေးခြင်း
+    // Data Load လုပ်ပေးခြင်း (Function နာမည်တွေ မှန်အောင် စစ်ပါ)
     if (id === 'dashboard') loadDashboardStats();
-    if (id === 'orders') typeof fetchOrders === 'function' && fetchOrders();
-    if (id === 'menu-manager') typeof renderMenuWithControls === 'function' && renderMenuWithControls();
-    if (id === 'customers') typeof fetchAllCustomers === 'function' && fetchAllCustomers();
+    if (id === 'order-page') typeof fetchOrders === 'function' && fetchOrders();
+    if (id === 'menu-page') typeof fetchMenuItems === 'function' && fetchMenuItems();
+    if (id === 'customer-page') typeof fetchAllCustomers === 'function' && fetchAllCustomers();
+    if (id === 'report-page') typeof loadReports === 'function' && loadReports();
 }
 
 // ၅။ Window Load (App စတင်ခြင်း)
 window.onload = () => {
-    const savedView = localStorage.getItem('activeView') || 'dashboard';
+    // HTML မှာ dashboard မပါရင် 'menu-page' ကို default ပေးပါ
+    const savedView = localStorage.getItem('activeView') || 'menu-page';
     changeNav(savedView, null);
     
-    initNotification();
-    setInterval(loadDashboardStats, 30000); // ၃၀ စက္ကန့်တစ်ခါ အော်ဒါအသစ်ရှိမရှိ စစ်မည်
+    if (typeof initNotification === 'function') initNotification();
+    setInterval(loadDashboardStats, 30000); 
 };
