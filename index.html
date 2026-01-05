@@ -66,7 +66,7 @@
 </section>
         <section id="menu-page" class="page-content">
             <div class="header-section">
-                <button id="cancel-edit-btn" class="hidden" onclick="exitEditMode()" style="background:#ff4757; color:white; border:none; padding:5px 12px; border-radius:8px; margin-right:10px;">
+                <button id="cancel-edit-btn" class="hidden" onclick="toggleEditMode()" style="background:#ff4757; color:white; border:none; padding:5px 12px; border-radius:8px; margin-right:10px;">
             Done
         </button>
         <button id="menu-option-btn" onclick="toggleMenuOptions()">
@@ -75,10 +75,10 @@
             </div>
          
             <div id="option-overlay" class="option-card hidden">
-                <button onclick="enterAddMode()" class="option-btn">
+                <button onclick="openAddModal()" class="option-btn">
                     <i class="fas fa-plus"></i> Add New Item
                 </button>
-                <button onclick="enterEditMode()" class="option-btn">
+                <button onclick="toggleEditMode()" class="option-btn">
                     <i class="fas fa-edit"></i> Edit Menu List
                 </button>
             </div>
