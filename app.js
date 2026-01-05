@@ -114,11 +114,25 @@ function showView(id) {
 }
 
 // ၅။ Window Load (App စတင်ခြင်း)
+// ၅။ Window Load (App စတင်ခြင်း)
 window.onload = () => {
-    // HTML မှာ dashboard မပါရင် 'menu-page' ကို default ပေးပါ
-    const savedView = localStorage.getItem('activeView') || 'menu-page';
-    changeNav(savedView, null);
+    // LocalStorage ထဲက သိမ်းထားတဲ့ view ကို ယူမယ်၊ မရှိရင် 'dashboard' ကို သုံးမယ်
+    const savedView = localStorage.getItem('activeView') || 'dashboard';
     
+    // UI မှာ Nav item လေးတွေကိုပါ active ဖြစ်အောင် လုပ်ဖို့ selector သေချာရှာရပါမယ်
+    const activeNavItem = document.querySelector(`.nav-item[onclick*="'${savedView}'"]`);
+    
+    // Page ပြောင်းလဲခြင်း function ကို ခေါ်မယ်
+    changeNav(savedView, activeNavItem);
+    
+    // တခြား Init function များ
     if (typeof initNotification === 'function') initNotification();
-    setInterval(loadDashboardStats, 30000); 
+    
+    // Dashboard Stats ကို 30 seconds တခါ update လုပ်မယ်
+    setInterval(() => {
+        if(localStorage.getItem('activeView') === 'dashboard') {
+            loadDashboardStats();
+        }
+    }, 30000); 
 };
+
