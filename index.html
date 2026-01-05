@@ -14,24 +14,20 @@
 </head>
 <body class="pearl-theme">
 
-    <nav class="bottom-nav">
-    <a href="#" class="nav-item" onclick="showPage('order-page', event)"> <i class="fas fa-shopping-basket"></i>
-        <span>Orders</span>
+   <nav class="bottom-nav">
+    <a href="#" class="nav-item" onclick="changeNav('order-page', this)"> 
+        <i class="fas fa-shopping-basket"></i> <span>Orders</span>
     </a> 
-        <a href="#" class="nav-item active" onclick="showPage('menu-page')">
-            <i class="fas fa-utensils"></i>
-            <span>Menu</span>
-        </a>
-        <a href="#" class="nav-item" onclick="showPage('customer-page')">
-            <i class="fas fa-users"></i>
-            <span>Customers</span>
-        </a>
-        <a href="#" class="nav-item" onclick="showPage('report-page')">
-            <i class="fas fa-chart-line"></i>
-            <span>Reports</span>
-        </a>
-    </nav>
-
+    <a href="#" class="nav-item" onclick="changeNav('menu-page', this)">
+        <i class="fas fa-utensils"></i> <span>Menu</span>
+    </a>
+    <a href="#" class="nav-item" onclick="changeNav('customer-page', this)">
+        <i class="fas fa-users"></i> <span>Customers</span>
+    </a>
+    <a href="#" class="nav-item" onclick="changeNav('report-page', this)">
+        <i class="fas fa-chart-line"></i> <span>Reports</span>
+    </a>
+</nav>
     <main id="app-container">
 
         <section id="menu-page" class="page-content">
