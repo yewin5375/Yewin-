@@ -39,20 +39,28 @@
 
     <div class="report-grid">
         <div class="report-card glass-card">
-            <span class="label">Today's Orders</span>
-            <h3 id="todayOrders" class="value">0 Orders</h3>
+            <span class="label"><i class="fas fa-shopping-bag"></i> Orders</span>
+            <h3 id="todayOrders" class="value">0</h3>
+            <span class="trend up"><i class="fas fa-chart-line"></i> Today</span>
         </div>
         <div class="report-card glass-card">
-            <span class="label">Today's Revenue</span>
-            <h3 id="todayRevenue" class="value">0 Ks</h3>
+            <span class="label"><i class="fas fa-wallet"></i> Revenue</span>
+            <h3 id="todayRevenue" class="value">0 K</h3>
+            <span class="trend up"><i class="fas fa-plus"></i> Today</span>
         </div>
     </div>
 
-    <div class="quick-actions" style="margin-top: 20px; padding: 0 15px;">
-        <h4 style="margin-bottom: 15px;">Quick Actions</h4>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <button onclick="changeNav('order-page')" class="btn-save" style="background: #00b894;">View Orders</button>
-            <button onclick="changeNav('menu-page')" class="btn-save">Manage Menu</button>
+    <div class="quick-actions" style="padding: 15px;">
+        <h4>Manage Shop</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+            <button onclick="changeNav('order-page')" class="action-btn">
+                <i class="fas fa-receipt"></i>
+                <span>Orders</span>
+            </button>
+            <button onclick="changeNav('menu-page')" class="action-btn">
+                <i class="fas fa-pizza-slice"></i>
+                <span>Menu</span>
+            </button>
         </div>
     </div>
 </section>
