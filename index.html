@@ -36,12 +36,14 @@
 
         <section id="menu-page" class="page-content">
             <div class="header-section">
-                <h2 class="title">BBQ Menu</h2>
-                <button id="menu-option-btn" onclick="toggleMenuOptions()">
-                    <i class="fas fa-ellipsis-v"></i>
-                </button>
+                <button id="cancel-edit-btn" class="hidden" onclick="exitEditMode()" style="background:#ff4757; color:white; border:none; padding:5px 12px; border-radius:8px; margin-right:10px;">
+            Done
+        </button>
+        <button id="menu-option-btn" onclick="toggleMenuOptions()">
+            <i class="fas fa-ellipsis-v"></i>
+        </button>
             </div>
-
+         
             <div id="option-overlay" class="option-card hidden">
                 <button onclick="enterAddMode()" class="option-btn">
                     <i class="fas fa-plus"></i> Add New Item
