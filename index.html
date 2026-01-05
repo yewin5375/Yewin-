@@ -215,51 +215,6 @@
     <script src="order.js"></script>
     <script src="customer.js"></script>
 
-    <script>
-     
-    // ၁။ Page ပြောင်းလဲခြင်းနှင့် မှတ်သားခြင်း Function
-    function showPage(pageId, event) {
-        // (က) စာမျက်နှာအားလုံးကို ဖျောက်
-        document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
-        
-        // (ခ) ရွေးချယ်ထားသော စာမျက်နှာကို ဖွင့်
-        const targetPage = document.getElementById(pageId);
-        if (targetPage) targetPage.classList.remove('hidden');
-        
-        // (ဂ) Navigation Active အရောင်ပြောင်း
-        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-        
-        // (ဃ) Active Button ကို ရှာပြီး အရောင်ပေးခြင်း
-        let activeBtn;
-        if (event && event.currentTarget) {
-            activeBtn = event.currentTarget;
-        } else {
-            activeBtn = document.querySelector(`.nav-item[onclick*="${pageId}"]`);
-        }
-        if (activeBtn) activeBtn.classList.add('active');
-
-        // (င) လက်ရှိ Page ID ကို သိမ်းထားခြင်း
-        localStorage.setItem('lastPage', pageId);
-
-        // (စ) Page အလိုက် Data ပြန်ခေါ်ခြင်း (Data အသစ်တွေ ပေါ်နေအောင်)
-        if (pageId === 'order-page' && typeof fetchOrders === 'function') fetchOrders();
-        if (pageId === 'menu-page' && typeof fetchMenuItems === 'function') fetchMenuItems();
-        if (pageId === 'customer-page' && typeof fetchAllCustomers === 'function') fetchAllCustomers();
-        if (pageId === 'report-page' && typeof loadReports === 'function') loadReports();
-    }
-
-    // ၂။ Browser ကို Refresh လုပ်တဲ့အခါ အလုပ်လုပ်မည့်အပိုင်း
-    window.onload = () => {
-        // Memory ထဲက နောက်ဆုံးကြည့်ခဲ့တဲ့ Page ကိုယူ၊ မရှိရင် 'menu-page' ကိုပြ
-        const savedPage = localStorage.getItem('lastPage') || 'menu-page';
-        showPage(savedPage);
-        
-        // Notification သို့မဟုတ် အခြား App စတင်ခြင်း Logic များ ရှိရင် ဒီမှာထည့်ပါ
-        if (typeof initNotification === 'function') initNotification();
-    };
-  
-        
-    </script>
 </body>
 </html>
 
