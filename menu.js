@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ၁။ ရိုးရိုး Menu Grid ပြသခြင်း
 async function fetchMenuItems() {
-    editMode = false; // ရိုးရိုး mode သို့ ပြန်ပြောင်း
+   // ရိုးရိုး mode သို့ ပြန်ပြောင်း
     const grid = document.getElementById('menu-grid');
     if(!grid) return;
     grid.innerHTML = '<div class="loading">Loading Menu...</div>';
