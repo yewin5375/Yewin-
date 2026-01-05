@@ -547,3 +547,103 @@ body {
     max-height: 200px;
     overflow-y: auto;
 }
+
+/* --- DASHBOARD SPECIFIC --- */
+
+/* Dashboard Grid Layout */
+.report-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* ဘေးချင်းယှဉ် ၂ ကွက်ပြ */
+    gap: 15px;
+    padding: 15px;
+}
+
+/* Dashboard Cards (Glassmorphism Style) */
+.report-card.glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: left;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07);
+    transition: transform 0.3s ease;
+}
+
+.report-card:active {
+    transform: scale(0.95); /* နှိပ်လိုက်ရင် ချိုင့်သွားတဲ့ effect */
+}
+
+.report-card .label {
+    display: block;
+    font-size: 12px;
+    color: #636e72;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.report-card .value {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--primary-accent); /* အစ်ကို့ရဲ့ ပင်မအရောင် (လိမ္မော်/နီ) */
+    margin: 0;
+}
+
+/* Quick Actions Section dashboard */
+.quick-actions {
+    margin-top: 10px;
+}
+
+.quick-actions h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2d3436;
+    margin-left: 5px;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 18px;
+    border: none;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn i {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: var(--primary-accent);
+}
+
+.action-btn span {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Trend Indicator (ရောင်းအား တက်/ကျ ပြရန်) */
+.trend {
+    font-size: 11px;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.trend.up { color: #00b894; }
+.trend.down { color: #d63031; }
+
+/* Dashboard Header Title */
+.header-section .title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #2d3436;
+    padding: 20px 15px 5px 15px;
+}
