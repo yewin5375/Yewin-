@@ -136,3 +136,19 @@ function filterCustomers() {
     font-size: 12px;
     font-weight: 700;
 }
+
+// customer.js ထဲက viewCustomerDetail function ထဲမှာ ဒါလေးထည့်ပါ
+if (c) {
+    // ... ကျန်တဲ့ code များ
+    document.getElementById('cust-total-spent').innerText = `${spent.toLocaleString()} K`;
+    
+    // Total Orders အရေအတွက်ကို ထည့်သွင်းခြင်း
+    const { count } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true })
+        .eq('customer_id', id);
+        
+    document.getElementById('cust-total-orders').innerText = count || 0;
+    
+    fetchCustomerOrders(id);
+}
