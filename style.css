@@ -426,3 +426,88 @@ body {
     margin-top: 10px;
     padding-bottom: 30px;
 }
+/* Report Dashboard Styling */
+.report-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 20px;
+}
+
+.report-card {
+    padding: 20px;
+    border-radius: 20px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.report-card.primary { background: linear-gradient(135deg, #FF6F00, #FF9100); }
+.report-card.secondary { background: linear-gradient(135deg, #1e272e, #485460); }
+
+.report-card .label { font-size: 12px; opacity: 0.9; }
+.report-card h2 { font-size: 20px; margin-top: 5px; position: relative; z-index: 2; }
+
+.icon-bg {
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    font-size: 50px;
+    opacity: 0.2;
+}
+
+.top-items-list { margin-top: 15px; }
+.top-item-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+/* Report Page Layout */
+.report-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 15px;
+}
+
+.chart-container {
+    height: 250px;
+    margin: 15px;
+    padding: 20px;
+    position: relative;
+}
+
+.expense-manager {
+    margin: 15px;
+    padding: 20px;
+}
+
+.expense-form {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.expense-form input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.expense-form button {
+    background: var(--primary-accent);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.mini-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
