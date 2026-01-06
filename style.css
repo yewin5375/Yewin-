@@ -144,3 +144,41 @@ body {
 /* Charts & Analytics */
 .chart-container { height: 250px; margin: 15px; padding: 15px; background: white; border-radius: 20px; }
 
+/* Menu Card ပုံစံသစ် */
+.menu-card {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden; /* ပုံကို ဘောင်အတွင်းထဲပဲ ရှိနေစေရန် */
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #f0f0f0;
+}
+
+/* ပုံပြသမည့်နေရာ */
+.menu-img-container {
+    width: 100%;
+    height: 120px; /* ပုံအမြင့် */
+    background: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.menu-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* ပုံကို ကွက်တိဖြစ်အောင် ညှိပေးသည် */
+}
+
+/* ပုံမရှိလျှင် ပြမည့် Icon */
+.no-image {
+    font-size: 2rem;
+    color: #dfe6e9;
+}
+
+.menu-details {
+    padding: 12px;
+}
+
