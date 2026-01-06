@@ -34,8 +34,10 @@
     </nav>
 
     <main id="app-container">
-        <section id="dashboard" class="page-content">
-            <div class="notification-container">
+        <section id="dashboard" class="page-content">  
+            <div class="header-section">
+                <h2 class="title">Business Overview</h2>
+                <div class="notification-container">
     <button id="noti-bell-btn" onclick="toggleNotiPanel()">
         <i class="fas fa-bell"></i>
         <span id="noti-badge" class="badge hidden">0</span>
@@ -49,12 +51,6 @@
         <div id="noti-list" class="noti-list">
             <p class="empty-msg">No new notifications</p>
         </div>
-    </div>
-        
-            
-            <div class="header-section">
-                <h2 class="title">Business Overview</h2>
-                
                 <div id="online-status" class="status-indicator">● Online</div>
             </div>
 
