@@ -35,8 +35,26 @@
 
     <main id="app-container">
         <section id="dashboard" class="page-content">
+            <div class="notification-container">
+    <button id="noti-bell-btn" onclick="toggleNotiPanel()">
+        <i class="fas fa-bell"></i>
+        <span id="noti-badge" class="badge hidden">0</span>
+    </button>
+    
+    <div id="noti-panel" class="noti-panel hidden">
+        <div class="noti-header">
+            <h4>Notifications</h4>
+            <button onclick="clearAllNoti()">Clear All</button>
+        </div>
+        <div id="noti-list" class="noti-list">
+            <p class="empty-msg">No new notifications</p>
+        </div>
+    </div>
+            </div>
+            
             <div class="header-section">
                 <h2 class="title">Business Overview</h2>
+                
                 <div id="online-status" class="status-indicator">● Online</div>
             </div>
 
