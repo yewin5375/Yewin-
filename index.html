@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chicken BBQ - Admin System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chicken BBQ - Professional Admin</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -11,256 +11,142 @@
     <link rel="stylesheet" href="style.css">
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="pearl-theme">
 
-   <nav class="bottom-nav">
-       <a href="#" class="nav-item" onclick="changeNav('dashboard', this)"> 
-        <i class="fas fa-th-large"></i> <span>Dashboard</span>
-    </a>
-    <a href="#" class="nav-item" onclick="changeNav('order-page', this)"> 
-        <i class="fas fa-shopping-basket"></i> <span>Orders</span>
-    </a> 
-    <a href="#" class="nav-item" onclick="changeNav('menu-page', this)">
-        <i class="fas fa-utensils"></i> <span>Menu</span>
-    </a>
-    <a href="#" class="nav-item" onclick="changeNav('customer-page', this)">
-        <i class="fas fa-users"></i> <span>Customers</span>
-    </a>
-    <a href="#" class="nav-item" onclick="changeNav('report-page', this)">
-        <i class="fas fa-chart-line"></i> <span>Reports</span>
-    </a>
-</nav>
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" onclick="changeNav('dashboard', this)"> 
+            <i class="fas fa-th-large"></i> <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" onclick="changeNav('order-page', this)"> 
+            <i class="fas fa-shopping-basket"></i> <span>Orders</span>
+        </a> 
+        <a href="#" class="nav-item" onclick="changeNav('menu-page', this)">
+            <i class="fas fa-utensils"></i> <span>Menu</span>
+        </a>
+        <a href="#" class="nav-item" onclick="changeNav('customer-page', this)">
+            <i class="fas fa-users"></i> <span>Customers</span>
+        </a>
+        <a href="#" class="nav-item" onclick="changeNav('report-page', this)">
+            <i class="fas fa-chart-line"></i> <span>Reports</span>
+        </a>
+    </nav>
+
     <main id="app-container">
-      <section id="dashboard" class="page-content">
-    <div class="header-section">
-        <h2 class="title" id="viewTitle">Business Overview</h2>
-    </div>
-
-    <div class="report-grid">
-        <div class="report-card glass-card">
-            <span class="label"><i class="fas fa-shopping-cart"></i> Today Orders</span>
-            <h3 id="stat-orders" class="value">0</h3>
-            <span class="trend" id="stat-pending">0 Pending</span>
-        </div>
-        <div class="report-card glass-card">
-            <span class="label"><i class="fas fa-money-bill-wave"></i> Today Revenue</span>
-            <h3 id="stat-revenue" class="value">0 K</h3>
-            <span class="trend" id="stat-unpaid">Unpaid: 0 K</span>
-        </div>
-        <div class="report-card glass-card">
-            <span class="label"><i class="fas fa-chart-line"></i> Estimated Profit</span>
-            <h3 id="stat-profit" class="value" style="color: #2ecc71;">0 K</h3>
-            <span class="trend">After Costs</span>
-        </div>
-        <div class="report-card glass-card">
-            <span class="label"><i class="fas fa-box"></i> Low Stock</span>
-            <h3 id="stat-lowstock" class="value" style="color: #e74c3c;">0</h3>
-            <span class="trend">Needs Restock</span>
-        </div>
-    </div>
-
-    <div class="dashboard-details">
-        <div class="glass-card table-container">
-            <h4><i class="fas fa-exclamation-triangle"></i> Low Stock Alerts</h4>
-            <div id="low-stock-list" class="alert-list">
-                </div>
-        </div>
-    </div>
-</section>
-
-
-        
-        <section id="menu-page" class="page-content">
+        <section id="dashboard" class="page-content">
             <div class="header-section">
-                <button id="cancel-edit-btn" class="hidden" onclick="toggleEditMode()" style="background:#ff4757; color:white; border:none; padding:5px 12px; border-radius:8px; margin-right:10px;">
-            Done
-        </button>
-        <button id="menu-option-btn" onclick="toggleMenuOptions()">
-            <i class="fas fa-ellipsis-v"></i>
-        </button>
+                <h2 class="title">Business Overview</h2>
+                <div id="online-status" class="status-indicator">● Online</div>
             </div>
 
-             <div class="input-group">
-    <label>ရင်းဈေး (Cost Price)</label>
-    <input type="number" id="menuCost" placeholder="ရင်းဈေးထည့်ပါ">
-</div>
-<div class="input-group">
-    <label>လက်ကျန် (Initial Stock)</label>
-    <input type="number" id="menuStock" placeholder="လက်ရှိအရေအတွက်">
-</div>
-            
-            <div id="option-overlay" class="option-card hidden">
-                <button onclick="openAddModal()" class="option-btn">
-                    <i class="fas fa-plus"></i> Add New Item
-                </button>
-                <button onclick="toggleEditMode()" class="option-btn">
-                    <i class="fas fa-edit"></i> Edit Menu List
-                </button>
+            <div class="report-grid">
+                <div class="report-card glass-card">
+                    <span class="label"><i class="fas fa-shopping-cart"></i> Orders</span>
+                    <h3 id="stat-orders" class="value">0</h3>
+                    <span class="trend" id="stat-pending">0 Pending</span>
+                </div>
+                <div class="report-card glass-card">
+                    <span class="label"><i class="fas fa-money-bill-wave"></i> Revenue</span>
+                    <h3 id="stat-revenue" class="value">0 K</h3>
+                    <span class="trend" id="stat-unpaid">Unpaid: 0 K</span>
+                </div>
+                <div class="report-card glass-card">
+                    <span class="label"><i class="fas fa-chart-line"></i> Profit</span>
+                    <h3 id="stat-profit" class="value" style="color: #2ecc71;">0 K</h3>
+                    <span class="trend">After Costs</span>
+                </div>
+                <div class="report-card glass-card">
+                    <span class="label"><i class="fas fa-box"></i> Low Stock</span>
+                    <h3 id="stat-lowstock" class="value" style="color: #e74c3c;">0</h3>
+                    <span class="trend">Needs Restock</span>
+                </div>
             </div>
 
-            <div id="menu-grid" class="grid-container">
-                </div>
-
-            <div id="edit-modal" class="modal hidden">
-    <div class="modal-content glass-card">
-        <div class="modal-header">
-            <h3 id="modal-title">Edit Item</h3>
-            <button class="close-btn" onclick="closeModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="image-upload-area" onclick="document.getElementById('file-input').click()">
-                <img id="preview-img" src="placeholder.jpg" alt="Preview">
-                <p>Tap to change image</p>
-                <input type="file" id="file-input" class="hidden" onchange="previewImage(event)">
-            </div>
-            <div class="input-group">
-                <label>Item Name</label>
-                <input type="text" id="edit-name" placeholder="Enter name">
-            </div>
-            <div class="input-row">
-                <div class="input-group">
-                    <label>Price (MMK)</label>
-                    <input type="number" id="edit-price">
-                </div>
-                <div class="input-group">
-                    <label>Stock</label>
-                    <input type="number" id="edit-stock">
+            <div class="dashboard-details">
+                <div class="glass-card">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Inventory Alerts</h4>
+                    <div id="low-stock-list" class="mini-list"></div>
                 </div>
             </div>
-            <div class="toggle-group">
-                <label>Available in Menu</label>
-                <input type="checkbox" id="edit-available">
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-            <button id="save-btn" class="btn-save" onclick="saveItem()">Save Changes</button>
-        </div>
-    </div>
-            </div>
-            
         </section>
 
         <section id="order-page" class="page-content hidden">
-    <div class="header-section">
-        <h2 class="title">Active Orders</h2>
-        <div class="header-actions">
-            <button class="icon-btn"><i class="fas fa-search"></i></button>
-        </div>
-    </div>
+            <div class="header-section">
+                <h2 class="title">Order Management</h2>
+            </div>
 
-    <div class="order-controls glass-card">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="order-search" placeholder="Search by Phone or Name..." onkeyup="filterOrders()">
-        </div>
-        <div class="filter-tabs">
-            <button class="filter-btn active" onclick="setOrderFilter('all')">All</button>
-            <button class="filter-btn" onclick="setOrderFilter('Preparing')">Prep</button>
-            <button class="filter-btn" onclick="setOrderFilter('Ready')">Ready</button>
-            <button class="filter-btn" onclick="setOrderFilter('Collected')">Done</button>
-        </div>
-    </div>
+            <div class="order-controls glass-card">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="order-search" placeholder="Order ID, Name or Phone..." onkeyup="filterOrders()">
+                </div>
+                <div class="filter-tabs">
+                    <button class="filter-btn active" onclick="setOrderFilter('All')">All</button>
+                    <button class="filter-btn" onclick="setOrderFilter('Preparing')">Prep</button>
+                    <button class="filter-btn" onclick="setOrderFilter('Ready')">Ready</button>
+                    <button class="filter-btn" onclick="setOrderFilter('Collected')">Done</button>
+                </div>
+            </div>
 
-    <div id="order-list" class="order-container">
-        <div class="loading-state">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Waiting for new orders...</p>
-        </div>
-    </div>
+            <div id="order-list" class="order-container">
+                </div>
         </section>
-        
+
+        <section id="menu-page" class="page-content hidden">
+            <div class="header-section">
+                <h2 class="title">Menu & Stock</h2>
+                <button class="add-btn" onclick="openAddModal()"><i class="fas fa-plus"></i> Add</button>
+            </div>
+            <div id="menu-grid" class="grid-container"></div>
+        </section>
+
         <section id="customer-page" class="page-content hidden">
-    <div class="header-section">
-        <h2 class="title">Customers</h2>
-        <div class="header-actions">
-            <div class="search-box mini">
-                <i class="fas fa-search"></i>
-                <input type="text" id="customer-search" placeholder="Search customer..." onkeyup="filterCustomers()">
+            <div class="header-section">
+                <h2 class="title">Loyalty Customers</h2>
             </div>
-        </div>
-    </div>
-
-    <div id="customer-list-view">
-        <div id="customer-grid" class="customer-grid-container">
-            </div>
-    </div>
-
-    <div id="customer-detail-view" class="hidden">
-        <button class="back-btn" onclick="showCustomerList()">
-            <i class="fas fa-arrow-left"></i> Back to List
-        </button>
-        <div id="customer-insight-card" class="glass-card">
-            <div class="profile-summary">
-                <h3 id="cust-name">Name</h3>
-                <p id="cust-phone">Phone</p>
-                <div class="badge-row">
-                    <span id="cust-points" class="badge">0 Points</span>
-                </div>
-            </div>
-            <div class="stats-row">
-                <div class="stat-box">
-                    <span class="label">Lifetime Value</span>
-                    <span id="cust-total-spent" class="value">0 K</span>
-                </div>
-                <div class="stat-box">
-                    <span class="label">Total Orders</span>
-                    <span id="cust-total-orders" class="value">0</span>
-                </div>
-            </div>
-        </div>
-        <div id="customer-order-history" class="history-container"></div>
-    </div>
+            <div id="customer-grid" class="customer-grid-container"></div>
         </section>
-        
-        
+
         <section id="report-page" class="page-content hidden">
-    <div class="header-section">
-        <h2 class="title">Sales Insights</h2>
-        <div class="date-filter">
-            <input type="date" id="report-date-picker" onchange="loadReports()">
-        </div>
-    </div>
-
-    <div class="report-grid">
-        <div class="report-card glass-card">
-            <span class="label">Total Revenue</span>
-            <h3 id="today-revenue" class="value">0 MMK</h3>
-            <span class="trend up"><i class="fas fa-arrow-up"></i> Sales</span>
-        </div>
-        <div class="report-card glass-card">
-            <span class="label">Net Profit</span>
-            <h3 id="net-profit" class="value" style="color: #00b894;">0 MMK</h3>
-            <span class="trend"><i class="fas fa-wallet"></i> Profit</span>
-        </div>
-    </div>
-
-    <div class="chart-container glass-card">
-        <canvas id="salesChart"></canvas>
-    </div>
-
-    <div class="expense-manager glass-card">
-        <h4>Daily Expenses</h4>
-        <div class="expense-form">
-            <input type="text" id="exp-title" placeholder="Description">
-            <input type="number" id="exp-amt" placeholder="Amount">
-            <button onclick="saveExpense()"><i class="fas fa-plus"></i></button>
-        </div>
-        <div id="expense-list" class="mini-list">
+            <div class="header-section">
+                <h2 class="title">Financial Insights</h2>
+                <input type="date" id="report-date" onchange="loadReports()">
             </div>
-    </div>
+            <div class="chart-container glass-card">
+                <canvas id="salesChart"></canvas>
+            </div>
+            <div id="report-summary" class="glass-card"></div>
         </section>
-        
     </main>
+
+    <div id="edit-modal" class="modal hidden">
+        <div class="modal-content glass-card">
+            <h3>Item Management</h3>
+            <div class="input-group">
+                <label>ရင်းဈေး (Cost Price)</label>
+                <input type="number" id="menuCost">
+            </div>
+            <div class="input-group">
+                <label>ရောင်းဈေး (Selling Price)</label>
+                <input type="number" id="menuPrice">
+            </div>
+            <div class="input-group">
+                <label>လက်ကျန် (Stock)</label>
+                <input type="number" id="menuStock">
+            </div>
+            <div class="modal-actions">
+                <button onclick="closeModal()">Cancel</button>
+                <button class="save-btn" onclick="saveItem()">Update Item</button>
+            </div>
+        </div>
+    </div>
 
     <script src="supabase.js"></script>
     <script src="app.js"></script>
-    <script src="menu.js"></script>
-    <script src="menu-manager.js"></script>
     <script src="order.js"></script>
+    <script src="menu.js"></script>
+    <script src="report.js"></script>
     <script src="customer.js"></script>
-
 </body>
 </html>
-
