@@ -1,200 +1,150 @@
-// ၁။ လက်ရှိ Filter Status ကို သိမ်းရန်
-let currentFilter = 'All';
-
-// ၂။ Real-time အော်ဒါအသစ်ဝင်ရင် သိရှိရန် (Supabase Realtime)
-const orderSubscription = supabase
-    .channel('orders-realtime')
-    .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'orders' 
-    }, payload => {
-        console.log('Change received!', payload);
-        
-        // အော်ဒါအသစ်ဝင်လျှင် အသံမြည်ပေးမည်
-        if (payload.eventType === 'INSERT') {
-            playNotificationSound();
-        }
-        
-        // ဘာပြောင်းလဲမှုပဲဖြစ်ဖြစ် List ကို Update လုပ်မည်
-        fetchOrders(); 
-    })
-    .subscribe();
-
-// ၃။ အော်ဒါများကို ဆွဲထုတ်ခြင်း (Fetch Orders)
-async function fetchOrders() {
-    const orderContainer = document.getElementById('order-list');
-    if (!orderContainer) return;
-
+// Dashboard Statistics Loader
+async function loadDashboardStats() {
     try {
-        // Database မှ အော်ဒါများ ဆွဲယူခြင်း
-        let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
+        const today = new Date().toISOString().split('T')[0];
 
-        // Filter status ရှိလျှင် စစ်ထုတ်မည်
-        if (currentFilter !== 'All') {
-            query = query.eq('order_status', currentFilter);
-        }
+        // ၁။ Today's Revenue & Orders
+        const { data: orders, error: oErr } = await supabase
+            .from('orders')
+            .select('*')
+            .gte('created_at', today);
 
-        const { data: orders, error } = await query;
+        if (oErr) throw oErr;
 
-        if (error) throw error;
+        const stats = {
+            total: orders.length,
+            revenue: orders.reduce((sum, o) => sum + Number(o.total_amount), 0),
+            pending: orders.filter(o => o.order_status === 'Preparing').length,
+            unpaid: orders.filter(o => o.payment_status === 'Unpaid').reduce((sum, o) => sum + Number(o.total_amount), 0)
+        };
 
-        // UI ကို Reset လုပ်ပြီး အသစ်ပြန်ထည့်ခြင်း
-        if (orders.length === 0) {
-            orderContainer.innerHTML = `<div class="empty-state">No ${currentFilter} orders found.</div>`;
-            return;
-        }
+        // ၂။ Profit Calculation (Linking order_items with menu cost_price)
+        const { data: items } = await supabase
+            .from('order_items')
+            .select('quantity, unit_price, menu(cost_price)')
+            .gte('created_at', today);
+        
+        const totalProfit = items ? items.reduce((sum, item) => {
+            const cost = item.menu?.cost_price || 0;
+            return sum + ((item.unit_price - cost) * item.quantity);
+        }, 0) : 0;
 
-        orderContainer.innerHTML = orders.map(order => renderOrderCard(order)).join('');
-
+        // UI Update
+        updateDashboardUI(stats, totalProfit);
     } catch (err) {
-        console.error("Fetch Error:", err.message);
-        orderContainer.innerHTML = `<p class="error">Error loading orders. Please try again.</p>`;
+        console.error("Dashboard Error:", err.message);
     }
 }
 
-// ၄။ Order Card တစ်ခုချင်းစီ၏ HTML ကို တည်ဆောက်ခြင်း
-function renderOrderCard(order) {
-    let items = [];
-    try { 
-        items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items; 
-    } catch (e) { 
-        items = []; 
-    }
+function updateDashboardUI(stats, profit) {
+    document.getElementById('stat-orders').innerText = stats.total;
+    document.getElementById('stat-revenue').innerText = stats.revenue.toLocaleString() + " K";
+    document.getElementById('stat-profit').innerText = profit.toLocaleString() + " K";
+    document.getElementById('stat-pending-count').innerText = stats.pending + " Pending";
+}
 
-    // Status အလိုက် Border အရောင်သတ်မှတ်ခြင်း
-    const statusColors = {
-        'Preparing': '#FFEAA7',
-        'Ready': '#55E6C1',
-        'Collected': '#FF4500'
+// Supabase Real-time Channel
+const orderChannel = supabase
+    .channel('professional-orders')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, payload => {
+        playNotificationSound();
+        loadDashboardStats();
+        if (typeof fetchOrders === 'function') fetchOrders();
+    })
+    .subscribe();
+
+
+
+async function saveNewOrder(customerData, cart) {
+    try {
+        // Step 1: Insert into Orders Table
+        const { data: order, error: oErr } = await supabase
+            .from('orders')
+            .insert([{
+                customer_phone: customerData.phone,
+                customer_name: customerData.name,
+                total_amount: customerData.total,
+                payment_method: customerData.method,
+                order_status: 'Preparing'
+            }])
+            .select().single();
+
+        if (oErr) throw oErr;
+
+        // Step 2: Insert into Order Items (This triggers auto-stock reduction)
+        const items = cart.map(item => ({
+            order_id: order.id,
+            product_id: item.id,
+            quantity: item.qty,
+            unit_price: item.price
+        }));
+
+        const { error: iErr } = await supabase.from('order_items').insert(items);
+        if (iErr) throw iErr;
+
+        // Step 3: Loyalty Point System
+        await handleLoyaltyPoints(customerData.phone, customerData.total, customerData.name);
+
+        alert("Order Placed Successfully! Stock Updated.");
+        return true;
+    } catch (error) {
+        alert("Error: " + error.message);
+        return false;
+    }
+}
+
+async function handleLoyaltyPoints(phone, amount, name) {
+    const pointsToAdd = Math.floor(amount / 1000); // 1000 MMK = 1 Point
+
+    const { data: customer } = await supabase
+        .from('customers')
+        .select('total_points, lifetime_value')
+        .eq('phone_number', phone)
+        .single();
+
+    if (customer) {
+        await supabase.from('customers').update({
+            total_points: customer.total_points + pointsToAdd,
+            lifetime_value: Number(customer.lifetime_value) + Number(amount),
+            last_order_date: new Date()
+        }).eq('phone_number', phone);
+    } else {
+        await supabase.from('customers').insert([{
+            phone_number: phone,
+            full_name: name,
+            total_points: pointsToAdd,
+            lifetime_value: amount
+        }]);
+    }
+}
+
+
+function renderOrderCard(order) {
+    const statusMap = {
+        'Preparing': { color: '#f1c40f', label: 'Prep' },
+        'Ready': { color: '#2ecc71', label: 'Ready' },
+        'Collected': { color: '#3498db', label: 'Done' }
     };
-    const borderColor = statusColors[order.order_status] || '#eee';
+    
+    const config = statusMap[order.order_status] || { color: '#95a5a6' };
 
     return `
-    <div class="order-card" style="border-left: 6px solid ${borderColor}">
-        <div class="order-header">
-            <span><i class="fas fa-clock"></i> ${new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-            <span class="status-badge" style="color: ${borderColor}">${order.order_status}</span>
+    <div class="order-card professional" style="border-left: 5px solid ${config.color}">
+        <div class="card-header">
+            <span class="order-id">#${order.id}</span>
+            <span class="time">${new Date(order.created_at).toLocaleTimeString()}</span>
         </div>
-        
-        <div class="customer-link" onclick="viewCustomerProfile('${order.customer_id}')">
-            <strong><i class="fas fa-user-circle"></i> ID: ${order.customer_id || 'Guest'}</strong>
+        <div class="card-body">
+            <h4>${order.customer_name} (${order.customer_phone})</h4>
+            <div class="status-badge" style="background: ${config.color}">${order.order_status}</div>
         </div>
-
-        <div class="order-items">
-            ${items.map(i => `<p><strong>${i.qty}</strong> x ${i.name}</p>`).join('')}
-        </div>
-
-        <div class="order-footer">
-            <p class="total-text">Total: <strong>${Number(order.total_amount).toLocaleString()} K</strong></p>
-            <div class="status-buttons">
-                <button class="status-btn ${order.order_status === 'Preparing' ? 'active-prep' : ''}" 
-                    onclick="updateStatus('${order.id}', 'Preparing')">Prep</button>
-                
-                <button class="status-btn ${order.order_status === 'Ready' ? 'active-ready' : ''}" 
-                    onclick="updateStatus('${order.id}', 'Ready')">Ready</button>
-                
-                <button class="status-btn done-btn" 
-                    onclick="finalizeOrder('${order.id}', ${order.total_amount}, '${order.customer_id}')">
-                    <i class="fas fa-check-circle"></i> Done
-                </button>
+        <div class="card-footer">
+            <div class="total">Total: <strong>${order.total_amount.toLocaleString()} K</strong></div>
+            <div class="actions">
+                <button onclick="updateOrderStatus(${order.id}, 'Ready')" class="btn-ready">Ready</button>
+                <button onclick="finalizeOrder(${order.id}, ${order.total_amount}, '${order.customer_phone}')" class="btn-collect">Complete</button>
             </div>
         </div>
     </div>`;
 }
 
-// ၅။ Status ပြောင်းလဲခြင်း (Update Status)
-async function updateStatus(orderId, newStatus) {
-    const { error } = await supabase
-        .from('orders')
-        .update({ order_status: newStatus })
-        .eq('id', orderId);
-
-    if (error) {
-        alert("Update Error: " + error.message);
-    }
-    // Realtime channel က အလိုအလျောက် fetchOrders() ပြန်ခေါ်ပေးလိမ့်မည်
-}
-
-// ၆။ အော်ဒါသိမ်းဆည်းခြင်းနှင့် Loyalty Point တွက်ချက်ခြင်း
-async function finalizeOrder(orderId, amount, customerId) {
-    if (!confirm("ငွေချေပြီးကြောင်း မှတ်တမ်းတင်ပြီး ဤအော်ဒါကို ပိတ်သိမ်းမလား?")) return;
-
-    try {
-        // ၁။ Order Status ကို Collected ပြောင်းမည်
-        const { error: orderError } = await supabase
-            .from('orders')
-            .update({ order_status: 'Collected', payment_status: 'Paid' })
-            .eq('id', orderId);
-
-        if (orderError) throw orderError;
-
-        // ၂။ Loyalty Points ပေးမည် (Customer ရှိလျှင်)
-        if (customerId && customerId !== 'null' && customerId !== 'Guest') {
-            await updateCustomerLoyalty(customerId, amount);
-        }
-
-        alert("Order Completed Successfully!");
-
-    } catch (err) {
-        alert("Error: " + err.message);
-    }
-}
-
-// ၇။ Customer ၏ Point များကို Update လုပ်ခြင်း
-async function updateCustomerLoyalty(customerId, amount) {
-    // ၁၀၀၀ ကျပ်လျှင် ၁ မှတ် တွက်ချက်သည်
-    const earnedPoints = Math.floor(amount / 1000); 
-
-    // လက်ရှိ Point ကို အရင်ယူသည်
-    const { data: cust, error: fetchErr } = await supabase
-        .from('customers')
-        .select('total_points, lifetime_value')
-        .eq('id', customerId)
-        .single();
-
-    if (cust) {
-        const { error: updateErr } = await supabase
-            .from('customers')
-            .update({
-                total_points: (cust.total_points || 0) + earnedPoints,
-                lifetime_value: (cust.lifetime_value || 0) + amount
-            })
-            .eq('id', customerId);
-        
-        if (updateErr) console.error("Loyalty Update Error:", updateErr.message);
-    }
-}
-
-// ၈။ Filter လုပ်ဆောင်ချက်
-function setOrderFilter(status) {
-    currentFilter = status;
-    
-    // ခလုတ်များ၏ Active ဖြစ်မှုကို ပြောင်းလဲခြင်း
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.innerText.toLowerCase() === status.toLowerCase() || (status === 'All' && btn.innerText === 'All')) {
-            btn.classList.add('active');
-        }
-    });
-
-    fetchOrders();
-}
-
-// ၉။ အသံနှင့် အခြား Helper Functions
-function playNotificationSound() {
-    const audio = new Audio('notification.mp3');
-    audio.play().catch(e => console.log("Sound play blocked by browser"));
-}
-
-function viewCustomerProfile(customerId) {
-    if (!customerId || customerId === 'null' || customerId === 'Guest') {
-        return alert("Guest Customer အတွက် Profile မရှိပါ။");
-    }
-    // Customer profile view သို့ သွားရန် Logic
-    changeNav('customers', null); 
-    // viewCustomerDetail(customerId); // ရှိလျှင် ခေါ်ရန်
-}
-
-// စတင်ချိန်တွင် Order များကို Load လုပ်ရန်
-document.addEventListener('DOMContentLoaded', fetchOrders);
