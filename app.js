@@ -135,4 +135,61 @@ window.onload = () => {
         }
     }, 30000); 
 };
+async function loadDashboardStats() {
+    try {
+        const today = new Date().toISOString().split('T')[0];
 
+        // 1. Today's Orders & Revenue
+        const { data: orders, error: oErr } = await supabase
+            .from('orders')
+            .select('*')
+            .gte('created_at', today);
+
+        if (oErr) throw oErr;
+
+        // Stats Calculation
+        const totalOrders = orders.length;
+        const pendingOrders = orders.filter(o => o.order_status === 'Preparing').length;
+        const totalRevenue = orders.reduce((sum, o) => sum + Number(o.total_amount), 0);
+        const unpaidAmount = orders.filter(o => o.payment_status === 'Unpaid')
+                                   .reduce((sum, o) => sum + Number(o.total_amount), 0);
+
+        // 2. Profit Calculation (Using order_items and menu cost price)
+        // Note: For advanced profit, we link order_items with menu cost_price
+        const { data: items, error: iErr } = await supabase
+            .from('order_items')
+            .select('quantity, unit_price, product_id, menu(cost_price)')
+            .gte('created_at', today);
+        
+        let totalProfit = 0;
+        if (items) {
+            totalProfit = items.reduce((sum, item) => {
+                const cost = item.menu?.cost_price || 0;
+                return sum + ((item.unit_price - cost) * item.quantity);
+            }, 0);
+        }
+
+        // 3. Low Stock Check
+        const { data: lowStock, count: lowCount } = await supabase
+            .from('menu')
+            .select('name, stock', { count: 'exact' })
+            .lt('stock', 5);
+
+        // UI Updates
+        document.getElementById('stat-orders').innerText = totalOrders;
+        document.getElementById('stat-pending').innerText = `${pendingOrders} Pending`;
+        document.getElementById('stat-revenue').innerText = `${totalRevenue.toLocaleString()} K`;
+        document.getElementById('stat-unpaid').innerText = `Unpaid: ${unpaidAmount.toLocaleString()} K`;
+        document.getElementById('stat-profit').innerText = `${totalProfit.toLocaleString()} K`;
+        document.getElementById('stat-lowstock').innerText = lowCount || 0;
+
+        // Display Low Stock List
+        const listDiv = document.getElementById('low-stock-list');
+        listDiv.innerHTML = lowStock?.length ? lowStock.map(i => 
+            `<div class="alert-item">⚠️ ${i.name} - Only <b>${i.stock}</b> left</div>`
+        ).join('') : '<p class="success-text">All stocks are healthy ✅</p>';
+
+    } catch (err) {
+        console.error("Dashboard Error:", err.message);
+    }
+}
