@@ -7,21 +7,21 @@ async function fetchMenu() {
     if (error) return;
 
     grid.innerHTML = menuItems.map(item => `
-        <div class="menu-card glass-card ${item.stock < 5 ? 'low-stock' : ''}">
-            <div class="menu-info">
-                <h4>${item.name}</h4>
-                <p class="price">${Number(item.price).toLocaleString()} K</p>
-                <p class="cost"><small>ရင်းဈေး: ${Number(item.cost_price || 0).toLocaleString()} K</small></p>
-            </div>
-            <div class="stock-info">
-                <span class="stock-count">Stock: ${item.stock}</span>
-            </div>
-            <button class="edit-btn" onclick="openEditModal(${JSON.stringify(item).replace(/"/g, '&quot;')})">
-                <i class="fas fa-edit"></i> Edit
-            </button>
+    <div class="menu-card ${item.stock < 5 ? 'low-stock' : ''}">
+        <div class="menu-info">
+            <h4>${item.name}</h4>
+            <p class="price">${Number(item.price).toLocaleString()} K</p>
+            <p class="cost">ရင်း: ${Number(item.cost_price || 0).toLocaleString()} K</p>
         </div>
-    `).join('');
-}
+        <div class="stock-info">
+            Stock: <strong>${item.stock}</strong>
+        </div>
+        <button class="edit-btn" onclick="openEditModal(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+            <i class="fas fa-edit"></i> Edit
+        </button>
+    </div>
+`).join('');
+    
 
 // ၂။ Edit Modal ဖွင့်ခြင်း
 function openEditModal(item) {
