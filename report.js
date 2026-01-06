@@ -1,114 +1,126 @@
-let salesChart;
+// ၁။ Chart ကို သိမ်းဆည်းရန် Variable
+let salesChart = null;
 
-// ၁။ စာမျက်နှာစဖွင့်ချိန်တွင် Report များကို load လုပ်ရန်
-document.addEventListener('DOMContentLoaded', () => {
-    const dateInput = document.getElementById('report-date-picker');
-    if(dateInput) {
-        dateInput.value = new Date().toISOString().split('T')[0];
-        loadReports();
-    }
-});
-
-// ၂။ အရောင်း၊ အမြတ်နှင့် အရောင်းရဆုံးပစ္စည်းများ တွက်ချက်ခြင်း
+// ၂။ Report Data များကို Load လုပ်ခြင်း
 async function loadReports() {
-    const selectedDate = document.getElementById('report-date-picker').value;
-    const startOfDay = `${selectedDate}T00:00:00`;
-    const endOfDay = `${selectedDate}T23:59:59`;
+    const selectedDate = document.getElementById('report-date').value || new Date().toISOString().split('T')[0];
     
-    // အရောင်းဒေတာ ဆွဲထုတ်ခြင်း
-    const { data: orders, error: orderErr } = await supabase
-        .from('orders')
-        .select('*')
-        .gte('created_at', startOfDay)
-        .lte('created_at', endOfDay);
+    try {
+        // ၂.၁ အရောင်းဒေတာများ ဆွဲယူခြင်း (Order Items + Menu for Cost Price)
+        const { data: reportData, error } = await supabase
+            .from('order_items')
+            .select(`
+                quantity, 
+                unit_price, 
+                created_at,
+                menu (cost_price)
+            `)
+            .gte('created_at', selectedDate + 'T00:00:00')
+            .lte('created_at', selectedDate + 'T23:59:59');
 
-    if (orderErr) return console.error(orderErr);
+        if (error) throw error;
 
-    const totalRevenue = orders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
-    document.getElementById('today-revenue').innerText = `${totalRevenue.toLocaleString()} MMK`;
+        // ၂.၂ အမြတ်တွက်ချက်ခြင်း
+        let totalRevenue = 0;
+        let totalCost = 0;
 
-    // အသုံးစရိတ် ဆွဲထုတ်ခြင်း
-    const { data: expenses } = await supabase
-        .from('expenses')
-        .select('*')
-        .gte('created_at', startOfDay)
-        .lte('created_at', endOfDay);
+        reportData.forEach(item => {
+            const revenue = item.unit_price * item.quantity;
+            const cost = (item.menu?.cost_price || 0) * item.quantity;
+            
+            totalRevenue += revenue;
+            totalCost += cost;
+        });
 
-    const totalExpense = expenses ? expenses.reduce((sum, e) => sum + (e.amount || 0), 0) : 0;
-    
-    // အသားတင်အမြတ် တွက်ချက်ခြင်း
-    const netProfit = totalRevenue - totalExpense;
-    const profitEl = document.getElementById('net-profit');
-    profitEl.innerText = `${netProfit.toLocaleString()} MMK`;
-    profitEl.style.color = netProfit >= 0 ? '#00b894' : '#ff7675';
+        const netProfit = totalRevenue - totalCost;
 
-    // Chart နှင့် List များ Update လုပ်ခြင်း
-    updateSalesChart(totalRevenue, totalExpense);
-    renderExpenseList(expenses || []);
-    calculateTopItems(orders);
+        // ၂.၃ Summary UI ကို Update လုပ်ခြင်း
+        updateReportSummary(totalRevenue, netProfit);
+
+        // ၂.၄ Chart ဆွဲရန် Data ပြင်ဆင်ခြင်း (ယခုလအတွင်း နေ့အလိုက် အရောင်းပြရန်)
+        await renderSalesChart();
+
+    } catch (err) {
+        console.error("Report Error:", err.message);
+    }
 }
 
-// ၃။ Chart.js ဖြင့် Doughnut Graph ဆွဲခြင်း
-function updateSalesChart(revenue, expense) {
+// ၃။ Summary UI Display
+function updateReportSummary(rev, profit) {
+    const summaryDiv = document.getElementById('report-summary');
+    summaryDiv.innerHTML = `
+        <div class="summary-container">
+            <div class="sum-box">
+                <span class="label">Total Revenue</span>
+                <span class="val">${rev.toLocaleString()} K</span>
+            </div>
+            <div class="sum-box">
+                <span class="label">Total Cost</span>
+                <span class="val">${(rev - profit).toLocaleString()} K</span>
+            </div>
+            <div class="sum-box highlight">
+                <span class="label">Net Profit</span>
+                <span class="val" style="color: #2ecc71;">${profit.toLocaleString()} K</span>
+            </div>
+        </div>
+    `;
+}
+
+// ၄။ Chart.js ဖြင့် Graph ဆွဲခြင်း
+async function renderSalesChart() {
     const ctx = document.getElementById('salesChart').getContext('2d');
+    
+    // နောက်ဆုံး ၇ ရက်စာ ဒေတာယူခြင်း
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const { data: chartData } = await supabase
+        .from('orders')
+        .select('total_amount, created_at')
+        .gte('created_at', sevenDaysAgo.toISOString());
+
+    // နေ့အလိုက် Data စုစည်းခြင်း
+    const dailyMap = {};
+    chartData.forEach(o => {
+        const date = new Date(o.created_at).toLocaleDateString();
+        dailyMap[date] = (dailyMap[date] || 0) + Number(o.total_amount);
+    });
+
+    const labels = Object.keys(dailyMap);
+    const totals = Object.values(dailyMap);
+
+    // Chart အဟောင်းရှိလျှင် ဖျက်မည်
     if (salesChart) salesChart.destroy();
 
     salesChart = new Chart(ctx, {
-        type: 'doughnut',
+        type: 'line',
         data: {
-            labels: ['Revenue', 'Expenses'],
+            labels: labels,
             datasets: [{
-                data: [revenue, expense],
-                backgroundColor: ['#FF4500', '#dfe6e9'],
-                borderWidth: 0
+                label: 'Daily Sales (K)',
+                data: totals,
+                borderColor: '#6c5ce7',
+                backgroundColor: 'rgba(108, 92, 231, 0.1)',
+                fill: true,
+                tension: 0.4
             }]
         },
         options: {
+            responsive: true,
             maintainAspectRatio: false,
-            cutout: '75%',
-            plugins: { legend: { position: 'bottom' } }
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
         }
     });
 }
 
-// ၄။ အသုံးစရိတ်အသစ် ထည့်သွင်းခြင်း
-async function saveExpense() {
-    const title = document.getElementById('exp-title').value;
-    const amount = document.getElementById('exp-amt').value;
-
-    if (!title || !amount) return alert("စာရင်းအမည်နှင့် ပမာဏ ထည့်ပါ");
-
-    const { error } = await supabase.from('expenses').insert([{
-        title: title,
-        amount: parseFloat(amount)
-    }]);
-
-    if (!error) {
-        document.getElementById('exp-title').value = '';
-        document.getElementById('exp-amt').value = '';
+// စတင်ချိန်တွင် Load လုပ်ရန်
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('report-page')) {
         loadReports();
     }
-}
-
-function renderExpenseList(expenses) {
-    const list = document.getElementById('expense-list');
-    list.innerHTML = expenses.map(e => `
-        <div class="history-item" style="margin: 5px 0; padding: 10px; background: rgba(0,0,0,0.02);">
-            <span style="font-size: 13px;">${e.title}</span>
-            <span style="font-weight:600; color: #ff7675;">-${e.amount.toLocaleString()} K</span>
-        </div>
-    `).join('');
-}
-
-function calculateTopItems(orders) {
-    let itemCounts = {};
-    orders.forEach(order => {
-        let items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
-        if (items) {
-            items.forEach(item => {
-                itemCounts[item.name] = (itemCounts[item.name] || 0) + (item.qty || 1);
-            });
-        }
-    });
-    // အစ်ကို့ဆီမှာ Best Sellers ပြဖို့ ID ရှိရင် ဒီနေရာမှာ ထည့်သုံးလို့ရပါတယ်
-}
+});
