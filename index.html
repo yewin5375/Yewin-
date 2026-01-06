@@ -32,38 +32,45 @@
     </a>
 </nav>
     <main id="app-container">
-<section id="dashboard" class="page-content">
+      <section id="dashboard" class="page-content">
     <div class="header-section">
-        <h2 class="title">Admin Overview</h2>
+        <h2 class="title" id="viewTitle">Business Overview</h2>
     </div>
 
     <div class="report-grid">
         <div class="report-card glass-card">
-            <span class="label"><i class="fas fa-shopping-bag"></i> Orders</span>
-            <h3 id="todayOrders" class="value">0</h3>
-            <span class="trend up"><i class="fas fa-chart-line"></i> Today</span>
+            <span class="label"><i class="fas fa-shopping-cart"></i> Today Orders</span>
+            <h3 id="stat-orders" class="value">0</h3>
+            <span class="trend" id="stat-pending">0 Pending</span>
         </div>
         <div class="report-card glass-card">
-            <span class="label"><i class="fas fa-wallet"></i> Revenue</span>
-            <h3 id="todayRevenue" class="value">0 K</h3>
-            <span class="trend up"><i class="fas fa-plus"></i> Today</span>
+            <span class="label"><i class="fas fa-money-bill-wave"></i> Today Revenue</span>
+            <h3 id="stat-revenue" class="value">0 K</h3>
+            <span class="trend" id="stat-unpaid">Unpaid: 0 K</span>
+        </div>
+        <div class="report-card glass-card">
+            <span class="label"><i class="fas fa-chart-line"></i> Estimated Profit</span>
+            <h3 id="stat-profit" class="value" style="color: #2ecc71;">0 K</h3>
+            <span class="trend">After Costs</span>
+        </div>
+        <div class="report-card glass-card">
+            <span class="label"><i class="fas fa-box"></i> Low Stock</span>
+            <h3 id="stat-lowstock" class="value" style="color: #e74c3c;">0</h3>
+            <span class="trend">Needs Restock</span>
         </div>
     </div>
 
-    <div class="quick-actions" style="padding: 15px;">
-        <h4>Manage Shop</h4>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
-            <button onclick="changeNav('order-page')" class="action-btn">
-                <i class="fas fa-receipt"></i>
-                <span>Orders</span>
-            </button>
-            <button onclick="changeNav('menu-page')" class="action-btn">
-                <i class="fas fa-pizza-slice"></i>
-                <span>Menu</span>
-            </button>
+    <div class="dashboard-details">
+        <div class="glass-card table-container">
+            <h4><i class="fas fa-exclamation-triangle"></i> Low Stock Alerts</h4>
+            <div id="low-stock-list" class="alert-list">
+                </div>
         </div>
     </div>
 </section>
+
+
+        
         <section id="menu-page" class="page-content">
             <div class="header-section">
                 <button id="cancel-edit-btn" class="hidden" onclick="toggleEditMode()" style="background:#ff4757; color:white; border:none; padding:5px 12px; border-radius:8px; margin-right:10px;">
