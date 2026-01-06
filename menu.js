@@ -8,19 +8,29 @@ async function fetchMenu() {
 
     grid.innerHTML = menuItems.map(item => `
     <div class="menu-card ${item.stock < 5 ? 'low-stock' : ''}">
-        <div class="menu-info">
-            <h4>${item.name}</h4>
-            <p class="price">${Number(item.price).toLocaleString()} K</p>
-            <p class="cost">ရင်း: ${Number(item.cost_price || 0).toLocaleString()} K</p>
+        <div class="menu-img-container">
+            ${item.image_url 
+                ? `<img src="${item.image_url}" alt="${item.name}">` 
+                : `<i class="fas fa-utensils no-image"></i>`
+            }
         </div>
-        <div class="stock-info">
-            Stock: <strong>${item.stock}</strong>
+        
+        <div class="menu-details">
+            <div class="menu-info">
+                <h4>${item.name}</h4>
+                <p class="price">${Number(item.price).toLocaleString()} K</p>
+                <p class="cost">ရင်း: ${Number(item.cost_price || 0).toLocaleString()} K</p>
+            </div>
+            <div class="stock-info">
+                လက်ကျန်: <strong>${item.stock}</strong>
+            </div>
+            <button class="edit-btn" onclick="openEditModal(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                <i class="fas fa-edit"></i> ပြင်ဆင်ရန်
+            </button>
         </div>
-        <button class="edit-btn" onclick="openEditModal(${JSON.stringify(item).replace(/"/g, '&quot;')})">
-            <i class="fas fa-edit"></i> Edit
-        </button>
     </div>
 `).join('');
+    
     
 
 // ၂။ Edit Modal ဖွင့်ခြင်း
